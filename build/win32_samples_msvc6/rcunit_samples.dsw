@@ -1,0 +1,170 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "rcunit_lib"="..\win32_lib_msvc6\rcunit_lib.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "rcunit_sample_app_1"=".\rcunit_sample_app_1.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name rcunit_lib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "rcunit_sample_app_2"=".\rcunit_sample_app_2.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name rcunit_lib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "rcunit_sample_app_3"=".\rcunit_sample_app_3.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name rcunit_lib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "rcunit_sample_app_4"=".\rcunit_sample_app_4.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name rcunit_lib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "rcunit_sample_app_5"=".\rcunit_sample_app_5.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name rcunit_lib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "rcunit_sample_app_6"=".\rcunit_sample_app_6.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name rcunit_lib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "rcunit_sample_app_7"=".\rcunit_sample_app_7.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name rcunit_lib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "rcunit_samples"=".\rcunit_samples.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name rcunit_lib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name rcunit_sample_app_1
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name rcunit_sample_app_2
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name rcunit_sample_app_3
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name rcunit_sample_app_4
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name rcunit_sample_app_5
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name rcunit_sample_app_6
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name rcunit_sample_app_7
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+

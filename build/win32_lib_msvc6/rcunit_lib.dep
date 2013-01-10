@@ -1,0 +1,205 @@
+# Microsoft Developer Studio Generated Dependency File, included by rcunit_lib.mak
+
+..\..\src\rcunit.c : \
+	"..\..\src\rcunit.h"\
+	"..\..\src\rcunit_assert.h"\
+	"..\..\src\rcunit_config.h"\
+	"..\..\src\rcunit_error.h"\
+	"..\..\src\rcunit_exception.h"\
+	"..\..\src\rcunit_hashtable.h"\
+	"..\..\src\rcunit_helpers.h"\
+	"..\..\src\rcunit_list.h"\
+	"..\..\src\rcunit_log.h"\
+	"..\..\src\rcunit_mem.h"\
+	"..\..\src\rcunit_mtrace.h"\
+	"..\..\src\rcunit_random.h"\
+	"..\..\src\rcunit_report.h"\
+	"..\..\src\rcunit_types.h"\
+	
+
+..\..\src\rcunit_error.c : \
+	"..\..\src\rcunit.h"\
+	"..\..\src\rcunit_assert.h"\
+	"..\..\src\rcunit_config.h"\
+	"..\..\src\rcunit_error.h"\
+	"..\..\src\rcunit_exception.h"\
+	"..\..\src\rcunit_hashtable.h"\
+	"..\..\src\rcunit_helpers.h"\
+	"..\..\src\rcunit_list.h"\
+	"..\..\src\rcunit_log.h"\
+	"..\..\src\rcunit_mem.h"\
+	"..\..\src\rcunit_mtrace.h"\
+	"..\..\src\rcunit_random.h"\
+	"..\..\src\rcunit_report.h"\
+	"..\..\src\rcunit_types.h"\
+	
+
+..\..\src\rcunit_exception.c : \
+	"..\..\src\rcunit.h"\
+	"..\..\src\rcunit_assert.h"\
+	"..\..\src\rcunit_config.h"\
+	"..\..\src\rcunit_error.h"\
+	"..\..\src\rcunit_exception.h"\
+	"..\..\src\rcunit_hashtable.h"\
+	"..\..\src\rcunit_helpers.h"\
+	"..\..\src\rcunit_list.h"\
+	"..\..\src\rcunit_log.h"\
+	"..\..\src\rcunit_mem.h"\
+	"..\..\src\rcunit_mtrace.h"\
+	"..\..\src\rcunit_random.h"\
+	"..\..\src\rcunit_report.h"\
+	"..\..\src\rcunit_types.h"\
+	
+
+..\..\src\rcunit_hashtable.c : \
+	"..\..\src\rcunit.h"\
+	"..\..\src\rcunit_assert.h"\
+	"..\..\src\rcunit_config.h"\
+	"..\..\src\rcunit_error.h"\
+	"..\..\src\rcunit_exception.h"\
+	"..\..\src\rcunit_hashtable.h"\
+	"..\..\src\rcunit_helpers.h"\
+	"..\..\src\rcunit_list.h"\
+	"..\..\src\rcunit_log.h"\
+	"..\..\src\rcunit_mem.h"\
+	"..\..\src\rcunit_mtrace.h"\
+	"..\..\src\rcunit_random.h"\
+	"..\..\src\rcunit_report.h"\
+	"..\..\src\rcunit_types.h"\
+	
+
+..\..\src\rcunit_list.c : \
+	"..\..\src\rcunit.h"\
+	"..\..\src\rcunit_assert.h"\
+	"..\..\src\rcunit_config.h"\
+	"..\..\src\rcunit_error.h"\
+	"..\..\src\rcunit_exception.h"\
+	"..\..\src\rcunit_hashtable.h"\
+	"..\..\src\rcunit_helpers.h"\
+	"..\..\src\rcunit_list.h"\
+	"..\..\src\rcunit_log.h"\
+	"..\..\src\rcunit_mem.h"\
+	"..\..\src\rcunit_mtrace.h"\
+	"..\..\src\rcunit_random.h"\
+	"..\..\src\rcunit_report.h"\
+	"..\..\src\rcunit_types.h"\
+	
+
+..\..\src\rcunit_log.c : \
+	"..\..\src\rcunit.h"\
+	"..\..\src\rcunit_assert.h"\
+	"..\..\src\rcunit_config.h"\
+	"..\..\src\rcunit_error.h"\
+	"..\..\src\rcunit_exception.h"\
+	"..\..\src\rcunit_hashtable.h"\
+	"..\..\src\rcunit_helpers.h"\
+	"..\..\src\rcunit_list.h"\
+	"..\..\src\rcunit_log.h"\
+	"..\..\src\rcunit_mem.h"\
+	"..\..\src\rcunit_mtrace.h"\
+	"..\..\src\rcunit_random.h"\
+	"..\..\src\rcunit_report.h"\
+	"..\..\src\rcunit_types.h"\
+	
+
+..\..\src\rcunit_log_hnd_file.c : \
+	"..\..\src\rcunit.h"\
+	"..\..\src\rcunit_assert.h"\
+	"..\..\src\rcunit_config.h"\
+	"..\..\src\rcunit_error.h"\
+	"..\..\src\rcunit_exception.h"\
+	"..\..\src\rcunit_hashtable.h"\
+	"..\..\src\rcunit_helpers.h"\
+	"..\..\src\rcunit_list.h"\
+	"..\..\src\rcunit_log.h"\
+	"..\..\src\rcunit_mem.h"\
+	"..\..\src\rcunit_mtrace.h"\
+	"..\..\src\rcunit_random.h"\
+	"..\..\src\rcunit_report.h"\
+	"..\..\src\rcunit_types.h"\
+	
+
+..\..\src\rcunit_log_hnd_stdout.c : \
+	"..\..\src\rcunit.h"\
+	"..\..\src\rcunit_assert.h"\
+	"..\..\src\rcunit_config.h"\
+	"..\..\src\rcunit_error.h"\
+	"..\..\src\rcunit_exception.h"\
+	"..\..\src\rcunit_hashtable.h"\
+	"..\..\src\rcunit_helpers.h"\
+	"..\..\src\rcunit_list.h"\
+	"..\..\src\rcunit_log.h"\
+	"..\..\src\rcunit_mem.h"\
+	"..\..\src\rcunit_mtrace.h"\
+	"..\..\src\rcunit_random.h"\
+	"..\..\src\rcunit_report.h"\
+	"..\..\src\rcunit_types.h"\
+	
+
+..\..\src\rcunit_mem.c : \
+	"..\..\src\rcunit.h"\
+	"..\..\src\rcunit_assert.h"\
+	"..\..\src\rcunit_config.h"\
+	"..\..\src\rcunit_error.h"\
+	"..\..\src\rcunit_exception.h"\
+	"..\..\src\rcunit_hashtable.h"\
+	"..\..\src\rcunit_helpers.h"\
+	"..\..\src\rcunit_list.h"\
+	"..\..\src\rcunit_log.h"\
+	"..\..\src\rcunit_mem.h"\
+	"..\..\src\rcunit_mtrace.h"\
+	"..\..\src\rcunit_random.h"\
+	"..\..\src\rcunit_report.h"\
+	"..\..\src\rcunit_types.h"\
+	
+
+..\..\src\rcunit_mtrace.c : \
+	"..\..\src\rcunit.h"\
+	"..\..\src\rcunit_assert.h"\
+	"..\..\src\rcunit_config.h"\
+	"..\..\src\rcunit_error.h"\
+	"..\..\src\rcunit_exception.h"\
+	"..\..\src\rcunit_hashtable.h"\
+	"..\..\src\rcunit_helpers.h"\
+	"..\..\src\rcunit_list.h"\
+	"..\..\src\rcunit_log.h"\
+	"..\..\src\rcunit_mem.h"\
+	"..\..\src\rcunit_mtrace.h"\
+	"..\..\src\rcunit_random.h"\
+	"..\..\src\rcunit_report.h"\
+	"..\..\src\rcunit_types.h"\
+	
+
+..\..\src\rcunit_random.c : \
+	"..\..\src\rcunit.h"\
+	"..\..\src\rcunit_assert.h"\
+	"..\..\src\rcunit_config.h"\
+	"..\..\src\rcunit_error.h"\
+	"..\..\src\rcunit_exception.h"\
+	"..\..\src\rcunit_hashtable.h"\
+	"..\..\src\rcunit_helpers.h"\
+	"..\..\src\rcunit_list.h"\
+	"..\..\src\rcunit_log.h"\
+	"..\..\src\rcunit_mem.h"\
+	"..\..\src\rcunit_mtrace.h"\
+	"..\..\src\rcunit_random.h"\
+	"..\..\src\rcunit_report.h"\
+	"..\..\src\rcunit_types.h"\
+	
+
+..\..\src\rcunit_report.c : \
+	"..\..\src\rcunit.h"\
+	"..\..\src\rcunit_assert.h"\
+	"..\..\src\rcunit_config.h"\
+	"..\..\src\rcunit_error.h"\
+	"..\..\src\rcunit_exception.h"\
+	"..\..\src\rcunit_hashtable.h"\
+	"..\..\src\rcunit_helpers.h"\
+	"..\..\src\rcunit_list.h"\
+	"..\..\src\rcunit_log.h"\
+	"..\..\src\rcunit_mem.h"\
+	"..\..\src\rcunit_mtrace.h"\
+	"..\..\src\rcunit_random.h"\
+	"..\..\src\rcunit_report.h"\
+	"..\..\src\rcunit_types.h"\
+	

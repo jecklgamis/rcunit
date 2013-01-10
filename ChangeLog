@@ -1,0 +1,7 @@
+2006-10-16 Jerrico L. Gamis <jecklgamis@users.sourceforge.net>
+
+* configure.ac : Changed Autoconf version requirement from 2.57 to 2.53.
+* doc/Makefile.am : Added Doxygen configuration (rcunit.doxy) file for
+  generating HTML source documentation.
+* src/rcunit_log_hnd_stdout.c : Deleted the "STDOUT" prefix in the
+  output.
