@@ -2,14 +2,14 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.53)
-AC_INIT([rcunit],[0.9],[jecklgamis@users.sourceforge.net])
+AC_INIT([rcunit],[0.9],[jecklgamis@gmail.com])
 AC_CANONICAL_HOST
 AC_PROG_MAKE_SET
 AC_CONFIG_SRCDIR([src/rcunit.c])
 AM_INIT_AUTOMAKE([rcunit],[0.9])
 
 # Configuration header
-AM_CONFIG_HEADER(src/rcunit_config_env.h)
+AC_CONFIG_HEADER(src/rcunit_config_env.h)
 
 AC_ARG_ENABLE(debug,[  --enable-debug    Turn on debugging],
 	[case "${enableval}" in
