@@ -32,7 +32,6 @@ $ ./configure --prefix=/some/dir
 By default --prefix is ```/usr/local```
 
 Changes from v0.9 to 1.0
-~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Signal handling (a major contribution from Tomasz Kantecki at Intel IE). 
 * Simplified creation/retrieval of test module and test registry.
