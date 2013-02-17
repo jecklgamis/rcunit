@@ -1,28 +1,33 @@
 /*
- * RCUNIT - A unit testing framework for C.
- * Copyright (C) 2006 Jerrico L. Gamis
+ * The MIT License (MIT)
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * RCUNIT - A unit testing framework for C
+ * Copyright 2013 Jerrico Gamis <jecklgamis@gmail.com>
  *
- * This program is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE. See the GNU General Public License for more details.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  *
- * You should have received a copy of the GNU General Public
- * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
  *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #ifndef RCUNIT_MTRACE_H
 #define RCUNIT_MTRACE_H
 
-/*  The RCUNIT Memory Tracing Facility
+/* The RCUNIT Memory Tracing Facility
  *  This is a simple pointer caching mechanism. Fundamentally, allocated
  *  pointers are cached (recorded) and uncached on deallocations. Any left
  *  pointers in the cache are considered leaks. Thus if a user assumes that
@@ -31,100 +36,103 @@
  *
  *  Below is the runtime memory layout of the pointer cache.
  *  RCU_POINTER_CACHE
- *      +-RCU_POINTER_TABLE
- *      +-RCU_POINTER_TABLE
- *      |   +-RCU_POINTER_INFO[RCU_POINTER_TABLE_SIZE];
+ *      +-rcu_pointer_table
+ *      +-rcu_pointer_table
+ *      |   +-rcu_pointer_info[rcu_pointer_table_SIZE];
  *      |   |   +-pointer #0
  *      |   |   +-size    #0
  *      |   |   ...
- *      |   |   +-pointer #RCU_POINTER_TABLE_SIZE[-1]
- *      |   |   +-size    #RCU_POINTER_TABLE_SIZE[-1]
- *      +-RCU_POINTER_TABLE
- *      +-RCU_POINTER_TABLE
+ *      |   |   +-pointer #rcu_pointer_table_SIZE[-1]
+ *      |   |   +-size    #rcu_pointer_table_SIZE[-1]
+ *      +-rcu_pointer_table
+ *      +-rcu_pointer_table
  *      | ... (dynamically allocated)
- *      +-RCU_POINTER_TABLE
+ *      +-rcu_pointer_table
  *
  *  The pointer cache expands the pointer table storage when needed.
  */
 
 #define RCU_DEFAULT_MALLOC_ALIGNMENT (RCU_SIZEOF_MEMCELL)
-#define RCU_POINTER_TABLE_SIZE       32
+#define rcu_pointer_table_SIZE       32
 
 #define RCU_POINTER_CACHE_1_NAME "rcunit"
 #define RCU_POINTER_CACHE_2_NAME "user"
 
-/** @brief Pointer information */
+#include "rcunit_list.h"
+
+/* Pointer information */
 typedef struct rcu_pointer_info {
-RCU_VOID *ptr;                      /**< Allocated pointer */
-RCU_U4 size;                        /**< Allocated size */
-RCU_INT used;                       /**< "Used" flag */
-}RCU_POINTER_INFO;
+    void *ptr;
+    size_t size;
+    int used;
+    char *filename;
+    char *function;
+    int line_no;
+} rcu_pointer_info;
 
-/** @brief Pointer table */
+/* Pointer table */
 typedef struct rcu_pointer_table {
-RCU_GENERIC_LIST link;              /**< Link to the next pointer table */
-RCU_POINTER_INFO tbl[RCU_POINTER_TABLE_SIZE];  /**< the pointer table */
-}RCU_POINTER_TABLE;
+    rcu_list link; /**< Link to the next pointer table */
+    rcu_pointer_info tbl[rcu_pointer_table_SIZE]; /**< the pointer table */
+} rcu_pointer_table;
 
-/** @brief Pointer cache */
-typedef struct rcu_pointer_cache{
-RCU_GENERIC_LIST ptr_tbl_list;   /**< List of pointer tables */
-RCU_U4 nr_alloc;                    /**< Total number of allocations */
-RCU_U4 nr_free;                     /**< Total number of deallocations */
-RCU_U4 nr_ptr_tbl;                  /**< Total number of pointer tables */
-RCU_U4 nr_leak;                     /**< Number of memory leaks found */
-RCU_U4 leak_size;                   /**< Total memory size of the memory leaks */
-RCU_U4 nr_free_counter;             /**< Number of deallocations before compaction */
-RCU_U4 max_alloc_size;              /**< Maximum allocated size */
-RCU_U4 max_total_alloc_size;        /**< Maximum total allocated size */
-const RCU_CHAR *name;                       /**< Identifier */
-}RCU_POINTER_CACHE;
+/* Pointer cache */
+typedef struct rcu_pointer_cache {
+    rcu_list ptr_tbl_list; /**< List of pointer tables */
+    size_t nr_alloc; /**< Total number of allocations */
+    size_t nr_free; /**< Total number of deallocations */
+    size_t nr_ptr_tbl; /**< Total number of pointer tables */
+    size_t nr_free_counter; /**< Number of deallocations before compaction */
+    size_t max_alloc_size; /**< Maximum allocated size */
+    size_t max_total_alloc_size; /**< Maximum total allocated size */
+    const char *name; /**< Identifier */
+} rcu_pointer_cache;
 
-extern RCU_POINTER_CACHE g_ptr_cache_1;
-extern RCU_POINTER_CACHE g_ptr_cache_2;
+extern rcu_pointer_cache g_ptr_cache_1;
+extern rcu_pointer_cache g_ptr_cache_2;
 
-/** @brief Traces the allocation of the given pointer and size */
+/* Traces the allocation of the given pointer and size */
 #define RCU_TRACE_ALLOC(ptr,size) \
-    rcu_trace_alloc_impl((ptr),(size),__FILE__,__LINE__,&g_ptr_cache_2);
+    rcu_trace_alloc_impl((ptr), (size), __FILE__,__func__, __LINE__, &g_ptr_cache_2);
 
-/** @brief Traces the deallocation of the given pointer */
+/* Traces the deallocation of the given pointer */
 #define RCU_TRACE_FREE(ptr) \
-    rcu_trace_free_impl((ptr),__FILE__,__LINE__,&g_ptr_cache_2);
+    rcu_trace_free_impl((ptr), __FILE__,__func__, __LINE__, &g_ptr_cache_2);
 
-
-/** @brief Checks the memory leak. This must be called in a point where the
+/* Checks the memory leak. This must be called in a point where the
  *  the user assumes all allocated pointers were correspondingly
  *  deallocated.
  */
-#define RCU_CHECK_MEMORY_LEAK() \
-    rcu_check_mem_leak_impl(__FILE__,__LINE__,&g_ptr_cache_2);
+#define RCU_CHECK_MEMORY_LEAK \
+    rcu_check_mem_leak_impl(__FILE__, __func__, __LINE__, &g_ptr_cache_2);
 
 /* These are used internally by RCUNIT */
 
-/** @brief Traces the allocation of the given pointer and size */
-#define RCU_TRACE_ALLOC_INTERNAL(ptr,size) \
-    rcu_trace_alloc_impl((ptr),(size),__FILE__,__LINE__,&g_ptr_cache_1);
+/* Traces the allocation of the given pointer and size */
+#define RCU_TRACE_ALLOC_INTERNAL(ptr, size) \
+    rcu_trace_alloc_impl((ptr),(size), __FILE__, __func__, __LINE__, &g_ptr_cache_1);
 
-/** @brief Traces the deallocation of the given pointer */
+/* Traces the deallocation of the given pointer */
 #define RCU_TRACE_FREE_INTERNAL(ptr) \
-    rcu_trace_free_impl((ptr),__FILE__,__LINE__,&g_ptr_cache_1);
+    rcu_trace_free_impl((ptr), __FILE__, __func__, __LINE__, &g_ptr_cache_1);
 
-/** @brief Checks the memory leak. This must be called in a point where the
+/* Checks the memory leak. This must be called in a point where the
  *  the user assumes all allocated pointers were correspondingly
  *  deallocated.
  */
-#define RCU_CHECK_MEMORY_LEAK_INTERNAL() \
-    rcu_check_mem_leak_impl(__FILE__,__LINE__,&g_ptr_cache_1);
+#define RCU_CHECK_MEMORY_LEAK_INTERNAL \
+    rcu_check_mem_leak_impl(__FILE__,__func__, __LINE__, &g_ptr_cache_1);
 
+/* Memory allocation tracing function prototypes */
+int rcu_trace_alloc_impl(void *ptr, size_t size, const char *filename, const char *function, const int line, rcu_pointer_cache *ptr_cache);
+int rcu_trace_free_impl(void *ptr, const char *filename, const char *function, const int line, rcu_pointer_cache *ptr_cache);
+int rcu_check_mem_leak_impl(const char *filename, const char *function, int line, rcu_pointer_cache *ptr_cache);
+int rcu_init_mtrace();
+int rcu_destroy_mtrace();
 
-/** Memory tracing function prototypes */
-RCU_INT rcu_trace_alloc_impl(RCU_VOID *ptr,RCU_U4 size, const RCU_CHAR*fname,const RCU_INT line,RCU_POINTER_CACHE *ptr_cache);
-RCU_INT rcu_trace_free_impl(RCU_VOID *ptr,const RCU_CHAR *fname,const RCU_INT line,RCU_POINTER_CACHE *ptr_cache);
-RCU_INT rcu_check_mem_leak_impl(const RCU_CHAR *fname,const RCU_INT line,RCU_POINTER_CACHE *ptr_cache);
-RCU_INT rcu_init_mtrace();
-RCU_INT rcu_destroy_mtrace();
+void rcu_ensure_mtrace_init();
+rcu_pointer_cache *rcu_get_rcunit_ptr_cache();
+rcu_pointer_cache *rcu_get_user_ptr_cache();
 
 #endif /* RCUNIT_MTRACE_H */
-
-
 

@@ -1,0 +1,420 @@
+RCUNIT User Guide
+=================
+Jerrico Gamis <jecklgamis@gmail.com> 
+:Author Initials: JG
+:toc:
+:icons:
+:numbered:
+:website: http://github.com/jecklgamis/rcunit/
+
+Introduction
+------------
+
+RCUNIT is a small framework for testing C programs. It uses non-local jumps to
+emulate exceptions and handles program terminating signals (e.g. SIGILL) 
+during test runs. RCUNIT allows creation of test fixtures, either per test
+or per test group. RCUNIT is free, you can use it in accordance with the terms
+of the http://en.wikipedia.org/wiki/MIT_License[MIT License].
+
+Introduction to Test Design Methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+RCUNIT is essentially a black box testing tool. Black box testing, also called 
+functional or behavioral testing,  is a test method designed to test the functional 
+requirements of a system. This type of testing does not require knowledge of the 
+internal structure of the system under test.
+
+White box testing, also called structural testing, is used for testing different 
+execution paths. This type of testing can find implementation problems of the 
+functional requirements.
+
+Test Fixture
+~~~~~~~~~~~~
+A http://en.wikipedia.org/wiki/Test_fixture[test fixture], also called test context, 
+is a fixed state or environment in which tests are run. 
+In an http://en.wikipedia.org/wiki/XUnit[xUnit] framework, this is typically configured 
+in a `setup` function and destroyed in `teardown` function.
+
+Test Suite
+~~~~~~~~~~
+Test suite or test group is a collection of tests that share the same test fixture.
+In RCUNIT, this is implemented using modules.
+
+Test Phase
+~~~~~~~~~~
+An xUnit test is typically divided into four phases:
+
+- Setup  - Sets up test fixture
+- Exercise -  Interacts with the system under test
+- Verify - Asserts expected outcome
+- Tear down - Tears down test fixture
+
+
+Getting Started
+---------------
+
+Installing RCUNIT
+~~~~~~~~~~~~~~~~~
+
+.Installing from source
+----------------------
+$ git clone git@github.com/jecklgamis/rcunit.git
+$ cd rcunit
+$ ./autogen.sh
+$ make
+$ sudo make install
+----------------------
+
+This will build and install the static library (`librcunit.a`) in `/usr/local/lib` and
+the headers in `/usr/local/include`.
+
+Writing Simple Test
+~~~~~~~~~~~~~~~~~~~
+
+.Example 
+---------
+#include <stdio.h>
+#include "rcunit.h"
+
+RCU_TEST(test_something){
+}
+
+int main(int argc,char *argv[]){
+    rcu_add_test(test_something);
+    return rcu_run_tests();
+}
+---------
+
+Writing Test With Setup and Teardown Functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A test can have an associated setup and teardown functions that are executed 
+before and after the test, respectively.
+
+.Example
+--------
+#include <stdio.h>
+#include "rcunit.h"
+
+RCU_TEST(test_something){
+}
+
+RCU_SETUP(setup){
+}
+
+RCU_TEARDOWN(teardown){
+}
+
+int main(int argc,char *argv[]){
+    rcu_add_test_fxt(test_something, setup, teardown);
+    return rcu_run_tests();
+}
+--------
+
+Using Assertion Macros
+~~~~~~~~~~~~~~~~~~~~~~
+Assertion macros are used for asserting specific conditions within a test or
+test fixture. An example is asserting if a certain variable has a specific value. 
+An assertion failure within a test is recorded by the framework, aborts the 
+test, and the test is flagged as failed.
+
+CAUTION: A test without any assertion statement will fail.
+
+.Example
+-----------------
+RCU_TEST(test_something){
+    unsigned char data = 128
+    RCU_ASSERT_BIT_SET(data, 7); /* Asserts that bit 7 is set */
+}
+-----------------
+
+Writing Test Module
+~~~~~~~~~~~~~~~~~~~
+
+A module (known as test suite or test group) is used for grouping one or more 
+(related) tests.
+
+.Example
+--------
+
+#include <stdio.h>
+#include "rcunit.h"
+
+RCU_TEST(test_something){
+}
+
+int main(int argc,char *argv[]){
+    rcu_module *mod = rcu_get_mod("module");
+    rcu_add_test_to_mod(mod, test_something);
+    return rcu_run_tests();
+}
+
+--------
+In the above example, `rcu_get_mod` function retrieves (or creates if necessary) the
+named module.
+
+Multiple modules can be configured arbitrarily. Below is one example.
+--------
+
+#include <stdio.h>
+#include "rcunit.h"
+
+void configure_module1() {
+   rcu_module *mod = rcu_get_mod("module1");
+   rcu_add_test_to_mod(...);
+}
+
+void configure_module2() {
+   rcu_module *mod = rcu_get_mod("module2");
+   rcu_add_test_to_mod(...);
+}
+
+int main(int argc,char *argv[]){
+    configure_module1();
+    configure_module2();
+    return rcu_run_tests();
+}
+
+--------
+
+TIP: A test can be added to a module more than once.
+
+The Default Test Module
+~~~~~~~~~~~~~~~~~~~~~~~
+A test always belongs to a particular module. The default module can 
+be used if there is no user-defined module.
+
+.Example
+--------
+rcu_add_test(test_something);
+--------
+
+This adds `test_something` to the default test module.
+
+Writing Test Module With Setup and Teardown Functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A test module can have setup and and teardown functions that are executed
+before and after all the tests within that module.
+
+.Example
+--------
+#include <stdio.h>
+#include "rcunit.h"
+
+RCU_TEST(test_something){
+}
+
+RCU_SETUP(mod_setup){
+}
+
+RCU_TEARDOWN(mod_teardown){
+}
+
+int main(int argc,char *argv[]){
+    rcu_module *mod = rcu_get_mod("module");
+    rcu_set_mod_fxt(mod, mod_setup, mod_teardown);
+    rcu_add_test_to_mod(mod, test_something);
+    return rcu_run_tests();
+}
+--------
+
+Setup and Teardown Execution Sequence
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+If a module and test both have setup and teardown functions, it will executed
+in the following sequence:
+
+- Run module setup
+- Run test setup 
+- Run test
+- Run test teardown 
+- Run module setup 
+
+Using Test Function Table
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A test function table is used for grouping test functions and added into a module.
+Instead of calling `rcu_add_test` repeatedly, you can simply include all the tests
+in a function table and add it once.
+
+.Example
+--------
+#include <stdio.h>
+#include "rcunit.h"
+
+int calc_sum(int x, int y) {
+    return x + y;
+}
+
+int calc_diff(int x, int y) {
+    return x - y;
+}
+
+RCU_TEST(test_calc_sum) {
+    RCU_ASSERT_EQUAL(3, calc_sum(1, 2))
+}
+
+RCU_TEST(test_calc_diff) {
+    RCU_ASSERT_EQUAL(-1, calc_diff(1, 2))
+}
+
+RCU_DEF_FUNC_TBL(calc_tests_table)
+RCU_INC_TEST(test_calc_sum)
+RCU_INC_TEST(test_calc_diff)
+RCU_DEF_FUNC_TBL_END
+
+int main(int argc, char *argv[]) {
+    rcu_module *mod = rcu_get_mod("calc_test_module");
+    rcu_add_test_func_tbl(mod, calc_tests_table);
+    return rcu_run_tests();
+}
+--------
+
+Writing Test Run Hook
+~~~~~~~~~~~~~~~~~~~~~
+Test run hooks are simply call back functions that are invoked before and
+after all the tests.
+
+.Example
+--------
+#include <stdio.h>
+#include "rcunit.h"
+
+RCU_RUN_HOOK(run_hook) {
+    int run_event;
+    run_event = RCU_GET_RUN_EVT_TYPE(param);
+    if (run_event == RCU_TEST_RUN_STARTED) {
+        puts("Test started");
+    } else if (run_event == RCU_TEST_RUN_FINISHED) {
+        puts("Test finished");
+    }
+}
+
+int main(int argc, char *argv[]) {
+    rcu_init();
+    rcu_set_run_hook(run_hook);
+    return rcu_run_tests();
+}
+--------
+
+Test Reports
+~~~~~~~~~~~~
+RCUNIT generates test run report in text format.
+
+- rcunit_test_run_report.txt
+
+RCUNIT APIs
+-----------
+
+.API Functions
+----------------
+/* Test function APIs */
+RCU_API int rcu_add_test(rcu_generic_function test);
+RCU_API int rcu_add_test_fxt(rcu_generic_function test, rcu_generic_function 
+    rcu_generic_function setup, rcu_generic_function teardown);
+RCU_API int rcu_add_test_fxt_to_mod(rcu_module *mod, rcu_generic_function test, 
+    setup, rcu_generic_function teardown);
+RCU_API int rcu_add_test_to_mod(rcu_module *mod, rcu_generic_function test);
+
+/* Test module interfaces */
+RCU_API rcu_module *rcu_get_mod(const char *name);
+RCU_API rcu_module *rcu_get_default_mod();
+RCU_API void rcu_set_mod_fxt(rcu_module *mod, rcu_generic_function setup,
+        rcu_generic_function teardown);
+
+/* Main APIs*/
+RCU_API int rcu_init();
+RCU_API int rcu_destroy();
+RCU_API int rcu_run_tests();
+RCU_API void rcu_dump_test_dbase();
+RCU_API int rcu_set_run_hook(rcu_generic_function hook);
+----------------
+
+.Assertion Macros
+-----------------
+RCU_ASSERT(cond) 
+RCU_ASSERT_TRUE(cond) 
+RCU_ASSERT_FALSE(cond) 
+RCU_ASSERT_NULL(ptr) 
+RCU_ASSERT_NOT_NULL(ptr) 
+RCU_ASSERT_EQUAL(expected, actual) 
+RCU_ASSERT_EQUAL_STRING(expected, actual) 
+RCU_ASSERT_SAME_BYTE_ARRAY(array1, array2, size) 
+RCU_ASSERT_NOT_SAME_BYTE_ARRAY(array1, array2, size)
+RCU_ASSERT_BIT_SET(data, bit_pos) 
+RCU_ASSERT_BIT_NOT_SET(data, bit_pos) 
+RCU_FAIL(msg) 
+-----------------
+
+.Helper Macros
+-----------------
+RCU_TEST(name){...}
+RCU_SETUP(name){...}
+RCU_TEARDOWN(name){...}
+RCU_RUN_HOOK(name){...}
+-----------------
+
+RCUNIT Internals
+----------------
+
+Exception Handling
+~~~~~~~~~~~~~~~~~~
+RCUNIT uses non-local jumps to simulate exceptions. This exception mechanism
+is used when running tests and test fixtures (setup and teardown).
+
+Signal Handling
+~~~~~~~~~~~~~~~
+
+RCUNIT can catch some signals thrown during a test run. This allows
+further tests to be executed instead of just terminating the test run.  The
+example code below demonstrates this.
+
+.Example
+--------
+#include <stdio.h>
+#include "rcunit.h"
+
+/* A buffer */
+typedef struct {
+    unsigned char *data;
+    size_t size;
+} buffer_t;
+
+RCU_TEST(my_test) {
+    buffer_t *buff = NULL;
+    RCU_ASSERT_NULL(buff);
+    fprintf(stdout, "buffer data address = %p", buff->data);
+}
+
+int main(int argc, char *argv[]) {
+    rcu_add_named_test(my_test,"my_test");
+    return rcu_run_tests();
+} 
+--------
+In the above code, a field access to a null buffer pointer is made and will
+certainly throw one of signals that can terminate the program.
+
+This is an example output of the above code.
+
+.Output
+--------
+[INFO  Sun Feb 10 20:22:32 2013 (rcunit.c:51)] : Test run started Sun Feb 10 20:22:32 2013
+[ERROR Sun Feb 10 20:22:32 2013 (rcunit_function.c:196)] : Caught illegal instruction in 0x100001650
+[INFO  Sun Feb 10 20:22:32 2013 (rcunit_report_plaintext.c:107)] : Test run report generated : rcunit_test_run_report.txt
+[INFO  Sun Feb 10 20:22:32 2013 (rcunit.c:57)] : Test run finished Sun Feb 10 20:22:32 2013
+[INFO  Sun Feb 10 20:22:32 2013 (rcunit.c:58)] : Test Run Results: Passed : 0  Failed : 1
+[INFO  Sun Feb 10 20:22:32 2013 (rcunit.c:62)] : Test failed!
+--------
+
+Logging
+~~~~~~~
+RCUNIT uses http://github.com/jecklgamis/logmoko[Logmoko], simple logging 
+framework derived from the RCUNIT logging codes.
+
+Testing
+~~~~~~~
+This sounds like recursive, but RCUNIT uses it's own testing framework itself.
+
+Contributors
+------------
+- Tomasz Kantecki (Intel, Ireland) - signal handling
+- Abigail Gamis (SHFL, Australia) - user guide, API refinements

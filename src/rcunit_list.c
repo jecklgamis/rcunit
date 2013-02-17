@@ -1,67 +1,75 @@
 /*
- * RCUNIT - A unit testing framework for C.
- * Copyright (C) 2006 Jerrico L. Gamis
+ * The MIT License (MIT)
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * RCUNIT - A unit testing framework for C
+ * Copyright 2013 Jerrico Gamis <jecklgamis@gmail.com>
  *
- * This program is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE. See the GNU General Public License for more details.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  *
- * You should have received a copy of the GNU General Public
- * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
  *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <rcunit.h>
 
-/**
- *  @brief Initializes the given list or list entry
- *  @param[in] list  List or list entry
- */
+#include "rcunit_list.h"
 
-RCU_VOID rcu_init_list(RCU_GENERIC_LIST *list ){
-    list->prev=list;
-    list->next=list;
-}
-
-/**
- *  @brief Returns true if the given list is empty
- *  @param[in] list List
- *  @return Boolean value (RCU_TRUE, RCU_FALSE)
- */
-
-RCU_INT rcu_is_list_empty(RCU_GENERIC_LIST *list){
-    return((list->next==list)?RCU_TRUE:RCU_FALSE);
-}
-
-/**
- *  @brief Inserts a entry into a list
- *  @param[in] list List
- *  @param[in] entry List entry
- */
-
-RCU_VOID rcu_insert_list(RCU_GENERIC_LIST *list,RCU_GENERIC_LIST *entry){
-    entry->prev=list->prev;
-    entry->next=list;
-    list->prev->next=entry;
-    list->prev=entry;
-}
-
-/**
- *  @brief Removes an entry from a list
- *  @param[in] entry List entry
- */
-
-RCU_VOID rcu_remove_list(RCU_GENERIC_LIST *entry){
-    if (entry->next!=entry ) {
-        entry->prev->next=entry->next;
-        entry->next->prev=entry->prev;
+void rcu_init_list(rcu_list *list) {
+    if (list != NULL) {
+        list->prev = list;
+        list->next = list;
     }
+}
+
+int rcu_is_list_empty(rcu_list *list) {
+    int result = 0;
+    if (list != NULL) {
+        result = (list->next == list);
+    }
+    return result;
+}
+
+void rcu_insert_list(rcu_list *list, rcu_list *entry) {
+    if (list != NULL && entry != NULL) {
+        entry->prev = list->prev;
+        entry->next = list;
+        list->prev->next = entry;
+        list->prev = entry;
+    }
+}
+
+void rcu_remove_list(rcu_list *entry) {
+    if (entry != NULL) {
+        if (entry->next != entry) {
+            entry->prev->next = entry->next;
+            entry->next->prev = entry->prev;
+        }
+    }
+}
+
+int rcu_get_list_size(rcu_list *list) {
+    int size = 0L;
+    rcu_list *cursor = NULL;
+    if (list != NULL) {
+        if (list != NULL) {
+
+            RCU_FOR_EACH_ENTRY(list, cursor) {
+                size++;
+            }
+        }
+    }
+    return size;
 }

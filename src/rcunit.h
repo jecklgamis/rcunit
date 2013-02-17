@@ -1,39 +1,48 @@
 /*
- * RCUNIT - A unit testing framework for C.
- * Copyright (C) 2006 Jerrico L. Gamis
+ * The MIT License (MIT)
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * RCUNIT - A unit testing framework for C
+ * Copyright 2013 Jerrico Gamis <jecklgamis@gmail.com>
  *
- * This program is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE. See the GNU General Public License for more details.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  *
- * You should have received a copy of the GNU General Public
- * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
  *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
 
 #ifndef RCUNIT_H
 #define RCUNIT_H
 
-/** @brief RCU interface tag */
-#define RCU_INTERFACE
+/* Tag to indicate an API function */
+#define RCU_API
 
-/** @brief Test machine name */
-#define RCU_DEFAULT_MACHINE_NAME  "default-mach"
-/** @brief Default test registry name  */
+/* Tag to indicate a function parameter is nullable */
+#define RCU_NULLABLE
+
+/* Test machine name */
+#define RCU_DEFAULT_MACHINE_NAME  "default-machine"
+
+/* Default test registry name  */
 #define RCU_DEFAULT_REGISTRY_NAME "default-reg"
-/** @brief Default test module name  */
+
+/* Default test module name  */
 #define RCU_DEFAULT_MODULE_NAME   "default-mod"
 
-/** @brief Timestamp buffer size */
+/* Timestamp buffer size */
 #define RCU_TSTAMP_BUFF_SIZE 32
 
 /** Standard C library header files */
@@ -42,337 +51,293 @@
 #include <string.h>
 #include <setjmp.h>
 #include <time.h>
+#include <stdarg.h>
+#include <signal.h>
 
-/** Other RCUNIT header files */
-#include <rcunit_config.h>
-#include <rcunit_types.h>
-#include <rcunit_list.h>
-#include <rcunit_hashtable.h>
-#include <rcunit_io_device.h>
+#include "logmoko.h"
+#include "rcunit_config.h"
+#include "rcunit_types.h"
+#include "rcunit_list.h"
 
-/** @brief "True" definition */
-#define RCU_TRUE 1
-
-/** @brief "False" definition */
-#define RCU_FALSE (!RCU_TRUE)
-
-/** @brief Test function not tested */
+/* Test function or module not tested */
 #define RCU_RUN_STAT_NOTTESTED      0
-/** @brief Test run is successful */
-#define RCU_RUN_STAT_SUCC           1
-/** @brief Test run failed status */
-#define RCU_RUN_STAT_FAIL           2
-/** @brief Init handler failed status*/
-#define RCU_RUN_STAT_FAIL_INIT      4
-/** @brief Destroy handler failed status */
-#define RCU_RUN_STAT_FAIL_DESTROY   8
 
-/** @brief Sets explicit run status */
+/* Test function or module run is successful */
+#define RCU_RUN_STAT_TEST_SUCC      1
+
+/* Test function or module run failed status */
+#define RCU_RUN_STAT_TEST_FAILED    2
+
+/* Init handler failed status */
+#define RCU_RUN_STAT_INIT_FAILED      4
+
+/* Destroy handler failed status */
+#define RCU_RUN_STAT_DESTROY_FAILED   8
+
+/* Sets explicit run status */
 #define RCU_SET_RUN_STAT(func_or_mod, stat) \
-    (func_or_mod)->run_stat |= (stat);
+    (func_or_mod)->run_stat = (stat);
 
-/** @brief Returns true the test run succeeded */
-#define RCU_RUN_STAT_SUCCEEDED(func_or_mod) \
-    ((func_or_mod)->run_stat & RCU_RUN_STAT_SUCC)
+#define RCU_SET_INIT_FAILED(func_or_mod) \
+    (func_or_mod)->init_failed = (RCU_TRUE);
 
-/** @brief Returns true the test run failed */
-#define RCU_RUN_STAT_FAILED(func_or_mod) \
-    ((func_or_mod)->run_stat & RCU_RUN_STAT_FAIL)
+#define RCU_SET_DESTROY_FAILED(func_or_mod) \
+    (func_or_mod)->destroy_failed = (RCU_TRUE);
 
-/** @brief Returns true if the init function failed */
-#define RCU_RUN_STAT_INIT_FAILED(func_or_mod) \
-    ((func_or_mod)->run_stat & RCU_RUN_STAT_FAIL_INIT)
+/* Returns true if the test was not performed */
+#define RCU_IS_NOT_TESTED(func_or_mod) \
+    ((func_or_mod)->run_stat == RCU_RUN_STAT_NOTTESTED)
 
-/** @brief Returns true if the destroy function failed */
-#define RCU_RUN_STAT_DESTROY_FAILED(func_or_mod) \
-    ((func_or_mod)->run_stat & RCU_RUN_STAT_FAIL_DESTROY)
+/* Returns true if the test run succeeded */
+#define RCU_IS_TEST_SUCCEDED(func_or_mod) \
+    ((func_or_mod)->run_stat == RCU_RUN_STAT_TEST_SUCC)
 
-/** @brief Sets the abort flag */
+/* Returns true if the test run failed */
+#define RCU_IS_TEST_FAILED(func_or_mod) \
+    ((func_or_mod)->run_stat == RCU_RUN_STAT_TEST_FAILED)
+
+/* Returns true if the init function failed */
+#define RCU_IS_INIT_FAILED(func_or_mod) \
+    ((func_or_mod)->init_failed)
+
+/* Returns true if the destroy function failed */
+#define RCU_IS_DESTROY_FAILED(func_or_mod) \
+    ((func_or_mod)->destroy_failed)
+
+/* Sets the abort flag */
 #define RCU_SET_ABORT(func_or_mod) \
     (func_or_mod)->aborted = RCU_TRUE;
 
-/** @brief Resets the abort flag */
+/* Resets the abort flag */
 #define RCU_CLEAR_ABORT(func_or_mod) \
     (func_or_mod)->aborted = RCU_FALSE;
 
-/** @brief Tests the abort flag */
+/* Tests the abort flag */
 #define RCU_ABORTED(func_or_mod) \
     ((func_or_mod)->aborted)
 
+#define RCU_HAS_NO_ASSERTS(func) \
+    ((func)->nr_succ_assert == 0 && (func)->nr_fail_assert == 0 && !RCU_ABORTED((func)))
 
-/** WARNING:
+/* WARNING:
  *  1. Do not change the order of the fields of the RCU_TEST_FUNCTION_ENTRY
- *     and RCU_TEST_MODULE_ENTRY structures.
+ *     and RCU_TEST_MODULE_ENTRY structures. Some macros rely on the order
+ *     of these fields.
  *  2. Do not move the position of the "link" fields.
  */
 
-/** @brief Test function table entry */
-typedef struct rcu_test_function_entry {
-const RCU_CHAR *name;               /**< Test function name */
-RCU_GENERIC_FUNCTION entry;         /**< Test function entry point */
-RCU_GENERIC_FUNCTION init;          /**< Init function */
-RCU_GENERIC_FUNCTION destroy;       /**< Destroy function */
-RCU_INT enable;                     /**< Run enable flag */
-}RCU_TEST_FUNCTION_ENTRY;
+#define RCU_TEST_FUNCTION_NAME_LENGTH 255
+#define RCU_TEST_MODULE_NAME_LENGTH 255
+#define RCU_TEST_REGISTRY_NAME_LENGTH 255
 
-/** @brief Test module table entry */
-typedef struct rcu_test_module_entry {
-const RCU_CHAR *name;                   /**< Test module name */
-RCU_GENERIC_FUNCTION init;          /**< Init function */
-RCU_GENERIC_FUNCTION destroy;       /**< Destroy function */
-RCU_TEST_FUNCTION_ENTRY *func_tbl;  /**< Test function table */
-RCU_INT enable;                         /**< Run enable flag */
-}RCU_TEST_MODULE_ENTRY;
+/* Test function table entry */
+typedef struct rcu_test_function_entry_tag {
+    const char *name;
+    rcu_generic_function entry;
+    rcu_generic_function init;
+    rcu_generic_function destroy;
+} rcu_test_function_entry;
 
-/** @brief Test registry runtime data structure */
-typedef struct rcu_test_registry {
-RCU_GENERIC_LIST link;              /**< Link to the next/previous test registry */
-RCU_GENERIC_LIST mod_list;          /**< List of test modules */
-const RCU_CHAR *name;               /**< Test registry name */
-RCU_INT enable;                     /**< Run enable flag */
-RCU_U4 nr_mod;                      /**< No. of registered test modules */
-}RCU_TEST_REGISTRY;
+/* Test module table entry */
+typedef struct rcu_module_entry_tag {
+    const char *name;
+    rcu_generic_function init;
+    rcu_generic_function destroy;
+    rcu_test_function_entry *func_tbl;
+} rcu_module_entry;
 
-/** @brief Test module runtime data structure */
-typedef struct rcu_test_module {
-RCU_GENERIC_LIST link;              /**< Link to the next/previous test module */
-RCU_GENERIC_FUNCTION init;          /**< Init function */
-RCU_GENERIC_FUNCTION destroy;       /**< Destroy function */
-RCU_GENERIC_LIST func_list;         /**< List of test functions */
-const RCU_CHAR *name;               /**< Test module name */
-RCU_INT enable;                     /**< Run enable flag */
-RCU_INT aborted;                    /**< Abort flag */
-RCU_U4 nr_test;                     /**< No. of registered test functions */
-RCU_INT run_stat;                   /**< Test module run status (set if init or destroy failed)*/
-RCU_GENERIC_LIST fail_rec_list;     /**< Failure record list */
-}RCU_TEST_MODULE;
+/* Test registry runtime data structure */
+typedef struct rcu_registry_tag {
+    rcu_list link;
+    rcu_list mod_list;
+    char name[RCU_TEST_REGISTRY_NAME_LENGTH + 1];
+    int nr_mod;
+    int nr_failed_mod;
+    int nr_succ_mod;
+    int nr_succ_test;
+    int nr_failed_test;
+} rcu_registry;
 
-/**  @brief  Failure record entry */
+/* Test module runtime data structure */
+typedef struct rcu_module_tag {
+    rcu_list link;
+    rcu_generic_function init;
+    rcu_generic_function destroy;
+    rcu_list func_list;
+    char name[RCU_TEST_MODULE_NAME_LENGTH + 1];
+    int nr_test;
+    int nr_failed_test;
+    int nr_succ_test;
+    int run_stat;
+    int init_failed;
+    int destroy_failed;
+    rcu_list fail_rec_list;
+} rcu_module;
+
+/*  Failure record entry */
 typedef struct rcu_failure_record {
-RCU_GENERIC_LIST link;              /**< Link to the next/previous record */
-RCU_CHAR *info;                     /**< Information */
-}RCU_FAILURE_RECORD;
+    rcu_list link;
+    char *info;
+} rcu_failure_record;
 
-/** @brief Test function runtime data structure */
+/* Test function runtime data structure */
+typedef struct rcu_test_tag {
+    rcu_list link;
+    char name[RCU_TEST_FUNCTION_NAME_LENGTH];
+    rcu_generic_function entry;
+    rcu_generic_function init;
+    rcu_generic_function destroy;
+    int run_stat;
+    int init_failed;
+    int destroy_failed;
+    int nr_fail_assert;
+    int nr_succ_assert;
+    rcu_list fail_rec_list;
+} rcu_test;
 
-/* The nr_fatal_assert cannot go higher than 1. This can be used to
- * determine if the aborted function is caused by a fatal assertion
- * inside the test function itself.
- */
-typedef struct rcu_test_functin {
-RCU_GENERIC_LIST link;              /**< Link to the next/previous test function */
-const RCU_CHAR *name;               /**< Test function name */
-RCU_GENERIC_FUNCTION entry;         /**< Entry point */
-RCU_GENERIC_FUNCTION init;          /**< Init function */
-RCU_GENERIC_FUNCTION destroy;       /**< Destroy function */
-RCU_INT enable;                     /**< Run enable flag */
-RCU_INT aborted;                    /**< Abort flag */
-RCU_INT run_stat;                   /**< Run status */
-RCU_U4 nr_fail_assert;              /**< No. of failed assertions */
-RCU_U4 nr_succ_assert;              /**< No. of successful assertions */
-RCU_U4 nr_fatal_assert;             /**< No. of fatal assertions */
-RCU_GENERIC_LIST fail_rec_list;     /**< Failure record list */
-}RCU_TEST_FUNCTION;
+/*  Sets the currently executing test function */
+#define RCU_SET_CURR_FUNC(machine, func) \
+    (machine)->ae.curr_func = func;
 
-/** @brief  Sets the currently executing test function */
-#define RCU_SET_CURR_FUNC(mach,func) \
-    (mach)->ae.curr_func=func;
+/* Sets the currently executing test module */
+#define RCU_SET_CURR_MOD(machine, mod) \
+    (machine)->ae.curr_mod = mod;
 
-/**  @brief Sets the currently executing test module */
-#define RCU_SET_CURR_MOD(mach,mod) \
-    (mach)->ae.curr_mod=mod;
+/* Sets the currently executing test registry */
+#define RCU_SET_CURR_REG(machine, reg)   \
+    (machine)->ae.curr_reg = reg;
 
-/**  @brief Sets the currently executing test registry */
-#define RCU_SET_CURR_REG(mach,reg)   \
-    (mach)->ae.curr_reg=reg;
+/* Gets the currently executing test function */
+#define RCU_GET_CURR_FUNC(machine)  \
+    (machine->ae.curr_func)
 
-/**  @brief Gets the currently executing test function */
-#define RCU_GET_CURR_FUNC(mach)  \
-    (mach->ae.curr_func)
+/* Gets the currently executing test module */
+#define RCU_GET_CURR_MOD(machine)  \
+    (machine->ae.curr_mod)
 
-/**  @brief Gets the currently executing test module */
-#define RCU_GET_CURR_MOD(mach)  \
-    (mach->ae.curr_mod)
+/* Gets the currently executing test registry  */
+#define RCU_GET_CURR_REG(machine)  \
+    (machine->ae.curr_reg)
 
-/**  @brief Gets the currently executing test registry  */
-#define RCU_GET_CURR_REG(mach)  \
-    (mach->ae.curr_reg)
-
-/**  @brief Gets the currently executing test machine */
-#define RCU_GET_CURR_MACH() \
-    (&the_machine)
+/* Gets the currently executing test machine */
+#define RCU_THE_TEST_MACHINE (&the_test_machine)
 
 /* Test run levels (i.e. when a test module is run through its reference or
  *  name, it is said to run in test module level)
  */
-/** @brief Test machine run level */
+/* Test machine run level */
 #define RCU_RUN_LEVEL_MACH   0
-/** @brief Test registry run level */
+
+/* Test registry run level */
 #define RCU_RUN_LEVEL_REG    1
-/** @brief Test module run level */
+
+/* Test module run level */
 #define RCU_RUN_LEVEL_MOD    2
 
-/**  @brief Sets the run level */
-#define RCU_SET_RUN_LEVEL(mach,level) \
-    (mach)->run_level= level;
+/* Sets the run level */
+#define RCU_SET_RUN_LEVEL(machine, level) \
+    (machine)->run_level = level;
 
-/**  @brief Gets the run level */
-#define RCU_GET_RUN_LEVEL(mach) \
-    ((mach)->run_level)
+/* Gets the run level */
+#define RCU_GET_RUN_LEVEL(machine) \
+    ((machine)->run_level)
 
-/**  @brief Gets the default module */
-#define RCU_GET_DEF_MOD() \
-    (&the_machine.def_mod)
+/* Assertion engine runtime data structure */
+typedef struct rcu_assertion_engine {
+    rcu_registry *curr_reg;
+    rcu_module *curr_mod;
+    rcu_test *curr_func;
+    rcu_list assert_list;
+    rcu_generic_function assert_hook;
+} rcu_assertion_engine;
 
-/**  @brief Gets the default registry */
-#define RCU_GET_DEF_REG() \
-    (&the_machine.def_reg)
-
-/** @brief Assertion engine runtime data structure */
-typedef struct rcu_assertion_engine{
-RCU_TEST_REGISTRY *curr_reg;        /**< Current test registry */
-RCU_TEST_MODULE *curr_mod;          /**< Current test module */
-RCU_TEST_FUNCTION *curr_func;       /**< Current test function */
-RCU_GENERIC_LIST assert_list;       /**< Failure records from non-run contexts */
-RCU_GENERIC_FUNCTION assert_hook;   /**< Assert callback when a failure is recorded */
-}RCU_ASSERTION_ENGINE;
-
-/** @brief Test machine run statistics */
-typedef struct rcu_run_statistics {
-RCU_U4 nr_fin_reg;                  /**< No. of completed test registries */
-RCU_U4 nr_fail_reg;                 /**< No. of failed test registries */
-RCU_U4 nr_succ_reg;                 /**< No. of successful test registries */
-RCU_U4 nr_abort_reg;                /**< No. of test registries with aborted tests */
-RCU_U4 nr_mod;                      /**< Total no. of test modules */
-RCU_U4 nr_fin_mod;                  /**< No. of completed test modules */
-RCU_U4 nr_fail_mod;                 /**< No. of failed test modules */
-RCU_U4 nr_succ_mod;                 /**< No. of modules that succeed*/
-RCU_U4 nr_abort_mod;                /**< No. of modules that aborted */
-RCU_U4 nr_test;                     /**< Total no. of test functions */
-RCU_U4 nr_fin_test;                 /**< No. of completed test functions */
-RCU_U4 nr_fail_test;                /**< No. of failed test functions */
-RCU_U4 nr_succ_test;                /**< No. of successful test functions */
-RCU_U4 nr_abort_test;               /**< No. of aborted test functions */
-RCU_U4 nr_succ_assert;              /**< No. of successful assertions */
-RCU_U4 nr_fail_assert;              /**< No. of failed assertions */
-RCU_U4 nr_fatal_assert;             /**< No. of fatal assertions */
-}RCU_RUN_STATISTICS;
-
-/** @brief Test run started */
+/* Test run started */
 #define RCU_TEST_RUN_STARTED    0
 
-/** @brief Test run finished */
+/* Test run finished */
 #define RCU_TEST_RUN_FINISHED   1
 
-/** @brief Returns the run event type from the test run hook parameter */
+/* Returns the run event type from the test run hook parameter */
 #define RCU_GET_RUN_EVT_TYPE(param) \
-    (*((RCU_INT*)param))
+    (*((int*)param))
 
-/** @brief Test function run context */
+/* Test function run context */
 #define RCU_RUN_CTX_UNKNOWN         0
-/** @brief Test function run context */
+
+/* Test function run context */
 #define RCU_RUN_CTX_FUNC            1
-/** @brief Test function init run context */
+
+/* Test function init run context */
 #define RCU_RUN_CTX_FUNC_INIT       2
-/** @brief Test function destroy run context */
+
+/* Test function destroy run context */
 #define RCU_RUN_CTX_FUNC_DESTROY    3
-/** @brief Test module init run context */
+
+/* Test module init run context */
 #define RCU_RUN_CTX_MOD_INIT        4
-/** @brief Test module destroy run context */
+
+/* Test module destroy run context */
 #define RCU_RUN_CTX_MOD_DESTROY     5
 
 /** Set test machine run context */
-#define RCU_SET_RUN_CTX(mach,ctx)   \
-    (mach)->run_ctx = (ctx);
+#define RCU_SET_RUN_CTX(machine, ctx)   (machine)->run_ctx = (ctx);
 
-/**  @brief  Get test machine run context */
-#define RCU_GET_RUN_CTX(mach)   \
-    ((mach)->run_ctx)
+/*  Get test machine run context */
+#define RCU_GET_RUN_CTX(machine)   ((machine)->run_ctx)
 
-/**  @brief Test machine runtime data structure */
-typedef struct rcu_test_machine {
-RCU_GENERIC_LIST link;              /**< Unused */
-RCU_TEST_MODULE def_mod;            /**< Default test module */
-RCU_TEST_REGISTRY def_reg;          /**< Default tes registry */
-RCU_GENERIC_LIST reg_list;          /**< List of test registries */
-const RCU_CHAR *name;               /**< Test machine name */
-RCU_INT init_done;                  /**< Init flag */
-RCU_ASSERTION_ENGINE ae;            /**< Assertion engine */
-RCU_RUN_STATISTICS run_stats;       /**< Run statistics */
-RCU_INT run_level;                  /**< Test run level */
-RCU_INT run_ctx;                    /**< Run context */
-RCU_GENERIC_FUNCTION run_hook;      /**< Test run hook function */
-RCU_U4 nr_reg;                      /**< Total no. of test registries */
-RCU_OUTPUT_HANDLER def_out_hnd;     /**< Input/output device */
-}RCU_TEST_MACHINE;
+/* HTML log file name */
+#define RCU_LOG_FILENAME_HTML  "rcunit_log.html"
 
-/** @brief Default test registry alternate reference */
-#define RCU_DEFAULT_REGISTRY RCU_NULL
+/* Plain text log file name */
+#define RCU_LOG_FILENAME_PLAINTEXT  "rcunit_log.txt"
 
-/** @brief Default test module alternate reference */
-#define RCU_DEFAULT_MODULE RCU_NULL
+/* Test machine runtime data structure */
+typedef struct rcu_test_machine_tag {
+    rcu_module def_mod;
+    rcu_registry def_reg;
+    rcu_list reg_list;
+    const char *name;
+    int init_done;
+    rcu_assertion_engine ae;
+    int run_level;
+    int run_ctx;
+    rcu_generic_function run_hook;
+    int nr_reg;
+    int nr_failed_reg;
+    int nr_succ_reg;
+    int nr_failed_test;
+    int nr_succ_test;
+    int terminate_on_first_failure;
+} rcu_test_machine;
 
-/** Framework interfaces */
-RCU_INT rcu_init();
-RCU_INT rcu_destroy();
-RCU_INT rcu_run_test_mach();
-RCU_INT rcu_dump_test_dbase();
-RCU_INT rcu_dump_asserts();
-RCU_INT rcu_set_run_hook(RCU_GENERIC_FUNCTION run_hook);
-RCU_INT rcu_set_assert_hook(RCU_GENERIC_FUNCTION assert_hook);
+void rcu_assert_impl(int cond, const char *filename, const char *func_name, int line, const char *format, ...);
+int rcu_get_timestamp(char *ts_buff, const int ts_buff_len);
+int rcu_is_mach_initialized(rcu_test_machine *machine);
+int rcu_del_all_fail_rec(rcu_test_machine *machine);
+int rcu_del_all_fail_rec_from_func(rcu_test *func);
+int rcu_del_all_fail_rec_from_mod(rcu_module *mod);
+void rcu_print(const char *str);
+void rcu_print_rcunit_info();
+rcu_module *rcu_cre_test_mod(const char *name, rcu_generic_function init,
+        rcu_generic_function destroy);
 
+/* Other RCUNIT header files */
+#include "rcunit_helpers.h"
+#include "rcunit_error.h"
+#include "rcunit_assert.h"
+#include "rcunit_report.h"
+#include "rcunit_exception.h"
+#include "rcunit_mem.h"
+#include "rcunit_mtrace.h"
+#include "rcunit_random.h"
+#include "rcunit_api.h"
 
-/** Test registry interfaces */
-RCU_TEST_REGISTRY *rcu_cre_test_reg(const RCU_CHAR *name, RCU_INT enable);
-RCU_INT rcu_destroy_test_reg(RCU_TEST_REGISTRY *reg);
-RCU_INT rcu_add_test_reg(RCU_TEST_REGISTRY *reg);
-RCU_INT rcu_run_test_reg(RCU_TEST_REGISTRY *reg);
-RCU_INT rcu_run_test_reg_by_name(const RCU_CHAR *name);
-
-/** Test module interfaces */
-RCU_TEST_MODULE *rcu_cre_test_mod(const RCU_CHAR *name, RCU_GENERIC_FUNCTION init, RCU_GENERIC_FUNCTION destroy, RCU_INT enable);
-RCU_INT rcu_destroy_test_mod(RCU_TEST_MODULE *mod);
-RCU_INT rcu_add_test_mod(RCU_TEST_REGISTRY *reg, RCU_TEST_MODULE *mod);
-RCU_INT rcu_add_test_mod_tbl(RCU_TEST_REGISTRY *reg, RCU_TEST_MODULE_ENTRY *mod_tbl);
-RCU_INT rcu_run_test_mod(RCU_TEST_MODULE *mod);
-RCU_INT rcu_run_test_mod_by_name(const RCU_CHAR *name);
-
-/** Test function interfaces */
-RCU_INT rcu_add_test_func(RCU_TEST_MODULE *mod, RCU_GENERIC_FUNCTION entry, RCU_GENERIC_FUNCTION init,RCU_GENERIC_FUNCTION destroy, const RCU_CHAR *name,RCU_INT enable);
-RCU_INT rcu_add_test_func_tbl(RCU_TEST_MODULE *mod, RCU_TEST_FUNCTION_ENTRY *func_tbl);
-
-/** Output handler interfaces */
-RCU_INT rcu_add_out_hnd(RCU_OUTPUT_HANDLER *out_hnd);
-RCU_INT rcu_del_out_hnd(RCU_OUTPUT_HANDLER *out_hnd);
-
-/** Internally used functions */
-RCU_INT rcu_assert_impl(RCU_INT cond, RCU_INT abort, const RCU_CHAR *info1, const RCU_CHAR *info2, const RCU_CHAR *fname, RCU_INT line);
-RCU_INT rcu_get_timestamp(RCU_CHAR *ts_buff,const RCU_INT ts_buff_len);
-RCU_INT rcu_is_mach_alive(RCU_TEST_MACHINE *mach);
-RCU_INT rcu_del_all_fail_rec(RCU_TEST_MACHINE *mach);
-RCU_INT rcu_del_all_fail_rec_from_func(RCU_TEST_FUNCTION *func);
-RCU_INT rcu_del_all_fail_rec_from_mod(RCU_TEST_MODULE *mod);
-RCU_INT rcu_print(const RCU_CHAR *str);
-RCU_INT rcu_sys_info();
-
-/** Other RCUNIT header files */
-#include <rcunit_error.h>
-#include <rcunit_assert.h>
-#include <rcunit_log.h>
-#include <rcunit_report.h>
-#include <rcunit_helpers.h>
-#include <rcunit_exception.h>
-#include <rcunit_mem.h>
-#include <rcunit_mtrace.h>
-#include <rcunit_random.h>
+/* External variable declarations (used internally) */
+extern const char *g_error_msg_tbl[];
+extern int g_ercd;
+extern rcu_test_machine the_test_machine;
+extern lmk_logger *the_rcu_logger;
 
 
-/** External variable declarations (used internally) */
-extern const RCU_CHAR *g_error_msg_tbl[];
-extern RCU_CHAR g_log_buff[RCU_LOG_BUFF_SIZE];
-extern RCU_INT g_ercd;
-extern RCU_TEST_MACHINE the_machine;
 #endif /* RCUNIT_H */
-
-
 

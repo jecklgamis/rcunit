@@ -1,416 +1,137 @@
-/*====================================================================
- *  TEST_MODULE BASIC TESTS
- *==================================================================*/
+/*
+ * The MIT License (MIT)
+ *
+ * RCUNIT - A unit testing framework for C
+ * Copyright 2013 Jerrico Gamis <jecklgamis@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
-RCU_DEF_TEST_FUNC(rcu_test_mod_001_f1,param){
-    RCU_LOG_INFO("rcu_test_mod_001_f1 invoked!");
+#include "rcunit.h"
+#include "testmoko.h"
+
+/* Verify that we can create a test module */
+TMK_TEST(rcu_test_get_mod) {
+    TMK_ASSERT_NOT_NULL(rcu_get_mod("m1"));
+    TMK_ASSERT_EQUAL(2, rcu_get_nr_mods())
 }
 
-RCU_DEF_TEST_FUNC(rcu_test_mod_001_f2,param){
-    RCU_LOG_INFO("rcu_test_mod_001_f2 invoked!");
+/* Verify that we can retrieve the default test module */
+TMK_TEST(rcu_test_get_default_mod) {
+    rcu_module *mod = rcu_get_default_mod();
+    TMK_ASSERT_NOT_NULL(mod);
 }
 
-RCU_DEF_TEST_FUNC(rcu_test_mod_001_f3,param){
-    RCU_LOG_INFO("rcu_test_mod_001_f3 invoked!");
+/* Verify the default module can be retrieved by name */
+TMK_TEST(rcu_test_get_default_mod_by_name) {
+    TMK_ASSERT_NOT_NULL(rcu_get_mod("default-mod"));
+    TMK_ASSERT_EQUAL(1, rcu_get_nr_mods())
 }
 
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_001){
-RCU_DEF_TEST_MOD(m1)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1) == RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(RCU_NULL,rcu_test_mod_001_f1,RCU_NULL,RCU_NULL,"rcu_test_mod_001_f1",RCU_TRUE)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(m1,rcu_test_mod_001_f2,RCU_NULL,RCU_NULL,"rcu_test_mod_001_f2",RCU_TRUE)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(m1,rcu_test_mod_001_f3,RCU_NULL,RCU_NULL,"rcu_test_mod_001_f3",RCU_TRUE)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
+/* Verify the default module name cannot be used in creating module */
+TMK_TEST(rcu_test_create_default_mod) {
+    TMK_ASSERT_NULL(rcu_cre_test_mod("default-mod", NULL, NULL));
+    TMK_ASSERT_EQUAL(1, rcu_get_nr_mods())
 }
 
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_002){
-RCU_DEF_TEST_MOD(m1)
-    LOCAL_ASSERT_NULL(m1=rcu_cre_test_mod(RCU_NULL,RCU_NULL,RCU_NULL,RCU_TRUE));
-    return(RCU_E_OK);
+static int nr_mod_fxt_calls = 0;
+
+RCU_SETUP(mod_setup) {
+    nr_mod_fxt_calls++;
 }
 
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_003){
-RCU_DEF_TEST_MOD(m1)
-    LOCAL_ASSERT_NULL(m1=rcu_cre_test_mod("default-mod",RCU_NULL,RCU_NULL,RCU_TRUE));
-    return(RCU_E_OK);
+RCU_TEARDOWN(mod_teardown) {
+    nr_mod_fxt_calls++;
 }
 
-RCU_DEF_INIT_FUNC(rcu_test_mod_004_mod_init,param){
-    fprintf(stdout,"rcu_test_mod_004_mod_init invoked!\n");
+/* Verify that the module's setup function is invoked*/
+TMK_TEST(rcu_test_mod_fixture_invocation) {
+    RCU_DEF_TEST_MOD(mod = rcu_get_mod("m1"));
+    TMK_ASSERT_NOT_NULL(mod);
+    TMK_ASSERT_EQUAL(2, rcu_get_nr_mods())
+    rcu_set_mod_fxt(mod, mod_setup, mod_teardown);
+    rcu_run_tests();
+    TMK_ASSERT_EQUAL(2, nr_mod_fxt_calls);
 }
 
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_004){
-RCU_DEF_TEST_MOD(m1)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",rcu_test_mod_004_mod_init,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1) == RCU_E_OK);
-    rcu_dump_test_dbase();
-    rcu_run_test_mach();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
+TMK_TEST(rcu_test_create_multiple_mods) {
+    TMK_ASSERT_NOT_NULL(rcu_get_mod("m1"));
+    TMK_ASSERT_NOT_NULL(rcu_get_mod("m2"));
+    TMK_ASSERT_EQUAL(3, rcu_get_nr_mods());
 }
 
-RCU_DEF_DESTROY_FUNC(rcu_test_mod_005_mod_destroy,param){
-    fprintf(stdout,"rcu_test_mod_005_mod_destroy invoked!\n");
+TMK_TEST(rcu_test_create_and_destroy_mod) {
+    RCU_DEF_TEST_MOD(m1)
+    TMK_ASSERT_NOT_NULL(m1 = rcu_cre_test_mod("m1", NULL, NULL));
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_mod(m1));
+    TMK_ASSERT_EQUAL(2, rcu_get_nr_mods())
+
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_destroy_test_mod(m1));
+    TMK_ASSERT_EQUAL(1, rcu_get_nr_mods())
 }
 
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_005){
-RCU_DEF_TEST_MOD(m1)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,rcu_test_mod_005_mod_destroy,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1) == RCU_E_OK);
-    rcu_dump_test_dbase();
-    rcu_run_test_mach();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_006){
-RCU_DEF_TEST_MOD(m1)
-RCU_DEF_TEST_MOD(m2)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT_NOT_NULL(m2=rcu_cre_test_mod("m2",RCU_NULL,RCU_NULL,RCU_FALSE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1) == RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m2) == RCU_E_OK);
-    rcu_dump_test_dbase();
-    rcu_run_test_mach();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_007){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_008){
-RCU_DEF_TEST_MOD(m1)
-    LOCAL_ASSERT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_destroy_test_mod(m1)==RCU_E_NG);
-    return(RCU_E_OK);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_009){
-RCU_DEF_TEST_MOD(m1)
-RCU_DEF_TEST_REG(r1)
-    LOCAL_ASSERT_NULL(r1=rcu_cre_test_reg("r1",RCU_TRUE));
-    LOCAL_ASSERT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1) == RCU_E_NG);
-    LOCAL_ASSERT(rcu_add_test_mod(r1,m1) == RCU_E_NG);
-    LOCAL_ASSERT(rcu_destroy_test_mod(m1)==RCU_E_NG);
-    LOCAL_ASSERT(rcu_destroy_test_reg(r1)==RCU_E_NG);
-    return(RCU_E_OK);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_010){
-RCU_DEF_TEST_MOD(m1)
-RCU_DEF_TEST_REG(r1)
-RCU_DEF_TEST_REG(r2)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(r1=rcu_cre_test_reg("r1",RCU_TRUE));
-    LOCAL_ASSERT_NOT_NULL(r2=rcu_cre_test_reg("r2",RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_reg(r1)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_reg(r2)==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(r1,m1) == RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_mod(r2,m1) == RCU_E_NG);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_011){
-RCU_DEF_TEST_MOD(m1)
-RCU_DEF_TEST_REG(r1)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(r1=rcu_cre_test_reg("r1",RCU_TRUE));
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(r1,m1) == RCU_E_NG);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_destroy_test_mod(m1) == RCU_E_OK);
-    LOCAL_ASSERT(rcu_destroy_test_reg(r1) == RCU_E_OK);
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_012){
-RCU_DEF_TEST_REG(r1)
-RCU_DEF_TEST_MOD(m1)
-RCU_DEF_TEST_MOD(m2)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(r1=rcu_cre_test_reg("r1",RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_reg(r1)==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT_NOT_NULL(m2=rcu_cre_test_mod("m2",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1) == RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_mod(r1,m2) == RCU_E_OK);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_013){
-RCU_DEF_TEST_REG(r1)
-RCU_DEF_TEST_MOD(m1)
-RCU_DEF_TEST_MOD(m2)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(r1=rcu_cre_test_reg("r1",RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_reg(r1)==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT_NOT_NULL(m2=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1) == RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_mod(r1,m2) == RCU_E_NG);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_destroy_test_mod(m2)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-RCU_DEF_EMPTY_TEST_FUNC(rcu_test_mod_014_f1)
-RCU_DEF_EMPTY_TEST_FUNC(rcu_test_mod_014_f2)
-
-RCU_DEF_FUNC_TBL(rcu_test_mod_014_ftbl1)
-    RCU_INC_FUNC_AUTONAME(rcu_test_mod_014_f1,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(rcu_test_mod_014_f2,RCU_NULL,RCU_NULL,RCU_TRUE)
+RCU_DEF_FUNC_TBL(test_tbl)
+RCU_INC_TEST(test)
 RCU_DEF_FUNC_TBL_END
 
-RCU_DEF_MOD_TBL(rcu_test_mod_014_mtbl1)
-    RCU_INC_MOD("rcu_test_mod_014_m1",RCU_NULL,RCU_NULL,rcu_test_mod_014_ftbl1,RCU_TRUE)
+RCU_DEF_MOD_TBL(mod_tbl)
+RCU_INC_MOD("mod-tbl", mod_tbl)
 RCU_DEF_MOD_TBL_END
 
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_014){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_mod_tbl(RCU_NULL,rcu_test_mod_014_mtbl1)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
+TMK_TEST(rcu_test_add_mod_tbl) {
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_mod_tbl(rcu_get_default_reg(), mod_tbl));
+    TMK_ASSERT(rcu_destroy() == RCU_E_OK);
 }
 
-RCU_DEF_EMPTY_TEST_FUNC(rcu_test_mod_015_f1)
-RCU_DEF_EMPTY_TEST_FUNC(rcu_test_mod_015_f2)
-
-RCU_DEF_FUNC_TBL(rcu_test_mod_015_ftbl1)
-    RCU_INC_FUNC_AUTONAME(rcu_test_mod_015_f1,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(rcu_test_mod_015_f2,RCU_NULL,RCU_NULL,RCU_TRUE)
-RCU_DEF_FUNC_TBL_END
-
-RCU_DEF_MOD_TBL(rcu_test_mod_015_mtbl1)
-    RCU_INC_MOD("rcu_test_mod_015_m1",RCU_NULL,RCU_NULL,rcu_test_mod_014_ftbl1,RCU_TRUE)
-RCU_DEF_MOD_TBL_END
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_015){
-    LOCAL_ASSERT(rcu_add_test_mod_tbl(RCU_NULL,rcu_test_mod_015_mtbl1)==RCU_E_NG);
-    return(RCU_E_OK);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_016){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_mod_tbl(RCU_NULL,RCU_NULL)==RCU_E_NG);
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
+TMK_TEST(rcu_test_add_null_mod_tbl) {
+    TMK_ASSERT_EQUAL(RCU_E_NG, rcu_add_test_mod_tbl(NULL, NULL));
 }
 
 RCU_DEF_MOD_TBL(rcu_test_mod_017_mtbl1)
-    RCU_INC_MOD("rcu_test_mod_017_m1",RCU_NULL,RCU_NULL,RCU_NULL,RCU_TRUE)
+RCU_INC_MOD_FXT("rcu_test_mod_017_m1", NULL, NULL, NULL)
 RCU_DEF_MOD_TBL_END
 
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_017){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_mod_tbl(RCU_NULL,rcu_test_mod_017_mtbl1)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
+TMK_TEST(rcu_test_mod_on_null_reg) {
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_mod_tbl(NULL, rcu_test_mod_017_mtbl1));
 }
 
-RCU_DEF_EMPTY_TEST_FUNC(rcu_test_mod_018_f1)
-RCU_DEF_EMPTY_TEST_FUNC(rcu_test_mod_018_f2)
-
-RCU_DEF_FUNC_TBL(rcu_test_mod_018_ftbl1)
-    RCU_INC_FUNC_AUTONAME(rcu_test_mod_018_f1,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(rcu_test_mod_018_f2,RCU_NULL,RCU_NULL,RCU_TRUE)
-RCU_DEF_FUNC_TBL_END
-
-RCU_DEF_MOD_TBL(rcu_test_mod_018_mtbl1)
-    RCU_INC_MOD(RCU_NULL,RCU_NULL,RCU_NULL,rcu_test_mod_018_ftbl1,RCU_TRUE)
-RCU_DEF_MOD_TBL_END
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_018){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_mod_tbl(RCU_NULL,rcu_test_mod_018_mtbl1)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
+//TODO revisit this
+TMK_TEST(rcu_test_run_mod) {
+    RCU_DEF_TEST_REG(r1)
+    RCU_DEF_TEST_MOD(m1)
+    TMK_ASSERT_NOT_NULL(m1 = rcu_get_mod("m1"));
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_test_mod(m1));
 }
 
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_019){
-RCU_DEF_TEST_REG(r1)
-RCU_DEF_TEST_MOD(m1)
-RCU_DEF_TEST_MOD(m2)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(r1=rcu_cre_test_reg("r1",RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_reg(r1)==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT_NOT_NULL(m2=rcu_cre_test_mod("m2",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(r1,m1)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m2)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
+TMK_TEST(rcu_test_run_mod_by_name) {
+    RCU_DEF_TEST_REG(r1)
+    RCU_DEF_TEST_MOD(m1)
+    TMK_ASSERT_NOT_NULL(m1 = rcu_get_mod("m1"));
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_test_mod_by_name("m1"));
 }
 
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_020){
-RCU_DEF_TEST_REG(r1)
-RCU_DEF_TEST_MOD(m1)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_run_test_mod(m1) == RCU_E_OK);
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
+TMK_TEST(rcu_test_run_mod_by_unknown_name) {
+    RCU_DEF_TEST_REG(r1)
+    RCU_DEF_TEST_MOD(m1)
+    TMK_ASSERT_NOT_NULL(m1 = rcu_get_mod("m1"));
+    TMK_ASSERT_EQUAL(RCU_E_NG, rcu_run_test_mod_by_name("unknown_module_name"));
 }
 
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_021){
-RCU_DEF_TEST_REG(r1)
-RCU_DEF_TEST_MOD(m1)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_run_test_mod_by_name("m1") == RCU_E_OK);
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_022){
-RCU_DEF_TEST_REG(r1)
-RCU_DEF_TEST_MOD(m1)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_run_test_mod(RCU_NULL) == RCU_E_OK);
-    LOCAL_ASSERT(rcu_run_test_mod(RCU_DEFAULT_MODULE) == RCU_E_OK);
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_023){
-RCU_DEF_TEST_REG(r1)
-RCU_DEF_TEST_MOD(m1)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_run_test_mod_by_name("unknown_module_name") == RCU_E_NG);
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_024){
-RCU_DEF_TEST_REG(r1)
-RCU_DEF_TEST_MOD(m1)
-RCU_DEF_TEST_MOD(m2)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT_NOT_NULL(m2=rcu_cre_test_mod("m2",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_run_test_mod(m2) == RCU_E_OK);
-    LOCAL_ASSERT(rcu_destroy_test_mod(m2) == RCU_E_OK);
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_025){
-RCU_DEF_TEST_REG(r1)
-RCU_DEF_TEST_MOD(m1)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    rcu_run_test_mach();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_026){
-RCU_DEF_TEST_REG(r1)
-RCU_DEF_TEST_MOD(m1)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_FALSE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_run_test_mod(m1) == RCU_E_OK);
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-RCU_DEF_EMPTY_TEST_FUNC(rcu_test_mod_027_f1)
-RCU_DEF_EMPTY_TEST_FUNC(rcu_test_mod_027_f2)
-RCU_DEF_EMPTY_TEST_FUNC(rcu_test_mod_027_f3)
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_027){
-RCU_DEF_TEST_MOD(m1)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_FALSE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(m1,rcu_test_mod_027_f1,RCU_NULL,RCU_NULL,"rcu_test_mod_027_f1",RCU_TRUE)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(m1,rcu_test_mod_027_f2,RCU_NULL,RCU_NULL,"rcu_test_mod_027_f2",RCU_TRUE)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(m1,rcu_test_mod_027_f3,RCU_NULL,RCU_NULL,"rcu_test_mod_027_f3",RCU_TRUE)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-RCU_DEF_INIT_FUNC(rcu_test_mod_028_mod_init,param){
-    RCU_FAIL_FATAL("rcu_test_mod_028_mod_init must fail");
-}
-
-RCU_DEF_EMPTY_TEST_FUNC(rcu_test_mod_028_f1)
-RCU_DEF_EMPTY_TEST_FUNC(rcu_test_mod_028_f2)
-RCU_DEF_EMPTY_TEST_FUNC(rcu_test_mod_028_f3)
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_028){
-RCU_DEF_TEST_MOD(m1)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",rcu_test_mod_028_mod_init,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(m1,rcu_test_mod_028_f1,RCU_NULL,RCU_NULL,"rcu_test_mod_028_f1",RCU_TRUE)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(m1,rcu_test_mod_028_f2,RCU_NULL,RCU_NULL,"rcu_test_mod_028_f2",RCU_TRUE)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(m1,rcu_test_mod_028_f3,RCU_NULL,RCU_NULL,"rcu_test_mod_028_f3",RCU_TRUE)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    rcu_run_test_mach();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-RCU_DEF_INIT_FUNC(rcu_test_mod_029_mod_destroy,param){
-    RCU_FAIL_FATAL("rcu_test_mod_029_mod_destroy must fail");
-}
-
-RCU_DEF_EMPTY_TEST_FUNC(rcu_test_mod_029_f1)
-RCU_DEF_EMPTY_TEST_FUNC(rcu_test_mod_029_f2)
-RCU_DEF_EMPTY_TEST_FUNC(rcu_test_mod_029_f3)
-
-DEF_LOCAL_TEST_FUNC(rcu_test_mod_029){
-RCU_DEF_TEST_MOD(m1)
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,rcu_test_mod_029_mod_destroy,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(m1,rcu_test_mod_029_f1,RCU_NULL,RCU_NULL,"rcu_test_mod_029_f1",RCU_TRUE)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(m1,rcu_test_mod_029_f2,RCU_NULL,RCU_NULL,"rcu_test_mod_029_f2",RCU_TRUE)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(m1,rcu_test_mod_029_f3,RCU_NULL,RCU_NULL,"rcu_test_mod_029_f3",RCU_TRUE)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    rcu_run_test_mach();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
 

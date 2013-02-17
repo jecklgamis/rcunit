@@ -1,236 +1,87 @@
-/*====================================================================
- *  TEST_FUNCTION BASIC TESTS
- *==================================================================*/
-RCU_DEF_TEST_FUNC(rcu_test_func_001_f1,param){
-    RCU_LOG_INFO("rcu_test_func_001_f1 invoked!");
+/*
+ * The MIT License (MIT)
+ *
+ * RCUNIT - A unit testing framework for C
+ * Copyright 2013 Jerrico Gamis <jecklgamis@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+#include <testmoko.h>
+#include "rcunit.h" 
+
+#include "rcunit_api.h"
+
+extern void test(void *param);
+extern void setup(void *param);
+extern void teardown(void *param);
+
+TMK_TEST(rcu_test_add_test) {
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test(test));
+    TMK_ASSERT_EQUAL(1, rcu_get_nr_tests());
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
 }
 
-DEF_LOCAL_TEST_FUNC(rcu_test_func_001){
-    LOCAL_ASSERT(rcu_add_test_func(RCU_NULL,rcu_test_func_001_f1,RCU_NULL,RCU_NULL,"rcu_test_func_001_f1",RCU_TRUE)==RCU_E_NG);
-    return(RCU_E_OK);
+TMK_TEST(rcu_test_add_test_fxt) {
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_fxt(test, setup, teardown));
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_fxt(test, setup, teardown));
+    TMK_ASSERT_EQUAL(2, rcu_get_nr_tests());
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
 }
 
-RCU_DEF_TEST_FUNC(rcu_test_func_002_f1,param){
-    RCU_LOG_INFO("rcu_test_func_002_f1 invoked!");
+TMK_TEST(rcu_test_add_test_to_mod) {
+    rcu_module *mod = rcu_get_mod("mod");
+    TMK_ASSERT_NOT_NULL(mod);
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_to_mod(mod, test));
+    TMK_ASSERT_EQUAL(2, rcu_get_nr_mods());
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
 }
 
-
-DEF_LOCAL_TEST_FUNC(rcu_test_func_002){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(RCU_NULL,rcu_test_func_002_f1,RCU_NULL,RCU_NULL,"rcu_test_func_002_f1",RCU_TRUE)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(RCU_NULL,rcu_test_func_002_f1,RCU_NULL,RCU_NULL,"rcu_test_func_002_f1",RCU_TRUE)==RCU_E_NG);
-    rcu_dump_test_dbase();
-    rcu_run_test_mach();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
+TMK_TEST(rcu_test_add_test_fxt_to_mod) {
+    rcu_module *mod = rcu_get_mod("mod");
+    TMK_ASSERT_NOT_NULL(mod);
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_fxt_to_mod(mod, test, setup, teardown));
+    TMK_ASSERT_EQUAL(2, rcu_get_nr_mods());
+    TMK_ASSERT_EQUAL(1, rcu_get_nr_tests());
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
 }
 
-RCU_DEF_TEST_FUNC(rcu_test_func_003_f1,param){
-    RCU_LOG_INFO("rcu_test_func_003_f1 invoked!");
+TMK_TEST(rcu_test_add_test_to_default_mod) {
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_to_mod(rcu_get_default_mod(), test));
+    TMK_ASSERT_EQUAL(1, rcu_get_nr_tests());
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
 }
 
-RCU_DEF_TEST_FUNC(rcu_test_func_003_f2,param){
-    RCU_LOG_INFO("rcu_test_func_003_f2 invoked!");
+TMK_TEST(rcu_test_add_test_fxt_to_default_mod) {
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_fxt_to_mod(rcu_get_default_mod(), test, setup, teardown));
+    TMK_ASSERT_EQUAL(1, rcu_get_nr_tests());
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
 }
 
-
-DEF_LOCAL_TEST_FUNC(rcu_test_func_003){
-RCU_DEF_TEST_MOD(m1);
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT_NOT_NULL(m1=rcu_cre_test_mod("m1",RCU_NULL,RCU_NULL,RCU_TRUE));
-    LOCAL_ASSERT(rcu_add_test_mod(RCU_NULL,m1)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(RCU_NULL,rcu_test_func_003_f1,RCU_NULL,RCU_NULL,"rcu_test_func_003_f1",RCU_TRUE)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(m1,rcu_test_func_003_f2,RCU_NULL,RCU_NULL,"rcu_test_func_003_f2",RCU_TRUE)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    rcu_run_test_mach();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_func_004_f1,param){
-    RCU_LOG_INFO("rcu_test_func_004_f1 invoked!");
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_func_004){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(RCU_DEFAULT_MODULE,rcu_test_func_004_f1,RCU_NULL,RCU_NULL,RCU_NULL,RCU_TRUE)==RCU_E_NG);
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_func_005_f1,param){
-    RCU_LOG_INFO("rcu_test_func_005_f1 invoked!");
-}
-
-RCU_DEF_INIT_FUNC(rcu_test_func_005_f1_init,param){
-    RCU_LOG_INFO("rcu_test_func_005_f1_init invoked!");
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_func_005){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(RCU_NULL,rcu_test_func_005_f1,rcu_test_func_005_f1_init,RCU_NULL,"rcu_test_func_005_f1",RCU_TRUE)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    rcu_run_test_mach();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_func_006_f1,param){
-    RCU_LOG_INFO("rcu_test_func_006_f1 invoked!");
-}
-
-RCU_DEF_INIT_FUNC(rcu_test_func_006_f1_destroy,param){
-    RCU_LOG_INFO("rcu_test_func_006_f1_destroy invoked!");
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_func_006){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(RCU_NULL,rcu_test_func_006_f1,RCU_NULL,rcu_test_func_006_f1_destroy,"rcu_test_func_006_f1",RCU_TRUE)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    rcu_run_test_mach();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_func_007_f1,param){
-    RCU_LOG_INFO("rcu_test_func_007_f1 invoked!");
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_func_007_f2,param){
-    RCU_LOG_INFO("rcu_test_func_007_f2 invoked!");
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_func_007){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(RCU_NULL,rcu_test_func_007_f1,RCU_NULL,RCU_NULL,"rcu_test_func_007_f1",RCU_TRUE)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(RCU_NULL,rcu_test_func_007_f2,RCU_NULL,RCU_NULL,"rcu_test_func_007_f1",RCU_TRUE)==RCU_E_NG);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_func_008_f1,param){
-    RCU_LOG_INFO("rcu_test_func_008_f1 invoked!");
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_func_008){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(RCU_NULL,rcu_test_func_008_f1,RCU_NULL,RCU_NULL,"rcu_test_func_008_f1",RCU_TRUE)==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(RCU_NULL,rcu_test_func_008_f1,RCU_NULL,RCU_NULL,"rcu_test_func_008_f1_bogus",RCU_TRUE)==RCU_E_NG);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_func_009_f1,param){
-    RCU_LOG_INFO("rcu_test_func_009_f1 invoked!");
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_func_009_f2,param){
-    RCU_LOG_INFO("rcu_test_func_009_f2 invoked!");
-}
-
-RCU_DEF_FUNC_TBL(rcu_test_func_009_ftbl1)
-    RCU_INC_FUNC_AUTONAME(rcu_test_func_009_f1,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(rcu_test_func_009_f2,RCU_NULL,RCU_NULL,RCU_TRUE)
+RCU_DEF_FUNC_TBL(test_func_tbl)
+RCU_INC_TEST(test)
 RCU_DEF_FUNC_TBL_END
 
-DEF_LOCAL_TEST_FUNC(rcu_test_func_009){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func_tbl(RCU_NULL,rcu_test_func_009_ftbl1)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_func_010_f1,param){
-    RCU_LOG_INFO("rcu_test_func_010_f1 invoked!");
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_func_010_f2,param){
-    RCU_LOG_INFO("rcu_test_func_010_f2 invoked!");
-}
-
-RCU_DEF_FUNC_TBL(rcu_test_func_010_ftbl1)
-    RCU_INC_FUNC("rcu_test_func_010_f1",rcu_test_func_010_f1,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(rcu_test_func_010_f2,RCU_NULL,RCU_NULL,RCU_TRUE)
-RCU_DEF_FUNC_TBL_END
-
-DEF_LOCAL_TEST_FUNC(rcu_test_func_010){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func_tbl(RCU_NULL,rcu_test_func_010_ftbl1)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    rcu_run_test_mach();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_func_011){
-    /** same as rcu_test_func_005 */
-    return(RCU_E_OK);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_func_012){
-    /** same as rcu_test_func_006 */
-    return(RCU_E_OK);
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_func_013_f1,param){
-    RCU_LOG_INFO("rcu_test_func_013_f1 invoked!");
-}
-
-RCU_DEF_INIT_FUNC(rcu_test_func_013_f1_init,param){
-    RCU_LOG_INFO("rcu_test_func_013_f1_init invoked!");
-}
-
-RCU_DEF_DESTROY_FUNC(rcu_test_func_013_f1_destroy,param){
-    RCU_LOG_INFO("rcu_test_func_013_f1_destroy invoked!");
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_func_013){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(RCU_NULL,rcu_test_func_013_f1,
-        rcu_test_func_013_f1_init,rcu_test_func_013_f1_destroy,
-        "rcu_test_func_013_f1",RCU_FALSE)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    rcu_run_test_mach();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_func_014_f1,param){
-}
-
-RCU_DEF_INIT_FUNC(rcu_test_func_014_f1_init,param){
-    RCU_FAIL_FATAL("rcu_test_func_014_f1_init is supposed to fail");
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_func_014){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(RCU_NULL,rcu_test_func_014_f1,rcu_test_func_014_f1_init,RCU_NULL,"rcu_test_func_014_f1",RCU_TRUE)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    rcu_run_test_mach();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_func_015_f1,param){
-    RCU_ASSERT(RCU_TRUE);
-    RCU_ASSERT(RCU_TRUE);
-    RCU_ASSERT(RCU_TRUE);
-    RCU_ASSERT(RCU_FALSE);
-    RCU_FAIL_FATAL("rcu_test_func_015_f1 fatal assertion");
-}
-
-RCU_DEF_DESTROY_FUNC(rcu_test_func_015_f1_destroy,param){
-    RCU_FAIL_FATAL("rcu_test_func_015_f1_destroy is supposed to fail");
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_func_015){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func(RCU_NULL,rcu_test_func_015_f1,RCU_NULL,rcu_test_func_015_f1_destroy,"rcu_test_func_015_f1",RCU_TRUE)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    rcu_run_test_mach();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
+TMK_TEST(rcu_test_add_test_func_tbl) {
+   TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_func_tbl(rcu_get_default_mod(), 
+           test_func_tbl));
+   TMK_ASSERT_EQUAL(1, rcu_get_nr_tests());
+   TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
 }

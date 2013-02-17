@@ -1,89 +1,135 @@
-
-/** this contains only non-fatal assertions */
-RCU_DEF_TEST_FUNC(rcu_test_assert_001_f1,param){
-RCU_INT ercd;
-    RCU_ASSERT(RCU_FALSE);
-    RCU_FAIL("rcu_test_assert_001_f1");
-    RCU_ASSERT_TRUE(RCU_FALSE);
-    RCU_ASSERT_FALSE(RCU_TRUE);
-    RCU_ASSERT_NULL(&ercd);
-    RCU_ASSERT_NOT_NULL(RCU_NULL);
-    RCU_ASSERT_FATAL(RCU_FALSE) //the only fatal;
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_assert_001_f2,param){
-    RCU_ASSERT_FATAL(RCU_FALSE);
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_assert_001_f3,param){
-    RCU_FAIL_FATAL("rcu_test_assert_001_f3");
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_assert_001_f4,param){
-    RCU_ASSERT_TRUE_FATAL(RCU_FALSE);
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_assert_001_f5,param){
-    RCU_ASSERT_FALSE_FATAL(RCU_TRUE);
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_assert_001_f6,param){
-RCU_INT ercd;
-    RCU_ASSERT_NULL_FATAL(&ercd);
-}
-
-RCU_DEF_TEST_FUNC(rcu_test_assert_001_f7,param){
-    RCU_ASSERT_NOT_NULL_FATAL(RCU_NULL);
-}
-/** The only successful assertion */
-RCU_DEF_TEST_FUNC(rcu_test_assert_001_f8,param){
-    RCU_ASSERT_NULL(RCU_NULL);
-    RCU_ASSERT_NULL(RCU_NULL);
-    RCU_ASSERT_NULL(RCU_NULL);
-
-}
-
-RCU_DEF_FUNC_TBL(rcu_test_assert_001_ftbl1)
-    RCU_INC_FUNC_AUTONAME(rcu_test_assert_001_f1,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(rcu_test_assert_001_f2,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(rcu_test_assert_001_f3,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(rcu_test_assert_001_f4,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(rcu_test_assert_001_f5,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(rcu_test_assert_001_f6,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(rcu_test_assert_001_f7,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(rcu_test_assert_001_f8,RCU_NULL,RCU_NULL,RCU_TRUE)
-RCU_DEF_FUNC_TBL_END
-
-/** This tests the non-fatal assertions */
-DEF_LOCAL_TEST_FUNC(rcu_test_assert_001){
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_add_test_func_tbl(RCU_DEFAULT_MODULE,
-        rcu_test_assert_001_ftbl1)==RCU_E_OK);
-    rcu_dump_test_dbase();
-    rcu_run_test_mach();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
-}
-
-RCU_DEF_GENERIC_FUNC(rcu_test_assert_002_assert_hook,param){
-    RCU_LOG_INFO("rcu_test_assert_002_assert_hook invoked!");
-}
-
-/** This is a test for assertions outside the known run contexts
-     (ie. test function, and init/destroy handlers)
+/*
+ * The MIT License (MIT)
+ *
+ * RCUNIT - A unit testing framework for C
+ * Copyright 2013 Jerrico Gamis <jecklgamis@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-DEF_LOCAL_TEST_FUNC(rcu_test_assert_002){
-RCU_INT x=0;
-    LOCAL_ASSERT(rcu_init()==RCU_E_OK);
-    LOCAL_ASSERT(rcu_set_assert_hook(rcu_test_assert_002_assert_hook)==RCU_E_OK);
-    RCU_ASSERT(x==1);
-    RCU_ASSERT(x==2);
-    rcu_dump_asserts();
-    LOCAL_ASSERT(rcu_destroy()==RCU_E_OK);
-    return(RCU_E_OK);
+
+#include "rcunit_api.h"
+#include "testmoko.h"
+
+
+static int nr_invocations = 0;
+
+int return_1() {
+    nr_invocations++;
+    return 1;
 }
 
+const char *return_string() {
+    nr_invocations++;
+    return "string";
+}
 
+const void *return_null_ptr() {
+    nr_invocations++;
+    return NULL;
+}
 
+/* Verify that assertion statements evaluate the condition only once 
+ */
+TMK_TEST(rcu_test_assert_single_evaluation) {
+    nr_invocations = 0;
+    RCU_ASSERT(return_1());
+    TMK_ASSERT_EQUAL(1, nr_invocations);
+    
+    nr_invocations = 0;
+    RCU_ASSERT_TRUE(return_1());
+    TMK_ASSERT_EQUAL(1, nr_invocations);
+    
+    nr_invocations = 0;
+    RCU_ASSERT_FALSE(!return_1());
+    TMK_ASSERT_EQUAL(1, nr_invocations);
 
+    nr_invocations = 0;
+    RCU_ASSERT_EQUAL(1, return_1());
+    TMK_ASSERT_EQUAL(1, nr_invocations);
+    
+    nr_invocations = 0;
+    RCU_ASSERT_EQUAL_STRING("string", return_string());
+    TMK_ASSERT_EQUAL(1, nr_invocations);
+    
+    nr_invocations = 0;
+    RCU_ASSERT_NULL(return_null_ptr());
+    TMK_ASSERT_EQUAL(1, nr_invocations);
+    
+    nr_invocations = 0;
+    RCU_ASSERT_NOT_NULL(return_string());
+    TMK_ASSERT_EQUAL(1, nr_invocations);
+    
+}
 
+RCU_TEST(rcu_bit_assertion_tests){
+    rcu_u2 data;
+    
+    data = 1;
+    RCU_ASSERT_BIT_SET(data, 0);
+
+    data = 128;
+    RCU_ASSERT_BIT_SET(data, 7);
+
+    data = 256;
+    RCU_ASSERT_BIT_SET(data, 8);
+
+    data = 32768;
+    RCU_ASSERT_BIT_SET(data, 15);
+    
+    data = 32768 + 256 + 128 + 1;
+    RCU_ASSERT_BIT_SET(data, 0);
+    RCU_ASSERT_BIT_SET(data, 7);
+    RCU_ASSERT_BIT_SET(data, 8);
+    RCU_ASSERT_BIT_SET(data, 15);
+}
+
+TMK_TEST(rcu_test_bit_assertions) {
+    rcu_add_test(rcu_bit_assertion_tests);
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
+}
+
+RCU_TEST(rcu_byte_assertion_tests){
+    rcu_u1 expected[4];
+
+    expected[0] = 0xde;
+    expected[1] = 0xad;
+    expected[2] = 0xc0;
+    expected[3] = 0xde;
+    
+    rcu_u1 actual[4];
+    actual[0] = 0xde;
+    actual[1] = 0xad;
+    actual[2] = 0xc0;
+    actual[3] = 0xde;
+    
+    RCU_ASSERT_SAME_BYTE_ARRAY(expected, actual, 4);
+    
+    actual[0] = 0xde;
+    actual[1] = 0xad;
+    actual[2] = 0xbe;
+    actual[3] = 0xef;
+
+    RCU_ASSERT_NOT_SAME_BYTE_ARRAY(expected, actual, 4);
+}
+
+TMK_TEST(rcu_test_byte_array_assertions) {
+    rcu_add_test(rcu_byte_assertion_tests);
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
+}

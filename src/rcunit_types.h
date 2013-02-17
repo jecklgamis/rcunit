@@ -1,59 +1,82 @@
 /*
- * RCUNIT - A unit testing framework for C.
- * Copyright (C) 2006 Jerrico L. Gamis
+ * The MIT License (MIT)
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * RCUNIT - A unit testing framework for C
+ * Copyright 2013 Jerrico Gamis <jecklgamis@gmail.com>
  *
- * This program is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE. See the GNU General Public License for more details.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  *
- * You should have received a copy of the GNU General Public
- * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
  *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #ifndef RCUNIT_TYPES_H
 #define RCUNIT_TYPES_H
 
-/** @brief 1-byte unsigned value */
-typedef unsigned char RCU_U1;
+/* Tags a deprecated function */
+#define RCU_DEPRECATED
 
-/** @brief 2-byte unsigned value */
-typedef unsigned short RCU_U2;
+/* Tags an API function */
+#define RCU_API
 
-/** @brief 4-byte unsigned value */
-typedef unsigned long RCU_U4;
+/* "True" definition */
+#define RCU_TRUE 1
 
-/** @brief Character data type */
-typedef char RCU_CHAR;
+/* "False" definition */
+#define RCU_FALSE (!RCU_TRUE)
 
-/** @brief Native integer data type */
-typedef int RCU_INT;
+/* 1-byte unsigned data type */
+typedef unsigned char rcu_u1;
 
-/** @brief void data type */
-typedef void RCU_VOID;
+/* 2-byte unsigned data type */
+typedef unsigned short rcu_u2;
 
-/** @brief NULL data type */
-#define RCU_NULL NULL
+/* 4-byte unsigned data type */
+typedef unsigned long rcu_u4;
 
-/** @brief The common function format */
-typedef RCU_VOID(*RCU_GENERIC_FUNCTION)(RCU_VOID *);
+/* Signed 1-byte data type */
+typedef char rcu_char;
 
-/** @brief The memory cell */
-typedef RCU_INT RCU_MEMCELL;
+/* Signed 2-byte data type */
+typedef short rcu_short;
 
-/** @brief Size in bytes of a memory cell (e.g. 32 bits in a 32-bit platform) */
-#define RCU_SIZEOF_MEMCELL (sizeof(RCU_INT))
+/* Signed 4 or 8 bytes data type */
+typedef int rcu_int;
 
-/** @brief Calculates the number of memory cells required to store nbytes */
-#define RCU_SIZEIN_MEMCELL(nbytes) (((nbytes)+3) >> 2)
+/* Signed 4 or 8 bytes data type */
+typedef long rcu_long;
+
+/* Floating point data type (32-bit) */
+typedef float rcu_float;
+
+/* Floating point data type (64-bit)  */
+typedef double rcu_double;
+
+/* Long long data type */
+typedef long long rcu_long_long;
+
+/* Long double data type */
+typedef long double rcu_long_double;
+
+/* The memory cell */
+typedef long rcu_memcell;
+
+/* The common function format */
+typedef void(*rcu_generic_function)(void *);
 
 #endif /* RCUNIT_TYPES_H */
 

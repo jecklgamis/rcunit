@@ -1,86 +1,73 @@
 /*
- * RCUNIT - A unit testing framework for C.
- * Copyright (C) 2006 Jerrico L. Gamis
+ * The MIT License (MIT)
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * RCUNIT - A unit testing framework for C
+ * Copyright 2013 Jerrico Gamis <jecklgamis@gmail.com>
  *
- * This program is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE. See the GNU General Public License for more details.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  *
- * You should have received a copy of the GNU General Public
- * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
  *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <rcunit.h>
+#include "rcunit.h"
 
-/** @brief Global error code */
-RCU_INT g_ercd=RCU_E_NG;
+int g_ercd = RCU_E_NG;
 
-/** @brief Global error string table */
-const RCU_CHAR *g_error_msg_tbl[]={
-/* RCU_E_OK            */ "Successful"
-/* RCU_E_NG            */,"Failed"
-/* RCU_E_NOMEM         */,"Memory allocation failed"
-/* RCU_E_INVPARAM      */,"Invalid parameter"
-/* RCU_E_MACHINIT      */,"Machine initialization failed"
-/* RCU_E_MACHINITDONE  */,"Machine already initialized "
-/* RCU_E_MACHNOINIT    */,"Machine not initialized"
-/* RCU_E_INVMACH       */,"Invalid machine"
-/* RCU_E_ENTITYDISABLED*/,"Test entity is disabled"
-/* RCU_E_EXEC          */,"Execution failed"
-/* RCU_E_REGNOINIT     */,"Registry not initialized"
-/* RCU_E_INVREGNAME    */,"Invalid registry name"
-/* RCU_E_INVREG        */,"Invalid registry"
-/* RCU_E_INVREGTABLE   */,"Invalid registry table"
-/* RCU_E_UNKNOWNREG    */,"Unknown registry"
-/* RCU_E_REGEXISTS     */,"Registry exists"
-/* RCU_E_MODNOINIT     */,"Module not initialized"
-/* RCU_E_INVMOD        */,"Invalid module"
-/* RCU_E_INVMODNAME    */,"Invalid module name"
-/* RCU_E_INVMODTABLE   */,"Invalid module table"
-/* RCU_E_UNKNOWNMOD    */,"Unknown module"
-/* RCU_E_MODEXISTS     */,"Module exists"
-/* RCU_E_FUNCNOINIT    */,"Function not initialized"
-/* RCU_E_INVFUNCNAME   */,"Invalid function name"
-/* RCU_E_INVFUNC       */,"Invalid function"
-/* RCU_E_INVFUNCTABLE  */,"Invalid function table"
-/* RCU_E_FUNCEXISTS    */,"Function exists"
-/* RCU_E_INVFUNCENTRY  */,"Invalid function entry point"
+const char *g_error_msg_tbl[] = {
+    /* RCU_E_OK            */"Successful"
+    /* RCU_E_NG            */, "Failed"
+    /* RCU_E_NOMEM         */, "Memory allocation failed"
+    /* RCU_E_INVPARAM      */, "Invalid parameter"
+    /* RCU_E_MACHINIT      */, "Machine initialization failed"
+    /* RCU_E_MACHINITDONE  */, "Machine already initialized "
+    /* RCU_E_MACHNOINIT    */, "Machine not initialized"
+    /* RCU_E_INVMACH       */, "Invalid machine"
+    /* RCU_E_ENTITYDISABLED */, "Test entity is disabled"
+    /* RCU_E_EXEC          */, "Execution failed"
+    /* RCU_E_REGNOINIT     */, "Registry not initialized"
+    /* RCU_E_INVREGNAME    */, "Invalid registry name"
+    /* RCU_E_INVREG        */, "Invalid registry"
+    /* RCU_E_INVREGTABLE   */, "Invalid registry table"
+    /* RCU_E_UNKNOWNREG    */, "Unknown registry"
+    /* RCU_E_REGEXISTS     */, "Registry exists"
+    /* RCU_E_MODNOINIT     */, "Module not initialized"
+    /* RCU_E_INVMOD        */, "Invalid module"
+    /* RCU_E_INVMODNAME    */, "Invalid module name"
+    /* RCU_E_INVMODTABLE   */, "Invalid module table"
+    /* RCU_E_UNKNOWNMOD    */, "Unknown module"
+    /* RCU_E_MODEXISTS     */, "Module exists"
+    /* RCU_E_FUNCNOINIT    */, "Function not initialized"
+    /* RCU_E_INVFUNCNAME   */, "Invalid function name"
+    /* RCU_E_INVFUNC       */, "Invalid function"
+    /* RCU_E_INVFUNCTABLE  */, "Invalid function table"
+    /* RCU_E_FUNCEXISTS    */, "Function exists"
+    /* RCU_E_INVFUNCENTRY  */, "Invalid function entry point"
 };
 
-
-/**
- *  @brief Returns the error code of the last operation that failed
- *  @return Error code
- */
-
-RCU_INT rcu_get_err(){
-#if RCU_ENABLE_TRACE_IFACE_ENTRY
-    RCU_LOG_INFO("INTERFACE : rcu_get_err");
-#endif
-    return(g_ercd);
+RCU_API int rcu_get_err() {
+    rcu_init();
+    return g_ercd;
 }
 
-/**
- *  @brief Returns the error message corresponding to an error code
- *  @param[in] ercd Error code
- *  @return Error message
- */
-
-const RCU_CHAR* rcu_get_err_msg(RCU_INT ercd){
-#if RCU_ENABLE_TRACE_IFACE_ENTRY
-    RCU_LOG_INFO("INTERFACE : rcu_get_err_msg");
-#endif
-    if (ercd >= RCU_E_OK && ercd <= RCU_E_INVFUNCENTRY){
-        return(g_error_msg_tbl[ercd]);
+RCU_API const char *rcu_get_err_msg(int ercd) {
+    rcu_init();
+    if (ercd >= RCU_E_OK && ercd <= RCU_E_INVFUNCENTRY) {
+        return (g_error_msg_tbl[ercd]);
     }
-    return("Unknown error code");
+    return "Unknown error code";
 }

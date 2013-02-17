@@ -1,93 +1,89 @@
 /*
- * RCUNIT - A unit testing framework for C.
- * Copyright (C) 2006 Jerrico L. Gamis
+ * The MIT License (MIT)
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * RCUNIT - A unit testing framework for C
+ * Copyright 2013 Jerrico Gamis <jecklgamis@gmail.com>
  *
- * This program is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE. See the GNU General Public License for more details.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  *
- * You should have received a copy of the GNU General Public
- * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
  *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #ifndef RCUNIT_ASSERT_H
 #define RCUNIT_ASSERT_H
 
-/*  RCUNIT Assertion Macro Facility
- *  The following are the commonly used assertion macros. A user-defined
- *  macro can be created.
- *  Considerations in creating a used-defined assertion macro.
- *  1. The assertion implementation function (rcu_assert_impl) has the
- *     following parameter descriptions.
- *     Parameter 1: Asserted condition
- *     Parameter 2: Abort flag (RCU_TRUE or RCU_FALSE)
- *     Parameter 3: Information (stringified)
- *     Parameter 4: Information (stringified)
- *     Parameter 5: __FILE__ (ANSI standard, string)
- *     Parameter 6: __LINE__ (ANSI standard, integer)
- *  2. The abort flag can be set only for failed condition.
- *  3. True condition is depedent on the C language convention :
- *     A non-zero is considered true, and false otherwise.
- */
+#include "rcunit.h"
 
-/** @brief Asserts a condition */
+
+extern void rcu_assert_impl(int cond, const char *filename, const char *func_name, int line,
+        const char *format, ...);
+
+/* Asserts a condition */
 #define RCU_ASSERT(cond) \
- { rcu_assert_impl((cond), RCU_FALSE,("RCU_ASSERT : " #cond),"",__FILE__, __LINE__); }
+ { rcu_assert_impl((cond), __FILE__,__func__, __LINE__, "%s", #cond); }
 
-/** @brief Asserts a condition (fatal) */
-#define RCU_ASSERT_FATAL(cond) \
- { rcu_assert_impl((cond), RCU_TRUE,("RCU_ASSERT_FATAL : " #cond),"",__FILE__, __LINE__); }
-
-/** @brief Records an implicitly failed condition described by msg */
-#define RCU_FAIL(msg) \
- { rcu_assert_impl(RCU_FALSE, RCU_FALSE,("RCU_FAIL : " #msg),"",__FILE__, __LINE__); }
-
-/** @brief Records an implicitly failed condition descibed by msg (fatal) */
-#define RCU_FAIL_FATAL(msg) \
- { rcu_assert_impl(RCU_FALSE, RCU_TRUE,("RCU_FAIL_FATAL : " #msg),"",__FILE__, __LINE__); }
-
-/** @brief Asserts a true condition */
+/* Asserts a false condition */
 #define RCU_ASSERT_TRUE(cond) \
- { rcu_assert_impl((cond),RCU_FALSE, ("RCU_ASSERT_TRUE : " #cond),"", __FILE__,__LINE__); }
+ { rcu_assert_impl((cond), __FILE__,__func__,__LINE__, "%s is false but expected to be true", #cond); }
 
-/** @brief Asserts a true condition (fatal) */
-#define RCU_ASSERT_TRUE_FATAL(cond) \
- { rcu_assert_impl((cond),RCU_TRUE, ("RCU_ASSERT_TRUE_FATAL : " #cond),"", __FILE__,__LINE__); }
-
-/** @brief Asserts a false condition */
+/* Asserts a false condition */
 #define RCU_ASSERT_FALSE(cond) \
- { rcu_assert_impl(!(cond),RCU_FALSE, ("RCU_ASSERT_FALSE : " #cond),"", __FILE__,__LINE__); }
+ { rcu_assert_impl(!(cond), __FILE__,__func__,__LINE__, "%s is true but expected to be false", #cond); }
 
-/** @brief Asserts a false condition (fatal) */
-#define RCU_ASSERT_FALSE_FATAL(cond) \
- { rcu_assert_impl(!(cond),RCU_TRUE, ("RCU_ASSERT_FALSE_FATAL:" #cond),"", __FILE__,__LINE__); }
-
-/** @brief Asserts a null pointer */
+/* Asserts a null pointer */
 #define RCU_ASSERT_NULL(ptr) \
- { rcu_assert_impl(((ptr)==RCU_NULL),RCU_FALSE, ("RCU_ASSERT_NULL:" #ptr),"", __FILE__,__LINE__); }
+ { rcu_assert_impl(((ptr) == NULL), __FILE__,__func__,__LINE__, "expecting null pointer"); }
 
-/** @brief Asserts a null pointer (fatal) */
-#define RCU_ASSERT_NULL_FATAL(ptr) \
- { rcu_assert_impl(((ptr)==RCU_NULL),RCU_TRUE, ("RCU_ASSERT_NULL_FATAL:" #ptr),"", __FILE__,__LINE__); }
-
-/** @brief Asserts a non-null pointer */
+/* Asserts a non-null pointer */
 #define RCU_ASSERT_NOT_NULL(ptr) \
- { rcu_assert_impl(((ptr)!=RCU_NULL),RCU_FALSE, ("RCU_ASSERT_NOT_NULL:" #ptr),"", __FILE__,__LINE__); }
+ { rcu_assert_impl(((ptr) != NULL), __FILE__,__func__,__LINE__,"expecting non-null pointer"); }
 
-/** @brief Asserts a non-null pointer (fatal) */
-#define RCU_ASSERT_NOT_NULL_FATAL(ptr) \
- { rcu_assert_impl(((ptr)!=RCU_NULL),RCU_TRUE, ("RCU_ASSERT_NOT_NULL_FATAL:" #ptr),"", __FILE__,__LINE__); }
+/* Asserts that the two variables are equal */
+#define RCU_ASSERT_EQUAL(expected, actual) \
+    { int __expected = expected; int __actual = actual; \
+     rcu_assert_impl((__expected == __actual), __FILE__,__func__, __LINE__,"%s expected to be %s but got %d", #actual, #expected, __actual);  \
+    }
+
+/* Asserts that the two strings are equal */
+#define RCU_ASSERT_EQUAL_STRING(expected, actual) \
+    { const char *__expected = expected; const char *__actual = actual; \
+    rcu_assert_impl( !(strcmp((__expected), (__actual))), __FILE__,__func__, __LINE__, "%s expected to be \"%s\" but got \"%s\"", __expected, __actual); \
+    }
+
+/* Records an explicitly failed condition described by msg */
+#define RCU_FAIL(msg) \
+ { rcu_assert_impl(RCU_FALSE, __FILE__,__func__, __LINE__, "failed explicitly : \"%s\"", msg); }
+
+/* Asserts that the two byte arrays are equal */
+#define RCU_ASSERT_SAME_BYTE_ARRAY(array1, array2, size) \
+    { rcu_assert_impl( !(memcmp(array1, array2, size)), __FILE__,__func__, __LINE__, "arrays are not the same"); }
+
+#define RCU_ASSERT_NOT_SAME_BYTE_ARRAY(array1, array2, size) \
+    { rcu_assert_impl( (memcmp(array1, array2, size)), __FILE__,__func__, __LINE__, "byte arrays are the same"); }
+
+/** Asserts that a bit is set at the given bit position (zero-based) */
+#define RCU_ASSERT_BIT_SET(data, bit_pos) \
+ { int __data = data; int __bit_pos = bit_pos; rcu_assert_impl(__data & (1 << __bit_pos), __FILE__,__func__,__LINE__,"bit %d is not set in %lu",__bit_pos, (rcu_u4) __data); }
+
+/** Asserts that a bit is set at the given bit position (zero-based) */
+#define RCU_ASSERT_BIT_NOT_SET(data, bit_pos) \
+ { int __data = data; int __bit_pos = bit_pos; rcu_assert_impl((data & (1 << bit_pos)) == 0,__FILE__,__func__,__LINE__,"bit %d is set in %lu",__bit_pos, (rcu_u4) __data); }
+
 
 #endif /* RCUNIT_ASSERT_H */
-
-
 

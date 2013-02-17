@@ -1,117 +1,80 @@
 /*
- * RCUNIT - A unit testing framework for C.
- * Copyright (C) 2006 Jerrico L. Gamis
+ * The MIT License (MIT)
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * RCUNIT - A unit testing framework for C
+ * Copyright 2013 Jerrico Gamis <jecklgamis@gmail.com>
  *
- * This program is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE. See the GNU General Public License for more details.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  *
- * You should have received a copy of the GNU General Public
- * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
  *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #ifndef RCUNIT_CONFIG_H
 #define RCUNIT_CONFIG_H
 
 #ifdef HAVE_CONFIG_H
-#include <rcunit_config_env.h>
+#include "rcunit_config_env.h"
 #endif
 
-/** @brief RCUNIT version string */
+/* RCUNIT version string */
 #ifdef HAVE_CONFIG_H
 #define RCU_VERSION_STRING  PACKAGE_VERSION
 #else
-#define RCU_VERSION_STRING  "0.1"
+#define RCU_VERSION_STRING  "1.0"
 #endif /** HAVE_CONFIG_H */
 
-/** @brief Enables ANSI I/O facility */
-#define RCU_ENABLE_ANSI_FILE_IO 1
-
-#if RCU_ENABLE_ANSI_FILE_IO
-
-/** @brief Enables file log handler */
+/* Enables file log handler */
 #define RCU_ENABLE_FILE_LOG_HANDLER 1
 
-/** @brief Enables stdout log handler */
-#define RCU_ENABLE_STDOUT_LOG_HANDLER 1
+/* Enables stdout log handler */
+#define RCU_ENABLE_CONSOLE_LOG_HANDLER 1
 
-/** @brief Enables report redirection */
-#define RCU_ENABLE_REDIRECT_REPORT 0
+/* Enable plain text logs instead of HTML */
+#define RCU_ENABLE_EMIT_PLAINTEXT_LOG 1
 
-/** @brief Enables log report redirection */
-#define RCU_ENABLE_REDIRECT_LOG 0
+/* Enable plain text test run report instead of HTML */
+#define RCU_ENABLE_EMIT_PLAINTEXT_REPORT 1
 
-#else
-
-/** @brief Enables file log handler */
-#define RCU_ENABLE_FILE_LOG_HANDLER 0
-
-/** @brief Enables stdout log handler */
-#define RCU_ENABLE_STDOUT_LOG_HANDLER 0
-
-/** @brief Enables report redirection */
-#define RCU_ENABLE_REDIRECT_REPORT 1
-
-/** @brief Enables log report redirection */
-#define RCU_ENABLE_REDIRECT_LOG 1
-
-#endif /** RCU_ENABLE_ANSI_FILE_IO */
-
-/** @brief Enable plain text logs instead of HTML */
-#define RCU_ENABLE_EMIT_PLAINTEXT_LOG 0
-
-/** @brief Enable plain text test run report instead of HTML */
-#define RCU_ENABLE_EMIT_PLAINTEXT_REPORT 0
-
-/** @brief Enables memory allocation alignment */
+/* Enables memory allocation alignment */
 #define RCU_ENABLE_MALLOC_ALIGNMENT 1
 
-/** @brief Enables memory tracing facility */
+/* Enables memory tracing facility */
 #define RCU_ENABLE_MTRACE 1
 
-
-/********************************************************************/
-/** Oopss: Thre are no user configurable switches beyond this point.
- *  These are used for debugging and testing purposes. Edit at your
+/*******************************************************************
+ * Oops: There are no user configurable switches beyond this point.
+ *  These are used for testing and debugging. Edit at your
  *  own risk.
- */
-/********************************************************************/
+ *
+ *******************************************************************/
+//#define RCU_DEBUG 1
+
 #ifdef RCU_DEBUG
 
-/** @brief Enables memory allocation tracing */
+/* Enables memory allocation tracing */
 #define RCU_ENABLE_TRACE_ALLOC 1
 
-/** @brief Enables function entry point tracing. This applies to test
- *  functions, test init and destroy functions, test run hook, and
- *  assertion hook.
- */
-#define RCU_ENABLE_TRACE_FUNCTION_ENTRY_POINTS 1
+/* Enable random malloc failure */
+#define RCU_ENABLE_RANDOM_MALLOC_FAILURE 0
 
-/** @brief Enables tracing of RCUNIT function interfaces */
-#define RCU_ENABLE_TRACE_IFACE_ENTRY 1
-
-/** @brief Enables mtrace test run report debugging */
-#define RCU_ENABLE_DEBUG_REPORT 1
-
-/** @brief Enables mtrace debugging */
-#define RCU_ENABLE_DEBUG_MTRACE 1
-
-/** @brief Enables file log handler debugging */
-#define RCU_ENABLE_DEBUG_FILE_LOG_HANDLER 1
+#define RCU_ENABLE_FORCE_MALLOC_FAILURE 0
 
 #endif /** RCU_DEBUG */
 
-
 #endif /* RCUNIT_CONFIG_H */
-
-
 
