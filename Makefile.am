@@ -2,7 +2,7 @@
 
 EXTRA_DIST = build
 
-SUBDIRS = src doc samples tests
+SUBDIRS = src samples tests
 
 
 
