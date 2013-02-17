@@ -1,4 +1,3 @@
-
 RCUNIT is a small framework for testing C programs. It uses non-local jumps to
 emulate exceptions and handles program terminating signals (e.g. SIGILL) 
 during test runs. RCUNIT allows creation of test fixtures, either per test
@@ -25,5 +24,9 @@ What Gets Installed?
 * RCUNIT static library (librcunit.a) in /usr/local/lib
 * RCUNIT header files in /usr/local/include
 
-Note you can change the installation path by re-running ./configure with the
---prefix=<dir> option. By default it uses /usr/local.
+Note you can change the installation path by re-running ./configure  with --prefix
+
+```
+$ ./configure --prefix=/some/dir
+```
+By default --prefix is ```/usr/local```
