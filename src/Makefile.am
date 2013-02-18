@@ -26,14 +26,23 @@ librcunit_a_SOURCES = \
     rcunit_thread.c
 
 include_HEADERS =  \
-    rcunit_types.h  \
-    rcunit_exception.h \
-    rcunit_list.h \
-    rcunit_random.h \
-    rcunit_hashtable.h \
-    rcunit_mem.h \
-    rcunit_queue.h \
-    rcunit_thread.h
+	rcunit.h \
+	rcunit_api.h \
+	rcunit_assert.h \
+	rcunit_config.h \
+	rcunit_config_env.h \
+	rcunit_error.h \
+	rcunit_exception.h \
+	rcunit_hashtable.h \
+	rcunit_helpers.h \
+	rcunit_list.h \
+	rcunit_mem.h \
+	rcunit_mtrace.h \
+	rcunit_queue.h \
+	rcunit_random.h \
+	rcunit_report.h \
+	rcunit_thread.h \
+	rcunit_types.h
 
 if DEBUG
 AM_CPPFLAGS  = 
