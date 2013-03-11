@@ -26,15 +26,15 @@
 
 #include <testmoko_exception.h>
 
-/** @brief Current exception stack frame */
+/* Current exception stack frame */
 tmk_exception_frame *g_tmk_curr_excp_frame = NULL;
 int g_tmk_excp_initialized = 0;
 
-/** @brief Defines an exception object table entry */
+/* Defines an exception object table entry */
 #define TMK_DEFINE_EXCEPTION(id, name) \
     { id, name },
 
-/** @brief Global exception object table */
+/* Global exception object table */
 tmk_exception
 g_tmk_excp_tbl[] = {
     TMK_DEFINE_EXCEPTION(TMK_EXCP_ID_START, "Reserved (TMK_EXCP_ID_START)")
@@ -51,12 +51,7 @@ g_tmk_excp_tbl[] = {
     TMK_DEFINE_EXCEPTION(TMK_EXCP_ID_UNKNOWN, "Unknown")
 };
 
-/**
- *  @brief Retrieves the exception object of the given exception id
- *  @param[in] id Exception identifier
- *  @return Exception object
- */
-
+/*  Retrieves the exception object of the given exception id */
 tmk_exception *tmk_lookup_excp_by_id(tmk_exception_id id) {
     tmk_exception *excp = &g_tmk_excp_tbl[TMK_EXCP_ID_UNKNOWN];
     if (id > TMK_EXCP_ID_START && id < TMK_EXCP_ID_END) {
@@ -65,32 +60,21 @@ tmk_exception *tmk_lookup_excp_by_id(tmk_exception_id id) {
     return excp;
 }
 
-/**
- *  @brief Initializes the exception mechanism
- *  @return Operation error code (TMK_E_OK, TMK_E_NG)
- */
-
+/*  Initializes the exception mechanism */
 void tmk_init_exception() {
     if (!g_tmk_excp_initialized) {
         g_tmk_curr_excp_frame = NULL;
     }
 }
 
-/**
- *  @brief Destroys the exception mechanism
- *  @return Operation error code (TMK_E_OK, TMK_E_NG)
- */
+/* Destroys the exception mechanism */
 
 void tmk_destroy_exception() {
     if (g_tmk_excp_initialized) {
     }
 }
 
-/**
- * @brief Handles SIGSEGV, SIGILL, SIGFPE, and SIGBUS signals when executing
- * tests.
- * @param signo signal number
- */
+/* Handles SIGSEGV, SIGILL, SIGFPE, and SIGBUS signals when executing tests */
 void tmk_sig_handler(int signo) {
     switch (signo) {
         case SIGSEGV:
@@ -115,11 +99,7 @@ void tmk_sig_handler(int signo) {
     siglongjmp(*(g_tmk_curr_excp_frame->env), TMK_EXCEPTION_TYPE_CORE);
 }
 
-/**
- * @brief Saves signal context
- *
- * @param frame exception frame
- */
+/* Saves signal context */
 void tmk_sig_save(tmk_exception_frame *frame) {
     sigaction(SIGSEGV, NULL, &frame->segv_act_old);
     sigaction(SIGILL, NULL, &frame->ill_act_old);
@@ -127,11 +107,7 @@ void tmk_sig_save(tmk_exception_frame *frame) {
     sigaction(SIGBUS, NULL, &frame->bus_act_old);
 }
 
-/**
- * @brief Restores signal context
- *
- * @param frame exception frame
- */
+/* Restores signal context */
 void tmk_sig_restore(tmk_exception_frame *frame) {
     sigaction(SIGSEGV, &frame->segv_act_old, NULL);
     sigaction(SIGILL, &frame->ill_act_old, NULL);
@@ -139,10 +115,7 @@ void tmk_sig_restore(tmk_exception_frame *frame) {
     sigaction(SIGBUS, &frame->bus_act_old, NULL);
 }
 
-/**
- * @brief Catches and handles some core dumping signals.
- *
- */
+/* Catches and handles some core dumping signals */
 void tmk_sig_catch() {
     struct sigaction __segv_act, __ill_act, __fpe_act, __bus_act;
 

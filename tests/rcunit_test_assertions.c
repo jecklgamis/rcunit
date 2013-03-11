@@ -24,9 +24,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "rcunit_api.h"
-#include "testmoko.h"
-
+#include "rcunit_test.h" 
 
 static int nr_invocations = 0;
 
@@ -51,7 +49,6 @@ TMK_TEST(rcu_test_assert_single_evaluation) {
     nr_invocations = 0;
     RCU_ASSERT(return_1());
     TMK_ASSERT_EQUAL(1, nr_invocations);
-    
     nr_invocations = 0;
     RCU_ASSERT_TRUE(return_1());
     TMK_ASSERT_EQUAL(1, nr_invocations);
@@ -63,11 +60,11 @@ TMK_TEST(rcu_test_assert_single_evaluation) {
     nr_invocations = 0;
     RCU_ASSERT_EQUAL(1, return_1());
     TMK_ASSERT_EQUAL(1, nr_invocations);
-    
+
     nr_invocations = 0;
     RCU_ASSERT_EQUAL_STRING("string", return_string());
     TMK_ASSERT_EQUAL(1, nr_invocations);
-    
+
     nr_invocations = 0;
     RCU_ASSERT_NULL(return_null_ptr());
     TMK_ASSERT_EQUAL(1, nr_invocations);
@@ -75,7 +72,6 @@ TMK_TEST(rcu_test_assert_single_evaluation) {
     nr_invocations = 0;
     RCU_ASSERT_NOT_NULL(return_string());
     TMK_ASSERT_EQUAL(1, nr_invocations);
-    
 }
 
 RCU_TEST(rcu_bit_assertion_tests){
@@ -129,7 +125,32 @@ RCU_TEST(rcu_byte_assertion_tests){
     RCU_ASSERT_NOT_SAME_BYTE_ARRAY(expected, actual, 4);
 }
 
-TMK_TEST(rcu_test_byte_array_assertions) {
+TMK_TEST(rcu_test_byte_assertions) {
     rcu_add_test(rcu_byte_assertion_tests);
     TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
 }
+
+RCU_TEST(rcu_float_assertion_tests) {
+    RCU_ASSERT_EQUAL_FLOATS(1.00001, 1.00001);
+    RCU_ASSERT_NOT_EQUAL_FLOATS(1.00001, 1.00000);
+}
+
+TMK_TEST(rcu_test_float_assertions) {
+    rcu_add_test(rcu_float_assertion_tests);
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
+}
+
+RCU_TEST(rcu_pointer_assertion_tests) {
+    int x;
+    int *y = &x;
+    RCU_ASSERT_EQUAL_PTRS(&x, y);
+}
+
+TMK_TEST(rcu_test_pointer_assertions) {
+    rcu_add_test(rcu_pointer_assertion_tests);
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
+}
+
+
+
+

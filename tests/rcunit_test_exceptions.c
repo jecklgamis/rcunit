@@ -24,7 +24,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "rcunit.h" 
+#include "rcunit_test.h" 
 
 int rcu_test_exception_001_1() {
     TMK_LOG("rcu_test_exception_001_1 invoked!");

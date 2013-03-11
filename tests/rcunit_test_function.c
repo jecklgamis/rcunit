@@ -24,10 +24,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <testmoko.h>
-#include "rcunit.h" 
-
-#include "rcunit_api.h"
+#include "rcunit_test.h" 
 
 extern void test(void *param);
 extern void setup(void *param);

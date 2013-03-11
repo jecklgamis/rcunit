@@ -33,7 +33,7 @@
 extern void rcu_assert_impl(int cond, const char *filename, const char *func_name, int line,
         const char *format, ...);
 
-/* Asserts a condition */
+/* Asserts a true condition */
 #define RCU_ASSERT(cond) \
  { rcu_assert_impl((cond), __FILE__,__func__, __LINE__, "%s", #cond); }
 
@@ -53,16 +53,37 @@ extern void rcu_assert_impl(int cond, const char *filename, const char *func_nam
 #define RCU_ASSERT_NOT_NULL(ptr) \
  { rcu_assert_impl(((ptr) != NULL), __FILE__,__func__,__LINE__,"expecting non-null pointer"); }
 
-/* Asserts that the two variables are equal */
+/* Asserts that the two values/variables are equal (integer types) */
 #define RCU_ASSERT_EQUAL(expected, actual) \
-    { int __expected = expected; int __actual = actual; \
-     rcu_assert_impl((__expected == __actual), __FILE__,__func__, __LINE__,"%s expected to be %s but got %d", #actual, #expected, __actual);  \
+    { long __expected = expected; long __actual = actual; \
+     rcu_assert_impl((__expected == __actual), __FILE__,__func__, __LINE__,"%s expected to be %s but got %ld", #actual, #expected, (long)__actual);  \
+    }
+
+/* Asserts that the two values/variables are not equal (integer types) */
+#define RCU_ASSERT_NOT_EQUAL(expected, actual) \
+    { long __expected = expected; long __actual = actual; \
+     rcu_assert_impl((__expected != __actual), __FILE__,__func__, __LINE__,"%s not expected to be %s but got %ld", #actual, #expected, (long)__actual);  \
+    }
+
+#define RCU_ASSERT_EQUAL_FLOATS(expected, actual) \
+    { double __expected = expected; double __actual = actual; \
+     rcu_assert_impl((__expected == __actual), __FILE__,__func__, __LINE__,"%s expected to be %s but got %lf", #actual, #expected, (double)__actual);  \
+    }
+
+#define RCU_ASSERT_NOT_EQUAL_FLOATS(expected, actual) \
+    { double __expected = expected; double __actual = actual; \
+     rcu_assert_impl((__expected != __actual), __FILE__,__func__, __LINE__,"%s not expected to be %s but got %lf", #actual, #expected, (double)__actual);  \
+    }
+
+#define RCU_ASSERT_EQUAL_PTRS(expected, actual) \
+    { void *__expected = expected; void *__actual = actual; \
+     rcu_assert_impl((__expected == __actual), __FILE__,__func__, __LINE__,"%s expected to be %s but got %p", #actual, #expected, (void*)__actual);  \
     }
 
 /* Asserts that the two strings are equal */
 #define RCU_ASSERT_EQUAL_STRING(expected, actual) \
     { const char *__expected = expected; const char *__actual = actual; \
-    rcu_assert_impl( !(strcmp((__expected), (__actual))), __FILE__,__func__, __LINE__, "%s expected to be \"%s\" but got \"%s\"", __expected, __actual); \
+    rcu_assert_impl( !(strcmp((__expected), (__actual))), __FILE__,__func__, __LINE__, "%s expected to be \"%s\" but got \"%s\"", #actual, #expected,__actual); \
     }
 
 /* Records an explicitly failed condition described by msg */

@@ -26,8 +26,8 @@
 
 #include "rcunit_test.h"
 
-extern int rcunit_sample_app_main(int argc, char **argv);
-extern int rcunit_sample_app_2_main(int argc, char **argv);
+//extern int rcunit_sample_app_main(int argc, char **argv);
+//extern int rcunit_sample_app_2_main(int argc, char **argv);
 
 RCU_TEST(test) {
     RCU_ASSERT(RCU_TRUE);
@@ -86,8 +86,9 @@ TMK_INCLUDE_TEST(rcu_test_run_hooks)
 /* assertion macro tests */
 TMK_INCLUDE_TEST(rcu_test_assert_single_evaluation)
 TMK_INCLUDE_TEST(rcu_test_bit_assertions)
-TMK_INCLUDE_TEST(rcu_test_byte_array_assertions)
-
+TMK_INCLUDE_TEST(rcu_test_byte_assertions)
+TMK_INCLUDE_TEST(rcu_test_float_assertions)
+TMK_INCLUDE_TEST(rcu_test_pointer_assertions)
 
 /* memory allocation tracing tests */
 TMK_INCLUDE_TEST( rcu_test_mtrace)

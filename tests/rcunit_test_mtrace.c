@@ -1,4 +1,4 @@
-#include "rcunit.h"
+#include "rcunit_test.h"
 
 #define NR_ALLOCS 16
 

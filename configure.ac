@@ -2,11 +2,11 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.53)
-AC_INIT([rcunit],[1.0],[jecklgamis@gmail.com])
+AC_INIT([rcunit],[1.0-beta],[jecklgamis@gmail.com])
 AC_CANONICAL_HOST
 AC_PROG_MAKE_SET
 AC_CONFIG_SRCDIR([src/rcunit.c])
-AM_INIT_AUTOMAKE([rcunit],[1.0])
+AM_INIT_AUTOMAKE
 
 # Configuration header
 AC_CONFIG_HEADER(src/rcunit_config_env.h)

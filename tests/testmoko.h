@@ -78,40 +78,55 @@ typedef struct tmk_test_function_entry {
  * to this is to assign/evaluate it to a local variable (block scope) 
  */
 
-/** @brief Asserts a condition */
+
+/* Asserts a condition */
 #define TMK_ASSERT(cond) \
  { tmk_assert_impl((cond), __FILE__, __func__, __LINE__, "%s", #cond); }
 
-/** @brief Asserts a false condition */
+/* Asserts a false condition */
 #define TMK_ASSERT_TRUE(cond) \
  { tmk_assert_impl((cond), __FILE__,__func__, __LINE__, "%s is not true", #cond); }
 
-/** @brief Asserts a false condition */
+/* Asserts a false condition */
 #define TMK_ASSERT_FALSE(cond) \
  { tmk_assert_impl(!(cond), __FILE__,__func__,__LINE__, "%s is true", #cond); }
 
-/** @brief Asserts a null pointer */
+/* Asserts a null pointer */
 #define TMK_ASSERT_NULL(ptr) \
  { tmk_assert_impl(((ptr) == NULL), __FILE__,__func__,__LINE__, "null"); }
 
-/** @brief Asserts a non-null pointer */
+/* Asserts a non-null pointer */
 #define TMK_ASSERT_NOT_NULL(ptr) \
  { tmk_assert_impl(((ptr) != NULL), __FILE__,__func__,__LINE__,"pointer is not null"); }
 
-/** @brief Asserts that the two variables are equal */
+/* Asserts that the two variables are equal */
 #define TMK_ASSERT_EQUAL(expected, actual) \
-    { int __expected = expected; int __actual = actual; \
+    { long __expected = (long)expected; long __actual = (long)actual; \
       tmk_assert_impl((__expected == __actual), __FILE__, __func__, __LINE__,  \
       "%s expected to be %d but got %d", #actual,__expected, __actual); \
     }
 
-/** @brief Asserts that the two strings are equal */
+/* Asserts that the two floating points are equal */
+#define TMK_ASSERT_EQUAL_FLOATS(expected, actual) \
+    { double __expected = (double)expected; double __actual = (double)actual; \
+      tmk_assert_impl((__expected == __actual), __FILE__, __func__, __LINE__,  \
+      "%s expected to be %lf but got %lf", #actual,__expected, __actual); \
+    }
+
+/* Asserts that the two pointers are equal */
+#define TMK_ASSERT_EQUAL_PTRS(expected, actual) \
+    { void *__expected = (void*)expected; void *__actual = (void*)actual; \
+      tmk_assert_impl((__expected == __actual), __FILE__, __func__, __LINE__,  \
+      "%s expected to be %p but got %", #actual,__expected, __actual); \
+    }
+
+/* Asserts that the two strings are equal */
 #define TMK_ASSERT_EQUAL_STRING(expected, actual) \
     { const char *__expected = expected; const char *__actual = actual; \
      tmk_assert_impl( !(strcmp((__expected), (__actual))), __FILE__, __func__, __LINE__,  \
              "expected \"%s\" but got \"%s\"", __expected, __actual); }
 
-/** @brief Records an explicitly failed condition described by msg */
+/* Records an explicitly failed condition described by msg */
 #define TMK_FAIL(msg) \
  { tmk_assert_impl(0, __FILE__, __func__, __LINE__, "Failed explicitly : %s", msg); }
 
@@ -128,7 +143,8 @@ void tmk_log_impl(const char* filename, const int line_no,
 extern TMK_API int tmk_run_tests(const tmk_test_function_entry *tbl,
         TMK_NULLABLE void (*setup)(), void (*teardown)());
 
-void tmk_assert_impl(int cond, const char *fname, const char *func_name, int line, const char *format, ...);
+extern void tmk_assert_impl(int cond, const char *filename, const char *func_name,int line, const char *format, ...); 
+
 
 #endif /* TESTMOKO_H */
 

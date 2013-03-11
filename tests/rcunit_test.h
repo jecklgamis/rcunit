@@ -27,6 +27,8 @@
 #ifndef RCUNIT_TEST_H
 #define RCUNIT_TEST_H
 
+#include <stdlib.h>
+#include <stdio.h>
 #include "rcunit.h"
 #include "testmoko.h"
 

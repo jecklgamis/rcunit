@@ -24,8 +24,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "rcunit.h"
-#include "testmoko.h"
+#include "rcunit_test.h" 
 
 /* Verify that we can create a test module */
 TMK_TEST(rcu_test_get_mod) {

@@ -19,3 +19,7 @@ rcunit_sample_app_demo_SOURCES = rcunit_sample_app_demo.c
 LDADD = ../src/librcunit.a
 
 AM_CPPFLAGS =  -I $(top_srcdir)/src  -I $(srcdir)
+
+clean-local:
+	rm -f *.log
+	rm  -f rcunit_test_run_report.*
