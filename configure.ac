@@ -46,7 +46,7 @@ AC_FUNC_MALLOC
 AC_CHECK_FUNCS([malloc free memset memcpy strcpy strcmp strlen setjmp longjmp sprintf fprintf ctime time])
 
 # Configuration files
-AC_CONFIG_FILES([Makefile src/Makefile samples/Makefile tests/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile samples/Makefile tests/Makefile doc/Makefile])
 
 AC_OUTPUT
 
