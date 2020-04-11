@@ -91,7 +91,6 @@ RCU_INC_TEST(test)
 RCU_DEF_FUNC_TBL_END
 
 RCU_DEF_MOD_TBL(mod_tbl)
-RCU_INC_MOD("mod-tbl", mod_tbl)
 RCU_DEF_MOD_TBL_END
 
 TMK_TEST(rcu_test_add_mod_tbl) {

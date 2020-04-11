@@ -29,8 +29,6 @@
 #define RCU_TEMP_BUFF_SIZE 1024
 static char g_temp_buff[RCU_TEMP_BUFF_SIZE];
 
-rcu_failure_record *rcu_cre_fail_rec(const char *info, const char *filename, const char func_name, int line_no);
-
 void rcu_assert_impl(int cond, const char *filename, const char *func_name,
                      int line_no, const char *format, ...) {
     rcu_test_machine *machine = NULL;
@@ -52,8 +50,6 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
     mod = RCU_GET_CURR_MOD(machine);
     run_ctx = RCU_GET_RUN_CTX(machine);
 
-    //    RCU_LOG_DEBUG("Asserting condition in %s (%s:%d)", func_name, filename, line_no);
-
     switch (run_ctx) {
         case RCU_RUN_CTX_MOD_INIT:
         case RCU_RUN_CTX_MOD_DESTROY:
@@ -65,7 +61,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
                 } else {
                     RCU_SET_DESTROY_FAILED(mod);
                 }
-                rcu_add_fail_rec_to_mod(mod, assert_msg_buff, filename, func_name, line_no, RCU_TRUE);
+                rcu_add_fail_rec_to_mod(mod, assert_msg_buff, filename, line_no, RCU_TRUE);
                 RCU_SET_RUN_CTX(machine, RCU_RUN_CTX_UNKNOWN);
                 RCU_THROW(RCU_GET_EXCP(RCU_EXCP_ABORTMODRUN));
             }
@@ -80,7 +76,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
                 } else {
                     RCU_SET_DESTROY_FAILED(func);
                 }
-                rcu_add_fail_rec_to_func(func, assert_msg_buff, filename, func_name, line_no);
+                rcu_add_fail_rec_to_func(func, assert_msg_buff, filename, line_no);
                 RCU_SET_RUN_CTX(machine, RCU_RUN_CTX_UNKNOWN);
                 RCU_THROW(RCU_GET_EXCP(RCU_EXCP_ASSERTIONFAILURE));
             }
@@ -95,7 +91,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
                               filename, line_no, assert_msg_buff);
                 RCU_INCR(func->nr_fail_assert);
                 RCU_SET_RUN_STAT(func, RCU_RUN_STAT_TEST_FAILED);
-                rcu_add_fail_rec_to_func(func, assert_msg_buff, filename, func_name, line_no);
+                rcu_add_fail_rec_to_func(func, assert_msg_buff, filename, line_no);
                 RCU_SET_RUN_CTX(machine, RCU_RUN_CTX_UNKNOWN);
                 RCU_THROW(RCU_GET_EXCP(RCU_EXCP_ASSERTIONFAILURE));
             } else {
@@ -106,8 +102,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
             if (!cond) {
                 RCU_LOG_ERROR("Assert failed in non-test function %s (%s:%d)",
                               func_name, filename, line_no);
-                rcu_add_fail_rec_impl(&machine->ae.assert_list, assert_msg_buff,
-                                      filename, func_name, func_name, line_no);
+                rcu_add_fail_rec_impl(&machine->ae.assert_list, assert_msg_buff, filename, func_name, line_no);
             }
     }
 
@@ -158,8 +153,7 @@ RCU_API int rcu_set_assert_hook(rcu_generic_function assert_hook) {
     return RCU_E_OK;
 }
 
-rcu_failure_record *rcu_cre_fail_rec(const char *info,
-                                     const char *filename, const char func_name, int line_no) {
+rcu_failure_record *rcu_cre_fail_rec(const char *info, const char *filename, const char *func_name, int line_no) {
     rcu_failure_record *fail_rec = NULL;
     int info_len;
     const char *error_str = NULL;
@@ -170,7 +164,7 @@ rcu_failure_record *rcu_cre_fail_rec(const char *info,
     if ((fail_rec = rcu_malloc(sizeof(rcu_failure_record))) == NULL) {
         return NULL;
     }
-    memset(g_temp_buff, 0x00, RCU_TEMP_BUFF_SIZE);
+    memset(g_temp_buff, 0, RCU_TEMP_BUFF_SIZE);
     error_str = "failed";
     sprintf(g_temp_buff, "%s(%d) : %s", filename, line_no, info);
     info_len = strlen(g_temp_buff) + 1;
@@ -184,8 +178,8 @@ rcu_failure_record *rcu_cre_fail_rec(const char *info,
     return fail_rec;
 }
 
-int rcu_add_fail_rec_impl(rcu_list *fail_rec_list,
-                          char *info, char *filename, const char *func_name, int line_no) {
+int rcu_add_fail_rec_impl(rcu_list *fail_rec_list, const char *info, const char *filename, const char *func_name,
+                          int line_no) {
     rcu_failure_record *fail_rec = NULL;
     rcu_test_machine *machine = NULL;
 

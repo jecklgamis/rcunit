@@ -35,6 +35,8 @@ const char *rcu_get_stat_str(int stat);
 
 #define RCU_DEFAULT_STRING_BUFFER_SIZE 1024
 
+int rcu_indent(FILE *fp, int nr_spaces);
+
 int rcu_gen_plaintext_report(rcu_test_machine *machine) {
     char ts_buff[RCU_TSTAMP_BUFF_SIZE];
     rcu_get_timestamp(ts_buff, RCU_TSTAMP_BUFF_SIZE);
@@ -114,6 +116,7 @@ int rcu_print_char(FILE *fp, char ch, int nr_chars) {
     for (a = 0; a < nr_chars; a++) {
         fprintf(fp, "%c", ch);
     }
+    return RCU_E_OK;
 }
 
 int rcu_indent(FILE *fp, int nr_spaces) {
@@ -121,4 +124,5 @@ int rcu_indent(FILE *fp, int nr_spaces) {
     for (a = 0; a < nr_spaces; a++) {
         fprintf(fp, " ");
     }
+    return RCU_E_OK;
 }

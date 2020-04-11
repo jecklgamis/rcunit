@@ -27,11 +27,9 @@
 
 #include "rcunit.h"
 
-extern rcu_test *rcu_srch_test_func_entry(rcu_module *mod,
-                                          rcu_generic_function entry);
+extern rcu_test *rcu_srch_test_func_entry(rcu_module *mod, rcu_generic_function entry);
 
-extern rcu_test *rcu_srch_test_func_by_name(rcu_module *mod,
-                                            const char *name);
+extern rcu_test *rcu_srch_test_func_by_name(rcu_module *mod, const char *name);
 
 int rcu_get_timestamp(char *ts_buff, int ts_buff_len) {
     time_t t;
@@ -41,14 +39,11 @@ int rcu_get_timestamp(char *ts_buff, int ts_buff_len) {
         RCU_LOG_WARN("Null timestamp buffer or insufficient buffer length");
         return RCU_E_NG;
     }
-
     memset(ts_buff, 0x00, ts_buff_len);
     time(&t);
     sprintf(ts_buff, "%s", ctime(&t));
-
     len = strlen(ts_buff);
     memset(&ts_buff[len - 1], 0x00, 1);
-
     return RCU_E_OK;
 }
 
@@ -73,15 +68,12 @@ RCU_API void rcu_dump_test_dbase() {
     rcu_dump_test_dbase_impl(&the_test_machine);
 }
 
-rcu_module *rcu_srch_mod_by_name_global(const char *mod_name,
-                                        rcu_registry **which_reg) {
+rcu_module *rcu_srch_mod_by_name_global(const char *mod_name, rcu_registry **which_reg) {
     rcu_test_machine *machine = &the_test_machine;
 
     *which_reg = NULL;
-
     RCU_FOR_EACH_ENTRY_WITH_CURSOR(&machine->reg_list, reg_cursor) {
         rcu_registry *reg = (rcu_registry *) reg_cursor;
-
         RCU_FOR_EACH_ENTRY_WITH_CURSOR(&reg->mod_list, mod_cursor) {
             rcu_module *mod = (rcu_module *) mod_cursor;
             if (!strcmp(mod->name, mod_name)) {
@@ -152,7 +144,6 @@ int rcu_srch_mod_by_ref_global(rcu_module *srch_mod,
 
     RCU_FOR_EACH_ENTRY_WITH_CURSOR(&machine->reg_list, reg_cursor) {
         rcu_registry *reg = (rcu_registry *) reg_cursor;
-
         RCU_FOR_EACH_ENTRY_WITH_CURSOR(&reg->mod_list, mod_cursor) {
             rcu_module *mod = (rcu_module *) mod_cursor;
             if (mod == srch_mod) {
@@ -168,13 +159,11 @@ int rcu_get_nr_tests() {
     rcu_test_machine *machine = &the_test_machine;
 
     rcu_init();
-
     RCU_FOR_EACH_ENTRY_WITH_CURSOR(&machine->reg_list, reg_cursor) {
         rcu_registry *reg = (rcu_registry *) reg_cursor;
 
         RCU_FOR_EACH_ENTRY_WITH_CURSOR(&reg->mod_list, mod_cursor) {
             rcu_module *mod = (rcu_module *) mod_cursor;
-
             RCU_FOR_EACH_ENTRY_WITH_CURSOR(&mod->func_list, test_cursor) {
                 nr_tests++;
             }
@@ -188,10 +177,8 @@ int rcu_get_nr_mods() {
     rcu_test_machine *machine = &the_test_machine;
 
     rcu_init();
-
     RCU_FOR_EACH_ENTRY_WITH_CURSOR(&machine->reg_list, reg_cursor) {
         rcu_registry *reg = (rcu_registry *) reg_cursor;
-
         RCU_FOR_EACH_ENTRY_WITH_CURSOR(&reg->mod_list, mod_cursor) {
             nr_mods++;
         }

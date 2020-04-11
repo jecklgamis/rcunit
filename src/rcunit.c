@@ -38,11 +38,15 @@ lmk_log_handler *the_rcu_file_log_hnd;
 /* The RCUNIT console file handler */
 lmk_log_handler *the_rcu_console_log_hnd;
 
-extern rcu_test *rcu_srch_test_func_by_name(rcu_module *mod,
-                                            const char *name);
+extern rcu_test *rcu_srch_test_func_by_name(rcu_module *mod, const char *name);
 
-extern rcu_test *rcu_srch_test_func_entry(rcu_module *mod,
-                                          rcu_generic_function entry);
+extern rcu_test *rcu_srch_test_func_entry(rcu_module *mod, rcu_generic_function entry);
+
+extern int rcu_init_test_mach(rcu_test_machine *machine);
+
+int rcu_init_log();
+
+int rcu_destroy_log();
 
 RCU_API int rcu_run_test_mach() {
     rcu_test_machine *machine = &the_test_machine;

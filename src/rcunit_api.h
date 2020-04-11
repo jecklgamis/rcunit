@@ -113,7 +113,72 @@ rcu_test_function_entry name[] = {
 #define RCU_DEF_DESTROY_FUNC(name) \
     RCU_TEARDOWN(name)
 
-RCU_API rcu_registry *rcu_cre_test_reg(const char *name);
+extern RCU_API rcu_registry *rcu_cre_test_reg(const char *name);
+
+extern RCU_API int rcu_add_test_mod(rcu_module *mod);
+
+extern RCU_API int rcu_destroy_test_reg(rcu_registry *reg);
+
+extern RCU_API int rcu_destroy_test_mod(rcu_module *mod);
+
+extern RCU_API int rcu_destroy_test_reg(rcu_registry *reg);
+
+extern RCU_API int rcu_destroy_test_reg(rcu_registry *reg);
+
+extern RCU_API int rcu_get_err();
+
+extern RCU_API int rcu_has_mem_leak();
+
+extern RCU_API int rcu_have_asserts();
+
+extern RCU_API int rcu_init();
+
+extern RCU_API int rcu_run_test_mach();
+
+extern RCU_API int rcu_run_test_mod_by_name(const char *name);
+
+extern RCU_API int rcu_run_test_reg_by_name(const char *name);
+
+extern RCU_API int rcu_run_test_reg_unsupported(rcu_registry *reg);
+
+extern RCU_API int rcu_run_tests();
+
+extern RCU_API int rcu_set_assert_hook(rcu_generic_function assert_hook);
+
+extern RCU_API int rcu_set_run_hook(rcu_generic_function run_hook);
+
+extern RCU_API rcu_exception *rcu_lookup_excp_by_id(rcu_exception_id id);
+
+extern RCU_API rcu_module *rcu_get_default_mod();
+
+extern RCU_API rcu_module *rcu_get_mod(const char *name);
+
+
+extern RCU_API rcu_registry *rcu_get_reg(const char *name);
+
+extern RCU_API rcu_thread *rcu_get_thread(const char *name, rcu_thread_routine routine, void *arg);
+
+extern RCU_API void *rcu_malloc(size_t size);
+
+extern RCU_API void rcu_destroy_threads();
+
+extern RCU_API void rcu_dump_asserts();
+
+extern RCU_API void rcu_dump_test_dbase();
+
+extern RCU_API void rcu_free(void *addr);
+
+extern RCU_API void rcu_init_threads();
+
+extern RCU_API int rcu_add_test_func_tbl(rcu_module *mod, rcu_test_function_entry *func_tbl);
+
+extern RCU_API int rcu_add_test_mod_tbl(rcu_registry *reg, rcu_module_entry *mod_tbl);
+
+extern RCU_API int rcu_run_test_mod(rcu_module *module);
+
+extern RCU_API void rcu_dump_test_reg(rcu_registry *reg);
+extern int rcu_destroy_test_mach(rcu_test_machine *machine);
+
 
 #endif /* RCUNIT_API_H */
 

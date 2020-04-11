@@ -37,6 +37,8 @@ int gs_mtrace_init_done = RCU_FALSE;
  */
 #define RCU_ENABLE_POINTER_TABLE_COMPACTION 0
 
+void rcu_get_mtrace_results(rcu_pointer_cache *ptr_cache, int *nr_leaks, size_t *leak_size);
+
 int rcu_cre_ptr_tbl(rcu_pointer_cache *ptr_cache) {
     rcu_pointer_table *ptr_tbl = NULL;
     int a = 0;
@@ -149,7 +151,7 @@ int rcu_dump_ptr_cache(rcu_pointer_cache *ptr_cache) {
     RCU_FOR_EACH_ENTRY(&ptr_cache->ptr_tbl_list, cursor) {
         ptr_tbl = (rcu_pointer_table *) cursor;
         memset(tbl_name, 0x00, 16);
-        sprintf(tbl_name, "", ptr_tbl);
+        sprintf(tbl_name, "%p", ptr_tbl);
         rcu_dump_ptr_tble(ptr_tbl, tbl_name);
     }
     RCU_LOG_INFO("[MTRACE POINTER CACHE DUMP END]");

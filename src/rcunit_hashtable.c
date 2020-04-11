@@ -26,6 +26,8 @@
 
 #include "rcunit_hashtable.h"
 
+extern rcu_memcell *rcu_alloc_mem_cell(size_t nr_mem_cell);
+
 rcu_hashtable *rcu_cre_hash_tbl(int nr_bucket) {
     rcu_hashtable *tbl;
     int tbl_size;
@@ -40,7 +42,7 @@ rcu_hashtable *rcu_cre_hash_tbl(int nr_bucket) {
     return NULL;
 }
 
-int rcu_gen_int32_hash_jenkin_impl(int key) {
+int rcu_gen_int32_hash_jenkins_impl(int key) {
     key += (key << 12);
     key ^= (key >> 22);
     key += (key << 4);
@@ -53,7 +55,7 @@ int rcu_gen_int32_hash_jenkin_impl(int key) {
 }
 
 int rcu_gen_int32_hash(int key) {
-    return rcu_gen_int32_hash_jenkin_impl(key);
+    return rcu_gen_int32_hash_jenkins_impl(key);
 }
 
 int rcu_gen_str_hash(const char *strz) {

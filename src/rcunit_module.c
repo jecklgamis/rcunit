@@ -75,8 +75,7 @@ int rcu_free_test_mod(rcu_module *mod) {
     return RCU_E_OK;
 }
 
-int rcu_init_mod(rcu_module *mod, rcu_generic_function init,
-                 rcu_generic_function destroy, const char *name) {
+int rcu_init_mod(rcu_module *mod, rcu_generic_function init, rcu_generic_function destroy, const char *name) {
     int name_len = 0;
     if (mod == NULL) {
         RCU_LOG_WARN("%s (null)", RCU_GET_ERR_MSG_OF(RCU_E_INVMOD));
@@ -151,10 +150,8 @@ RCU_API int rcu_destroy_test_mod(rcu_module *mod) {
     return RCU_E_OK;
 }
 
-int rcu_add_fail_rec_to_mod(rcu_module *mod, const char *info,
-                            const char *filepath, const int line_no, int fatal) {
-    return (rcu_add_fail_rec_impl(&mod->fail_rec_list, info, filepath, line_no,
-                                  fatal));
+int rcu_add_fail_rec_to_mod(rcu_module *mod, const char *info, const char *filepath, const int line_no, int fatal) {
+    return rcu_add_fail_rec_impl(&mod->fail_rec_list, info, filepath, "", line_no);
 }
 
 int rcu_del_all_fail_rec_from_mod(rcu_module *mod) {
@@ -175,7 +172,7 @@ rcu_test *rcu_srch_test_func_by_name(rcu_module *mod,
     return (NULL);
 }
 
-int rcu_run_test_mod(rcu_module *module) {
+RCU_API int rcu_run_test_mod(rcu_module *module) {
     rcu_test_machine *machine = NULL;
     char ts_buff[RCU_TSTAMP_BUFF_SIZE];
     rcu_module *mod;

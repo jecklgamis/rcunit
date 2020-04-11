@@ -131,7 +131,7 @@
 #define RCU_TEST_REGISTRY_NAME_LENGTH 255
 
 /* Test function table entry */
-typedef struct rcu_test_function_entry_tag {
+typedef struct {
     const char *name;
     rcu_generic_function entry;
     rcu_generic_function init;
@@ -139,7 +139,7 @@ typedef struct rcu_test_function_entry_tag {
 } rcu_test_function_entry;
 
 /* Test module table entry */
-typedef struct rcu_module_entry_tag {
+typedef struct {
     const char *name;
     rcu_generic_function init;
     rcu_generic_function destroy;
@@ -147,7 +147,7 @@ typedef struct rcu_module_entry_tag {
 } rcu_module_entry;
 
 /* Test registry runtime data structure */
-typedef struct rcu_registry_tag {
+typedef struct {
     rcu_list link;
     rcu_list mod_list;
     char name[RCU_TEST_REGISTRY_NAME_LENGTH + 1];
@@ -159,7 +159,7 @@ typedef struct rcu_registry_tag {
 } rcu_registry;
 
 /* Test module runtime data structure */
-typedef struct rcu_module_tag {
+typedef struct {
     rcu_list link;
     rcu_generic_function init;
     rcu_generic_function destroy;
@@ -181,7 +181,7 @@ typedef struct rcu_failure_record {
 } rcu_failure_record;
 
 /* Test function runtime data structure */
-typedef struct rcu_test_tag {
+typedef struct {
     rcu_list link;
     char name[RCU_TEST_FUNCTION_NAME_LENGTH];
     rcu_generic_function entry;
@@ -292,7 +292,7 @@ typedef struct rcu_assertion_engine {
 #define RCU_LOG_FILENAME_PLAINTEXT  "rcunit_log.txt"
 
 /* Test machine runtime data structure */
-typedef struct rcu_test_machine_tag {
+typedef struct {
     rcu_module def_mod;
     rcu_registry def_reg;
     rcu_list reg_list;
@@ -338,6 +338,7 @@ rcu_module *rcu_cre_test_mod(const char *name, rcu_generic_function init,
 #include "rcunit_mem.h"
 #include "rcunit_mtrace.h"
 #include "rcunit_random.h"
+#include "rcunit_thread.h"
 #include "rcunit_api.h"
 
 /* External variable declarations (used internally) */
@@ -346,6 +347,62 @@ extern int g_ercd;
 extern rcu_test_machine the_test_machine;
 extern lmk_logger *the_rcu_logger;
 
+extern int rcu_add_fail_rec_to_mod(rcu_module *mod, const char *info, const char *filepath, const int line_no,
+                                   int fatal);
+
+extern int rcu_run_test_reg_impl(rcu_test_machine *machine, rcu_registry *reg);
+
+extern int rcu_add_fail_rec_to_func(rcu_test *func, const char *info, const char *filepath, const int line_no);
+
+extern int rcu_add_test_func(rcu_module *mod, rcu_generic_function entry, rcu_generic_function init,
+                             rcu_generic_function destroy, const char *name);
+
+extern int rcu_run_tests_impl(rcu_test_machine *machine);
+
+extern int rcu_stop_mach(rcu_test_machine *machine);
+
+extern void rcu_gen_test_run_report(rcu_test_machine *machine);
+
+extern int rcu_get_nr_tests();
+
+extern int rcu_get_nr_mods();
+
+extern int rcu_get_nr_registry();
+
+extern int rcu_has_mem_leak();
+
+extern int rcu_add_fail_rec_impl(rcu_list *fail_rec_list, const char *info, const char *filename,
+                                 const char *func_name, int line_no);
+
+extern int rcu_reg_exists(rcu_test_machine *machine, rcu_registry *reg);
+
+extern void rcu_init_exception();
+
+extern int rcu_init_reg(rcu_registry *reg, const char *name);
+
+extern int rcu_init_mod(rcu_module *mod, rcu_generic_function init, rcu_generic_function destroy, const char *name);
+
+extern int rcu_add_test_reg(rcu_registry *reg);
+
+extern int rcu_restart_mach(rcu_test_machine *machine);
+
+extern int rcu_run_test_mod_impl(rcu_test_machine *machine, rcu_module *mod);
+
+extern void rcu_destroy_exception();
+
+extern int rcu_destroy_test_dbase(rcu_test_machine *machine);
+
+extern int rcu_stop_assert_engine(rcu_test_machine *machine);
+
+extern int rcu_del_all_fail_rec_impl(rcu_list *fail_rec_list);
+
+extern rcu_module *rcu_srch_mod_by_name_global(const char *mod_name, rcu_registry **which_reg);
+
+extern int rcu_free_test_func(rcu_test *func);
+
+extern void rcu_reset_all_run_stat();
+
+int rcu_run_test_func_impl(rcu_test_machine *machine, rcu_test *func);
 
 #endif /* RCUNIT_H */
 

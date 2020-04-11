@@ -42,21 +42,19 @@ RCU_API int rcu_add_test(rcu_generic_function test) {
 }
 
 RCU_API int rcu_add_test_to_mod(rcu_module *mod, rcu_generic_function test) {
-    return rcu_add_test_func(mod, test, NULL, NULL);
+    return rcu_add_test_func(mod, test, NULL, NULL, NULL);
 }
 
-RCU_API int rcu_add_test_fxt(rcu_generic_function test,
-                             rcu_generic_function setup, rcu_generic_function teardown) {
-    return rcu_add_test_func(rcu_get_default_mod(), test, setup, teardown);
+RCU_API int rcu_add_test_fxt(rcu_generic_function test, rcu_generic_function setup, rcu_generic_function teardown) {
+    return rcu_add_test_func(rcu_get_default_mod(), test, setup, teardown, NULL);
 }
 
 RCU_API int rcu_add_test_fxt_to_mod(rcu_module *mod, rcu_generic_function test,
                                     rcu_generic_function setup, rcu_generic_function teardown) {
-    return rcu_add_test_func(rcu_get_default_mod(), test, setup, teardown);
+    return rcu_add_test_func(rcu_get_default_mod(), test, setup, teardown, NULL);
 }
 
-RCU_API int rcu_add_test_func(rcu_module *mod,
-                              rcu_generic_function entry, rcu_generic_function init,
+RCU_API int rcu_add_test_func(rcu_module *mod, rcu_generic_function entry, rcu_generic_function init,
                               rcu_generic_function destroy, const char *name) {
     rcu_test *func = NULL;
     rcu_registry *which_reg = NULL;
@@ -104,8 +102,7 @@ RCU_API int rcu_add_test_func(rcu_module *mod,
     return RCU_E_OK;
 }
 
-RCU_API int rcu_add_test_func_tbl(rcu_module *mod,
-                                  rcu_test_function_entry *func_tbl) {
+RCU_API int rcu_add_test_func_tbl(rcu_module *mod, rcu_test_function_entry *func_tbl) {
     rcu_test_function_entry *cursor = NULL;
     int index;
     rcu_test_machine *machine = &the_test_machine;
@@ -122,7 +119,6 @@ RCU_API int rcu_add_test_func_tbl(rcu_module *mod,
     }
 
     mod = (mod == NULL) ? rcu_get_default_mod() : mod;
-
     RCU_FOR_EACH_FUNC_ENTRY(func_tbl, cursor, index) {
         if (cursor->entry != NULL) {
             rcu_add_test_func(mod, cursor->entry, cursor->init,
@@ -156,9 +152,8 @@ int rcu_free_test_func(rcu_test *func) {
     return RCU_E_OK;
 }
 
-int rcu_add_fail_rec_to_func(rcu_test *func, const char *info,
-                             const char *filepath, const int line_no) {
-    return (rcu_add_fail_rec_impl(&func->fail_rec_list, info, filepath, line_no));
+int rcu_add_fail_rec_to_func(rcu_test *func, const char *info, const char *filepath, const int line_no) {
+    return rcu_add_fail_rec_impl(&func->fail_rec_list, info, filepath, "", line_no);
 }
 
 int rcu_del_all_fail_rec_from_func(rcu_test *func) {

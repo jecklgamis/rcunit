@@ -78,7 +78,6 @@ typedef struct tmk_test_function_entry {
  * to this is to assign/evaluate it to a local variable (block scope) 
  */
 
-
 /* Asserts a condition */
 #define TMK_ASSERT(cond) \
  { tmk_assert_impl((cond), __FILE__, __func__, __LINE__, "%s", #cond); }
@@ -130,20 +129,19 @@ typedef struct tmk_test_function_entry {
 #define TMK_FAIL(msg) \
  { tmk_assert_impl(0, __FILE__, __func__, __LINE__, "Failed explicitly : %s", msg); }
 
-void tmk_log_impl(const char* filename, const int line_no,
-        const char *format, ...);
+void tmk_log_impl(const char *filename, const int line_no,
+                  const char *format, ...);
 
 #define TMK_LOG(format...) \
-	tmk_log_impl(__FILE__, __LINE__, format);
+    tmk_log_impl(__FILE__, __LINE__, format);
 
 
 #define TMK_PRINT_THIS_LINE \
     fprintf(stdout,">> %s %s %d\n", __FILE__,__func__,__LINE__);
 
-extern TMK_API int tmk_run_tests(const tmk_test_function_entry *tbl,
-        TMK_NULLABLE void (*setup)(), void (*teardown)());
+extern TMK_API int tmk_run_tests(tmk_test_function_entry *tbl, TMK_NULLABLE void (*setup)(), void (*teardown)());
 
-extern void tmk_assert_impl(int cond, const char *filename, const char *func_name,int line, const char *format, ...); 
+extern void tmk_assert_impl(int cond, const char *filename, const char *func_name, int line, const char *format, ...);
 
 
 #endif /* TESTMOKO_H */

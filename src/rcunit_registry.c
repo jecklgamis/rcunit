@@ -36,6 +36,8 @@ int rcu_reg_exists(rcu_test_machine *machine, rcu_registry *reg);
 
 rcu_registry *rcu_cre_test_reg(const char *name);
 
+RCU_API int rcu_destroy_test_reg(rcu_registry *reg);
+
 RCU_API rcu_registry *rcu_get_reg(const char *name) {
     rcu_registry *reg = NULL;
     if (name == NULL) {
@@ -286,7 +288,7 @@ int rcu_mod_exists(rcu_registry *reg, rcu_module *srch_mod) {
     return RCU_FALSE;
 }
 
-void rcu_dump_test_reg(rcu_registry *reg) {
+RCU_API void rcu_dump_test_reg(rcu_registry *reg) {
     rcu_list *cursor1 = NULL;
     rcu_list *cursor2 = NULL;
     rcu_test *func = NULL;
