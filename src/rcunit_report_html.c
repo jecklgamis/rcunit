@@ -24,7 +24,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "rcunit.h" 
+#include "rcunit.h"
 
 int rcu_gen_html_report(rcu_test_machine *machine) {
     return RCU_E_OK;

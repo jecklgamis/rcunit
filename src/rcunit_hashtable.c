@@ -33,7 +33,7 @@ rcu_hashtable *rcu_cre_hash_tbl(int nr_bucket) {
         return NULL;
     }
     tbl_size = RCU_SIZEOF_HASHTABLE(nr_bucket);
-    tbl = (rcu_hashtable*) rcu_alloc_mem_cell(tbl_size);
+    tbl = (rcu_hashtable *) rcu_alloc_mem_cell(tbl_size);
     if (tbl == NULL) {
         return NULL;
     }

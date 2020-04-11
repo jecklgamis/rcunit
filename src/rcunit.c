@@ -39,9 +39,10 @@ lmk_log_handler *the_rcu_file_log_hnd;
 lmk_log_handler *the_rcu_console_log_hnd;
 
 extern rcu_test *rcu_srch_test_func_by_name(rcu_module *mod,
-        const char *name);
+                                            const char *name);
+
 extern rcu_test *rcu_srch_test_func_entry(rcu_module *mod,
-        rcu_generic_function entry);
+                                          rcu_generic_function entry);
 
 RCU_API int rcu_run_test_mach() {
     rcu_test_machine *machine = &the_test_machine;
@@ -56,7 +57,7 @@ RCU_API int rcu_run_test_mach() {
     rcu_gen_test_run_report(machine);
     RCU_LOG_INFO("Test run finished %s", ts_buff);
     RCU_LOG_INFO("Test Run Results: Passed : %d  Failed : %d", machine->nr_succ_test, machine->nr_failed_test);
-    if (machine->nr_failed_reg == 0 && rcu_get_nr_tests() > 0 ) {
+    if (machine->nr_failed_reg == 0 && rcu_get_nr_tests() > 0) {
         RCU_LOG_INFO("Test successful!");
     } else {
         RCU_LOG_INFO("Test failed!");
@@ -87,15 +88,15 @@ void rcu_print_rcunit_info() {
 #if RCU_ENABLE_MALLOC_ALIGNMENT
     RCU_LOG_DEBUG("Memory allocation aligned to %u bytes", RCU_DEFAULT_MALLOC_ALIGNMENT);
 #endif
-    RCU_LOG_DEBUG("sizeof(char) is %u bytes", sizeof (char));
-    RCU_LOG_DEBUG("sizeof(rcu_short) is %u bytes", sizeof (rcu_short));
-    RCU_LOG_DEBUG("sizeof(int) is %u bytes", sizeof (int));
-    RCU_LOG_DEBUG("sizeof(rcu_long) is %u bytes", sizeof (rcu_long));
-    RCU_LOG_DEBUG("sizeof(rcu_float) is %u bytes", sizeof (rcu_float));
-    RCU_LOG_DEBUG("sizeof(rcu_double) is %u bytes", sizeof (rcu_double));
-    RCU_LOG_DEBUG("sizeof(rcu_long_long) is %u bytes", sizeof (rcu_long_long));
-    RCU_LOG_DEBUG("sizeof(rcu_long_double) is %u bytes", sizeof (rcu_long_double));
-    RCU_LOG_DEBUG("sizeof(void*) is %lu bytes", sizeof (void*));
+    RCU_LOG_DEBUG("sizeof(char) is %u bytes", sizeof(char));
+    RCU_LOG_DEBUG("sizeof(rcu_short) is %u bytes", sizeof(rcu_short));
+    RCU_LOG_DEBUG("sizeof(int) is %u bytes", sizeof(int));
+    RCU_LOG_DEBUG("sizeof(rcu_long) is %u bytes", sizeof(rcu_long));
+    RCU_LOG_DEBUG("sizeof(rcu_float) is %u bytes", sizeof(rcu_float));
+    RCU_LOG_DEBUG("sizeof(rcu_double) is %u bytes", sizeof(rcu_double));
+    RCU_LOG_DEBUG("sizeof(rcu_long_long) is %u bytes", sizeof(rcu_long_long));
+    RCU_LOG_DEBUG("sizeof(rcu_long_double) is %u bytes", sizeof(rcu_long_double));
+    RCU_LOG_DEBUG("sizeof(void*) is %lu bytes", sizeof(void *));
     RCU_LOG_DEBUG("[ RCUNIT INFORMATION END ]");
 }
 
@@ -152,7 +153,7 @@ int rcu_init_log() {
     int log_level = LMK_LOG_LEVEL_DEBUG;
 #else
     int log_level = LMK_LOG_LEVEL_INFO;
-#endif    
+#endif
     lmk_set_log_level(the_rcu_logger, log_level);
     the_rcu_file_log_hnd = lmk_get_file_log_handler("rcunit-flh", "rcunit.log");
     if (the_rcu_file_log_hnd != NULL) {

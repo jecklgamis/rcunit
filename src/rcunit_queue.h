@@ -34,10 +34,15 @@
 typedef rcu_list rcu_queue;
 
 void rcu_init_queue(rcu_queue *queue);
+
 void rcu_destroy_queue(rcu_queue *queue);
+
 void rcu_insert_queue(rcu_queue *queue, rcu_queue *element);
+
 rcu_queue *rcu_remove_queue(rcu_queue *queue);
+
 int rcu_get_queue_size(rcu_queue *entry);
+
 int rcu_is_queue_empty(rcu_queue *list);
 
 #endif /* RCUNIT_QUEUE_H */

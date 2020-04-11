@@ -26,10 +26,15 @@
 
 #include "rcunit.h"
 
-extern rcu_test *rcu_srch_test_func_entry_global(rcu_generic_function entry, rcu_module **which_mod, rcu_registry **which_reg);
+extern rcu_test *
+rcu_srch_test_func_entry_global(rcu_generic_function entry, rcu_module **which_mod, rcu_registry **which_reg);
+
 extern rcu_test *rcu_srch_test_func_by_name_global(const char *name, rcu_module **which_mod, rcu_registry **which_reg);
+
 extern rcu_test *rcu_alloc_test_func(int nr_func);
+
 extern rcu_module *rcu_srch_mod_by_name_global(const char *mod_name, rcu_registry **which_reg);
+
 rcu_test *rcu_srch_test_func_entry(rcu_module *mod, rcu_generic_function entry);
 
 RCU_API int rcu_add_test(rcu_generic_function test) {
@@ -41,18 +46,18 @@ RCU_API int rcu_add_test_to_mod(rcu_module *mod, rcu_generic_function test) {
 }
 
 RCU_API int rcu_add_test_fxt(rcu_generic_function test,
-        rcu_generic_function setup, rcu_generic_function teardown) {
+                             rcu_generic_function setup, rcu_generic_function teardown) {
     return rcu_add_test_func(rcu_get_default_mod(), test, setup, teardown);
 }
 
 RCU_API int rcu_add_test_fxt_to_mod(rcu_module *mod, rcu_generic_function test,
-        rcu_generic_function setup, rcu_generic_function teardown) {
+                                    rcu_generic_function setup, rcu_generic_function teardown) {
     return rcu_add_test_func(rcu_get_default_mod(), test, setup, teardown);
 }
 
 RCU_API int rcu_add_test_func(rcu_module *mod,
-        rcu_generic_function entry, rcu_generic_function init,
-        rcu_generic_function destroy, const char *name) {
+                              rcu_generic_function entry, rcu_generic_function init,
+                              rcu_generic_function destroy, const char *name) {
     rcu_test *func = NULL;
     rcu_registry *which_reg = NULL;
     rcu_test_machine *machine = NULL;
@@ -83,7 +88,7 @@ RCU_API int rcu_add_test_func(rcu_module *mod,
         strncpy(func->name, test_name, strlen(test_name));
     } else {
         name_len = strlen(name) > RCU_TEST_FUNCTION_NAME_LENGTH ?
-                RCU_TEST_FUNCTION_NAME_LENGTH : strlen(name);
+                   RCU_TEST_FUNCTION_NAME_LENGTH : strlen(name);
         strncpy(func->name, name, name_len);
     }
     func->entry = entry;
@@ -100,7 +105,7 @@ RCU_API int rcu_add_test_func(rcu_module *mod,
 }
 
 RCU_API int rcu_add_test_func_tbl(rcu_module *mod,
-        rcu_test_function_entry *func_tbl) {
+                                  rcu_test_function_entry *func_tbl) {
     rcu_test_function_entry *cursor = NULL;
     int index;
     rcu_test_machine *machine = &the_test_machine;
@@ -121,7 +126,7 @@ RCU_API int rcu_add_test_func_tbl(rcu_module *mod,
     RCU_FOR_EACH_FUNC_ENTRY(func_tbl, cursor, index) {
         if (cursor->entry != NULL) {
             rcu_add_test_func(mod, cursor->entry, cursor->init,
-                    cursor->destroy, cursor->name);
+                              cursor->destroy, cursor->name);
         } else {
             RCU_LOG_WARN("Invalid test function entry. (index = %d)", index);
         }
@@ -134,9 +139,9 @@ rcu_test *rcu_alloc_test_func(int nr_func) {
     if (nr_func <= 0) {
         return NULL;
     }
-    func = (rcu_test *) rcu_malloc(sizeof (rcu_test) * nr_func);
+    func = (rcu_test *) rcu_malloc(sizeof(rcu_test) * nr_func);
     if (func != NULL) {
-        memset(func, 0, sizeof (rcu_test));
+        memset(func, 0, sizeof(rcu_test));
     }
     return func;
 }
@@ -152,7 +157,7 @@ int rcu_free_test_func(rcu_test *func) {
 }
 
 int rcu_add_fail_rec_to_func(rcu_test *func, const char *info,
-        const char *filepath, const int line_no) {
+                             const char *filepath, const int line_no) {
     return (rcu_add_fail_rec_impl(&func->fail_rec_list, info, filepath, line_no));
 }
 
@@ -169,16 +174,17 @@ int rcu_run_test_func_impl(rcu_test_machine *machine, rcu_test *func) {
     if (func->init != NULL) {
         RCU_SET_RUN_CTX(machine, RCU_RUN_CTX_FUNC_INIT);
         RCU_TRY
-        {
-            func->init(NULL);
-        }
+                {
+                    func->init(NULL);
+                }
 
-        RCU_CATCH(e) {
-            if (e->id != RCU_EXCP_ASSERTIONFAILURE) {
-                RCU_LOG_ERROR("Caught %s in %s setup", e->name, func->name);
-            }
-            return RCU_E_NG;
-        }
+            RCU_CATCH(e)
+                {
+                    if (e->id != RCU_EXCP_ASSERTIONFAILURE) {
+                        RCU_LOG_ERROR("Caught %s in %s setup", e->name, func->name);
+                    }
+                    return RCU_E_NG;
+                }
         RCU_END_CATCH
     }
 
@@ -186,16 +192,17 @@ int rcu_run_test_func_impl(rcu_test_machine *machine, rcu_test *func) {
     RCU_LOG_DEBUG("Running test function : %s", func->name);
 
     RCU_TRY
-    {
-        func->entry(NULL);
-        RCU_SET_RUN_STAT(func, RCU_RUN_STAT_TEST_SUCC);
-    }
+            {
+                func->entry(NULL);
+                RCU_SET_RUN_STAT(func, RCU_RUN_STAT_TEST_SUCC);
+            }
 
-    RCU_CATCH(e) {
-        if (e->id != RCU_EXCP_ASSERTIONFAILURE) {
-            RCU_LOG_ERROR("Caught %s in %s", e->name, func->name);
-        }
-    }
+        RCU_CATCH(e)
+            {
+                if (e->id != RCU_EXCP_ASSERTIONFAILURE) {
+                    RCU_LOG_ERROR("Caught %s in %s", e->name, func->name);
+                }
+            }
     RCU_END_CATCH
 
     if (RCU_IS_TEST_SUCCEDED(func)) {
@@ -210,16 +217,17 @@ int rcu_run_test_func_impl(rcu_test_machine *machine, rcu_test *func) {
     if (func->destroy != NULL) {
         RCU_SET_RUN_CTX(machine, RCU_RUN_CTX_FUNC_DESTROY);
         RCU_TRY
-        {
-            func->destroy(NULL);
-        }
+                {
+                    func->destroy(NULL);
+                }
 
-        RCU_CATCH(e) {
-            if (e->id != RCU_EXCP_ASSERTIONFAILURE) {
-                RCU_LOG_ERROR("Caught %s in %s", e->name, func->name);
-            }
-            return RCU_E_NG;
-        }
+            RCU_CATCH(e)
+                {
+                    if (e->id != RCU_EXCP_ASSERTIONFAILURE) {
+                        RCU_LOG_ERROR("Caught %s in %s", e->name, func->name);
+                    }
+                    return RCU_E_NG;
+                }
         RCU_END_CATCH
     }
 

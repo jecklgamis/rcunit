@@ -94,8 +94,8 @@ typedef struct rcu_exception_context {
 
 #if RCU_DEBUG_EXCEPTION
 #define TRACE_FRAME_HERE \
-	fprintf(stdout, "[%s:%d]g_curr_excp_frame = %p\n", __FILE__, __LINE__, g_curr_excp_frame); \
-	fprintf(stdout, "[%s:%d]g_curr_excp_frame->env = %p\n", __FILE__, __LINE__,g_curr_excp_frame->env);
+    fprintf(stdout, "[%s:%d]g_curr_excp_frame = %p\n", __FILE__, __LINE__, g_curr_excp_frame); \
+    fprintf(stdout, "[%s:%d]g_curr_excp_frame->env = %p\n", __FILE__, __LINE__,g_curr_excp_frame->env);
 #else
 #define TRACE_FRAME_HERE
 #endif
@@ -108,7 +108,7 @@ typedef struct rcu_exception_context {
         rcu_exception_frame __frame;          \
         __frame.outer = g_curr_excp_frame;    \
         __frame.excp = NULL;              \
-	g_curr_excp_frame = &__frame;         \
+    g_curr_excp_frame = &__frame;         \
         g_curr_excp_frame->env = &__env;      \
         TRACE_FRAME_HERE \
         rcu_sig_save(&__frame);             \
@@ -143,7 +143,9 @@ typedef struct rcu_exception_context {
 
 /* Exception mechanism function prototypes */
 void rcu_init_excp();
+
 void rcu_destroy_excp();
+
 rcu_exception *rcu_lookup_excp_by_id(rcu_exception_id id);
 
 /** External variable declarations */
@@ -151,8 +153,11 @@ extern rcu_exception_frame *g_curr_excp_frame;
 
 /** Exception signal handlers */
 extern void rcu_sig_handler(int signo);
+
 extern void rcu_sig_catch(void);
+
 extern void rcu_sig_restore(rcu_exception_frame *pf);
+
 extern void rcu_sig_save(rcu_exception_frame *pf);
 
 #endif /* RCUNIT_EXCEPTION_H */

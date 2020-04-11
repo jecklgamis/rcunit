@@ -36,18 +36,18 @@ int g_excp_initialized = 0;
 
 /* Global exception object table */
 rcu_exception g_rcu_excp_tbl[] = {
-    RCU_DEFINE_EXCEPTION(RCU_EXCP_ID_START, "Reserved (RCU_EXCP_ID_START)")
-    RCU_DEFINE_EXCEPTION(RCU_EXCP_ABORTTESTRUN, "test function aborted")
-    RCU_DEFINE_EXCEPTION(RCU_EXCP_ABORTMODRUN, "test module aborted")
-    RCU_DEFINE_EXCEPTION(RCU_EXCP_NULLPOINTER, "null pointer")
-    RCU_DEFINE_EXCEPTION(RCU_EXCP_INVPARAM, "invalid parameter")
-    RCU_DEFINE_EXCEPTION(RCU_EXCP_SIGSEGV, "segmentation violation")
-    RCU_DEFINE_EXCEPTION(RCU_EXCP_SIGILL, "illegal instruction")
-    RCU_DEFINE_EXCEPTION(RCU_EXCP_SIGFPE, "floating point")
-    RCU_DEFINE_EXCEPTION(RCU_EXCP_SIGBUS, "bus error")
-    RCU_DEFINE_EXCEPTION(RCU_EXCP_ASSERTIONFAILURE, "assertion failure")
-    RCU_DEFINE_EXCEPTION(RCU_EXCP_ID_END, "Reserved (RCU_EXCP_ID_END)")
-    RCU_DEFINE_EXCEPTION(RCU_EXCP_ID_UNKNOWN, "Unknown")
+        RCU_DEFINE_EXCEPTION(RCU_EXCP_ID_START, "Reserved (RCU_EXCP_ID_START)")
+        RCU_DEFINE_EXCEPTION(RCU_EXCP_ABORTTESTRUN, "test function aborted")
+        RCU_DEFINE_EXCEPTION(RCU_EXCP_ABORTMODRUN, "test module aborted")
+        RCU_DEFINE_EXCEPTION(RCU_EXCP_NULLPOINTER, "null pointer")
+        RCU_DEFINE_EXCEPTION(RCU_EXCP_INVPARAM, "invalid parameter")
+        RCU_DEFINE_EXCEPTION(RCU_EXCP_SIGSEGV, "segmentation violation")
+        RCU_DEFINE_EXCEPTION(RCU_EXCP_SIGILL, "illegal instruction")
+        RCU_DEFINE_EXCEPTION(RCU_EXCP_SIGFPE, "floating point")
+        RCU_DEFINE_EXCEPTION(RCU_EXCP_SIGBUS, "bus error")
+        RCU_DEFINE_EXCEPTION(RCU_EXCP_ASSERTIONFAILURE, "assertion failure")
+        RCU_DEFINE_EXCEPTION(RCU_EXCP_ID_END, "Reserved (RCU_EXCP_ID_END)")
+        RCU_DEFINE_EXCEPTION(RCU_EXCP_ID_UNKNOWN, "Unknown")
 };
 
 RCU_API rcu_exception *rcu_lookup_excp_by_id(rcu_exception_id id) {

@@ -68,7 +68,7 @@ RCU_API void *rcu_malloc(size_t size) {
 #if RCU_ENABLE_MALLOC_ALIGNMENT
     aligned_size = RCU_ALIGN_N(RCU_DEFAULT_MALLOC_ALIGNMENT, size);
 #endif
-    addr = (void*) rcu_native_malloc(aligned_size);
+    addr = (void *) rcu_native_malloc(aligned_size);
     if (addr != NULL) {
 #if RCU_ENABLE_MTRACE
         RCU_TRACE_ALLOC_INTERNAL(addr, aligned_size);
@@ -97,7 +97,7 @@ rcu_memcell *rcu_alloc_mem_cell(size_t nr_mem_cell) {
     if (nr_mem_cell == 0) {
         return NULL;
     }
-    mem_cell = rcu_malloc(sizeof (rcu_memcell) * nr_mem_cell);
+    mem_cell = rcu_malloc(sizeof(rcu_memcell) * nr_mem_cell);
     return mem_cell;
 }
 

@@ -86,7 +86,7 @@
 #define RCU_LOG_ERROR(format...) LMK_LOG_ERROR(the_rcu_logger, format);
 #define RCU_LOG_FATAL(format...) LMK_LOG_FATAL(the_rcu_logger, format);
 
-#define RCU_DEC_TEST_FUNC(func,param) \
+#define RCU_DEC_TEST_FUNC(func, param) \
     extern void func(void* param);
 
 /* Declares a test function table */
@@ -102,10 +102,10 @@
     extern rcu_module_entry mod[];
 
 #define RCU_RET_IF_NULL(ptr) \
-	if ((ptr) == NULL) return;
+    if ((ptr) == NULL) return;
 
 #define RCU_RET_VALUE_IF_NULL(ptr, value) \
-	if ((ptr) == NULL) return value;
+    if ((ptr) == NULL) return value;
 
 #endif /* RCUNIT_HELPERS_H */
 

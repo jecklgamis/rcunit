@@ -49,6 +49,7 @@ typedef struct {
 } rcu_thread;
 
 RCU_API rcu_thread *rcu_get_thread(const char *name, rcu_thread_routine run, void *arg);
+
 RCU_API void rcu_join_thread(rcu_thread *thread);
 
 #endif /* RCUNIT_THREAD_H **/****

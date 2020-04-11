@@ -27,7 +27,9 @@
 #include "rcunit.h"
 
 extern int rcu_gen_html_report(rcu_test_machine *machine);
+
 extern int rcu_gen_plaintext_report(rcu_test_machine *machine);
+
 extern int rcu_gen_xml_report(rcu_test_machine *machine);
 
 const char *rcu_get_stat_str(int stat) {
@@ -48,13 +50,13 @@ const char *rcu_get_stat_str(int stat) {
 void rcu_prepare_report(rcu_test_machine *machine) {
 
     RCU_FOR_EACH_ENTRY_WITH_CURSOR_INDEX(&machine->reg_list, reg_cursor, reg_no) {
-        rcu_registry *reg = (rcu_registry*) reg_cursor;
+        rcu_registry *reg = (rcu_registry *) reg_cursor;
 
         RCU_FOR_EACH_ENTRY_WITH_CURSOR_INDEX(&reg->mod_list, mod_cursor, mod_no) {
-            rcu_module *mod = (rcu_module*) mod_cursor;
+            rcu_module *mod = (rcu_module *) mod_cursor;
 
             RCU_FOR_EACH_ENTRY_WITH_CURSOR_INDEX(&mod->func_list, func_cursor, func_no) {
-                rcu_test *func = (rcu_test*) func_cursor;
+                rcu_test *func = (rcu_test *) func_cursor;
                 if (RCU_IS_TEST_SUCCEDED(func)) {
                     RCU_INCR(mod->nr_succ_test);
                 } else if (RCU_IS_TEST_FAILED(func)) {

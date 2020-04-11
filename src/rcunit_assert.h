@@ -31,7 +31,7 @@
 
 
 extern void rcu_assert_impl(int cond, const char *filename, const char *func_name, int line,
-        const char *format, ...);
+                            const char *format, ...);
 
 /* Asserts a true condition */
 #define RCU_ASSERT(cond) \

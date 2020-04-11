@@ -72,7 +72,8 @@ enum {
 
 /** Error management function prototypes */
 int rcu_get_err();
-const char* rcu_get_err_msg(int ercd);
+
+const char *rcu_get_err_msg(int ercd);
 
 #endif /* RCUNIT_ERROR_H */
 

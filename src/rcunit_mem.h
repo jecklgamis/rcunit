@@ -33,11 +33,15 @@
 #include "rcunit_types.h"
 
 extern RCU_API void *rcu_malloc(size_t size);
+
 extern RCU_API void rcu_free(void *addr);
 
 void *rcu_native_malloc(size_t size);
+
 void rcu_native_free(void *addr);
+
 rcu_memcell *rcu_alloc_mem_cell(size_t nr_mem_cell);
+
 void rcu_free_mem_cell(rcu_memcell **cell);
 
 #endif /* RCUNIT_MEM_H */

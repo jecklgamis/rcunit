@@ -311,15 +311,23 @@ typedef struct rcu_test_machine_tag {
 } rcu_test_machine;
 
 void rcu_assert_impl(int cond, const char *filename, const char *func_name, int line, const char *format, ...);
+
 int rcu_get_timestamp(char *ts_buff, const int ts_buff_len);
+
 int rcu_is_mach_initialized(rcu_test_machine *machine);
+
 int rcu_del_all_fail_rec(rcu_test_machine *machine);
+
 int rcu_del_all_fail_rec_from_func(rcu_test *func);
+
 int rcu_del_all_fail_rec_from_mod(rcu_module *mod);
+
 void rcu_print(const char *str);
+
 void rcu_print_rcunit_info();
+
 rcu_module *rcu_cre_test_mod(const char *name, rcu_generic_function init,
-        rcu_generic_function destroy);
+                             rcu_generic_function destroy);
 
 /* Other RCUNIT header files */
 #include "rcunit_helpers.h"

@@ -60,9 +60,13 @@ typedef struct rcu_list {
 
 /** List operations function prototypes */
 void rcu_init_list(rcu_list *list);
+
 int rcu_is_list_empty(rcu_list *list);
+
 void rcu_insert_list(rcu_list *list, rcu_list *entry);
+
 void rcu_remove_list(rcu_list *entry);
+
 int rcu_get_list_size(rcu_list *entry);
 
 #endif /* RCUNIT_LIST_H */

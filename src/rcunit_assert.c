@@ -28,10 +28,11 @@
 
 #define RCU_TEMP_BUFF_SIZE 1024
 static char g_temp_buff[RCU_TEMP_BUFF_SIZE];
+
 rcu_failure_record *rcu_cre_fail_rec(const char *info, const char *filename, const char func_name, int line_no);
 
 void rcu_assert_impl(int cond, const char *filename, const char *func_name,
-        int line_no, const char *format, ...) {
+                     int line_no, const char *format, ...) {
     rcu_test_machine *machine = NULL;
     rcu_test *func = NULL;
     rcu_module *mod = NULL;
@@ -58,7 +59,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
         case RCU_RUN_CTX_MOD_DESTROY:
             if (!cond) {
                 RCU_LOG_ERROR("Assert failed in %s (%s:%d) : %s", func_name,
-                        filename, line_no, assert_msg_buff);
+                              filename, line_no, assert_msg_buff);
                 if (run_ctx == RCU_RUN_CTX_MOD_INIT) {
                     RCU_SET_INIT_FAILED(mod);
                 } else {
@@ -73,7 +74,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
         case RCU_RUN_CTX_FUNC_DESTROY:
             if (!cond) {
                 RCU_LOG_ERROR("Assert failed in %s (%s:%d) : %s", func_name,
-                        filename, line_no, assert_msg_buff);
+                              filename, line_no, assert_msg_buff);
                 if (run_ctx == RCU_RUN_CTX_MOD_INIT) {
                     RCU_SET_INIT_FAILED(func);
                 } else {
@@ -91,7 +92,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
             }
             if (!cond) {
                 RCU_LOG_ERROR("Assert failed in %s (%s:%d) : %s", func_name,
-                        filename, line_no, assert_msg_buff);
+                              filename, line_no, assert_msg_buff);
                 RCU_INCR(func->nr_fail_assert);
                 RCU_SET_RUN_STAT(func, RCU_RUN_STAT_TEST_FAILED);
                 rcu_add_fail_rec_to_func(func, assert_msg_buff, filename, func_name, line_no);
@@ -104,9 +105,9 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
         default:
             if (!cond) {
                 RCU_LOG_ERROR("Assert failed in non-test function %s (%s:%d)",
-                        func_name, filename, line_no);
+                              func_name, filename, line_no);
                 rcu_add_fail_rec_impl(&machine->ae.assert_list, assert_msg_buff,
-                        filename, func_name, func_name, line_no);
+                                      filename, func_name, func_name, line_no);
             }
     }
 
@@ -130,14 +131,14 @@ RCU_API void rcu_dump_asserts() {
     RCU_LOG_WARN("[ NON TEST RUN ASSERTIONS DUMP START]");
 
     RCU_FOR_EACH_ENTRY(&machine->ae.assert_list, cursor) {
-        fail_rec = (rcu_failure_record*) cursor;
+        fail_rec = (rcu_failure_record *) cursor;
         RCU_LOG_WARN("%s", fail_rec->info);
     }
     RCU_LOG_WARN("[ NON TEST RUN ASSERTIONS DUMP END]");
 }
 
 int rcu_restart_assert_engine(rcu_test_machine *machine) {
-    memset(&machine->ae, 0x00, sizeof (rcu_assertion_engine));
+    memset(&machine->ae, 0x00, sizeof(rcu_assertion_engine));
     RCU_LOG_DEBUG("Assertion engine restarted");
     return RCU_E_OK;
 }
@@ -158,7 +159,7 @@ RCU_API int rcu_set_assert_hook(rcu_generic_function assert_hook) {
 }
 
 rcu_failure_record *rcu_cre_fail_rec(const char *info,
-        const char *filename, const char func_name, int line_no) {
+                                     const char *filename, const char func_name, int line_no) {
     rcu_failure_record *fail_rec = NULL;
     int info_len;
     const char *error_str = NULL;
@@ -166,7 +167,7 @@ rcu_failure_record *rcu_cre_fail_rec(const char *info,
     if (filename == NULL) {
         return NULL;
     }
-    if ((fail_rec = rcu_malloc(sizeof (rcu_failure_record))) == NULL) {
+    if ((fail_rec = rcu_malloc(sizeof(rcu_failure_record))) == NULL) {
         return NULL;
     }
     memset(g_temp_buff, 0x00, RCU_TEMP_BUFF_SIZE);
@@ -184,7 +185,7 @@ rcu_failure_record *rcu_cre_fail_rec(const char *info,
 }
 
 int rcu_add_fail_rec_impl(rcu_list *fail_rec_list,
-        char *info, char *filename, const char *func_name, int line_no) {
+                          char *info, char *filename, const char *func_name, int line_no) {
     rcu_failure_record *fail_rec = NULL;
     rcu_test_machine *machine = NULL;
 
@@ -216,11 +217,11 @@ int rcu_del_all_fail_rec_impl(rcu_list *fail_rec_list) {
     }
 
     RCU_FOR_EACH_ENTRY(fail_rec_list, cursor) {
-        fail_rec = (rcu_failure_record*) cursor;
+        fail_rec = (rcu_failure_record *) cursor;
         rcu_free(fail_rec->info);
         RCU_SAVE_CURSOR(cursor)
-        rcu_remove_list(cursor);
-        rcu_free(fail_rec);
+            rcu_remove_list(cursor);
+            rcu_free(fail_rec);
         RCU_RESTORE_CURSOR(cursor)
     }
     return RCU_E_OK;
@@ -242,13 +243,13 @@ int rcu_del_all_fail_rec(rcu_test_machine *machine) {
     }
 
     RCU_FOR_EACH_ENTRY(&machine->reg_list, cursor1) {
-        reg = (rcu_registry*) cursor1;
+        reg = (rcu_registry *) cursor1;
 
         RCU_FOR_EACH_ENTRY(&reg->mod_list, cursor2) {
-            mod = (rcu_module*) cursor2;
+            mod = (rcu_module *) cursor2;
 
             RCU_FOR_EACH_ENTRY(&mod->func_list, cursor3) {
-                func = (rcu_test*) cursor3;
+                func = (rcu_test *) cursor3;
                 rcu_del_all_fail_rec_from_func(func);
             }
             rcu_del_all_fail_rec_from_mod(mod);

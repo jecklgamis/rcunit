@@ -60,7 +60,7 @@ rcu_thread *rcu_srch_thread_by_name(const char *name) {
     rcu_list *cursor = NULL;
 
     RCU_FOR_EACH_ENTRY(&g_rcu_thread_list, cursor) {
-        rcu_thread *thread = (rcu_thread*) cursor;
+        rcu_thread *thread = (rcu_thread *) cursor;
         if (!strcmp(thread->name, name)) {
             return thread;
         }
@@ -75,12 +75,12 @@ RCU_API rcu_thread *rcu_get_thread(const char *name, rcu_thread_routine routine,
         return NULL;
     }
     if ((thread = rcu_srch_thread_by_name(name)) == NULL) {
-        if ((thread = rcu_native_malloc(sizeof (rcu_thread))) != NULL) {
+        if ((thread = rcu_native_malloc(sizeof(rcu_thread))) != NULL) {
             rcu_init_thread(thread);
             rcu_insert_list(&g_rcu_thread_list, &thread->link);
             thread->name = name;
             pthread_attr_init(&thread->attr);
-            if (!pthread_create(&thread->id, &thread->attr, (void*) routine, (void*) arg)) {
+            if (!pthread_create(&thread->id, &thread->attr, (void *) routine, (void *) arg)) {
 #if RCU_DEBUG_THREADS
                 fprintf(stdout, "Thread %s created  (id = %d, routine = %p)\n", thread->name, (int) thread->id, (void*) routine);
 #endif
@@ -95,7 +95,7 @@ void rcu_start_thread(rcu_thread *thread) {
 
 void rcu_stop_thread(rcu_thread *thread) {
     if (thread != NULL && rcu_srch_thread_by_name(thread->name) != NULL) {
-        pthread_join(thread->id, (void**) NULL);
+        pthread_join(thread->id, (void **) NULL);
     }
 }
 

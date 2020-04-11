@@ -92,7 +92,7 @@ extern rcu_pointer_cache g_ptr_cache_1;
 extern rcu_pointer_cache g_ptr_cache_2;
 
 /* Traces the allocation of the given pointer and size */
-#define RCU_TRACE_ALLOC(ptr,size) \
+#define RCU_TRACE_ALLOC(ptr, size) \
     rcu_trace_alloc_impl((ptr), (size), __FILE__,__func__, __LINE__, &g_ptr_cache_2);
 
 /* Traces the deallocation of the given pointer */
@@ -124,14 +124,22 @@ extern rcu_pointer_cache g_ptr_cache_2;
     rcu_check_mem_leak_impl(__FILE__,__func__, __LINE__, &g_ptr_cache_1);
 
 /* Memory allocation tracing function prototypes */
-int rcu_trace_alloc_impl(void *ptr, size_t size, const char *filename, const char *function, const int line, rcu_pointer_cache *ptr_cache);
-int rcu_trace_free_impl(void *ptr, const char *filename, const char *function, const int line, rcu_pointer_cache *ptr_cache);
+int rcu_trace_alloc_impl(void *ptr, size_t size, const char *filename, const char *function, const int line,
+                         rcu_pointer_cache *ptr_cache);
+
+int rcu_trace_free_impl(void *ptr, const char *filename, const char *function, const int line,
+                        rcu_pointer_cache *ptr_cache);
+
 int rcu_check_mem_leak_impl(const char *filename, const char *function, int line, rcu_pointer_cache *ptr_cache);
+
 int rcu_init_mtrace();
+
 int rcu_destroy_mtrace();
 
 void rcu_ensure_mtrace_init();
+
 rcu_pointer_cache *rcu_get_rcunit_ptr_cache();
+
 rcu_pointer_cache *rcu_get_user_ptr_cache();
 
 #endif /* RCUNIT_MTRACE_H */

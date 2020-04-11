@@ -27,9 +27,13 @@
 #include "rcunit.h"
 
 extern rcu_module *rcu_srch_mod_by_name_global(const char *mod_name, rcu_registry **which_reg);
+
 rcu_registry *rcu_srch_reg_by_name(rcu_test_machine *machine, const char *reg_name);
+
 int rcu_mod_exists(rcu_registry *reg, rcu_module *srch_mod);
+
 int rcu_reg_exists(rcu_test_machine *machine, rcu_registry *reg);
+
 rcu_registry *rcu_cre_test_reg(const char *name);
 
 RCU_API rcu_registry *rcu_get_reg(const char *name) {
@@ -56,9 +60,9 @@ rcu_registry *rcu_alloc_reg(int nr_reg) {
     if (nr_reg == 0) {
         return NULL;
     }
-    reg = (rcu_registry *) rcu_malloc(sizeof (rcu_registry) * nr_reg);
+    reg = (rcu_registry *) rcu_malloc(sizeof(rcu_registry) * nr_reg);
     if (reg != NULL) {
-        memset(reg, 0, sizeof (rcu_registry));
+        memset(reg, 0, sizeof(rcu_registry));
     }
     return reg;
 }
@@ -79,11 +83,11 @@ int rcu_init_reg(rcu_registry *reg, const char *name) {
         RCU_LOG_WARN("%s (null)", RCU_GET_ERR_MSG_OF(RCU_E_INVREGNAME));
         return RCU_E_NG;
     }
-    memset(reg, 0, sizeof (rcu_registry));
+    memset(reg, 0, sizeof(rcu_registry));
     rcu_init_list(&reg->link);
     rcu_init_list(&reg->mod_list);
     name_len = strlen(name) > RCU_TEST_REGISTRY_NAME_LENGTH ?
-            RCU_TEST_REGISTRY_NAME_LENGTH : strlen(name);
+               RCU_TEST_REGISTRY_NAME_LENGTH : strlen(name);
     strncpy(reg->name, name, name_len);
     RCU_LOG_DEBUG("Initialized registry : %s", reg->name);
     return RCU_E_OK;
@@ -101,7 +105,7 @@ rcu_registry *rcu_cre_test_reg(const char *name) {
     if (name != NULL && !strcmp(name, RCU_DEFAULT_REGISTRY_NAME)) {
         RCU_SET_ERCD(RCU_E_INVREGNAME);
         RCU_LOG_WARN("%s (%s is reserved)", RCU_GET_ERR_MSG(),
-                RCU_DEFAULT_REGISTRY_NAME);
+                     RCU_DEFAULT_REGISTRY_NAME);
         rcu_free_reg(reg);
         return NULL;
     }
@@ -127,10 +131,10 @@ RCU_API int rcu_destroy_test_reg(rcu_registry *reg) {
     RCU_LOG_DEBUG("Destroying test registry: %s", reg->name);
 
     RCU_FOR_EACH_ENTRY(&reg->mod_list, cursor) {
-        mod = (rcu_module*) cursor;
+        mod = (rcu_module *) cursor;
         RCU_SAVE_CURSOR(cursor)
-        rcu_remove_list(cursor);
-        rcu_destroy_test_mod(mod);
+            rcu_remove_list(cursor);
+            rcu_destroy_test_mod(mod);
         RCU_RESTORE_CURSOR(cursor)
     }
     rcu_remove_list(&reg->link);
@@ -173,7 +177,7 @@ RCU_API int rcu_add_mod_to_reg(rcu_registry *reg, rcu_module *mod) {
                 srch_mod->name, which_reg->name);
         return RCU_E_NG;
     }
-#endif    
+#endif
     reg = (reg == NULL) ? rcu_get_default_reg() : reg;
 #if 0
     reg = (reg == NULL) ? RCU_GET_DEF_REG() : reg;
@@ -252,7 +256,7 @@ rcu_module *rcu_srch_mod_by_name(rcu_registry *reg, const char *mod_name) {
     }
 
     RCU_FOR_EACH_ENTRY(&reg->mod_list, cursor) {
-        srch_mod = (rcu_module*) cursor;
+        srch_mod = (rcu_module *) cursor;
         if (!strcmp(srch_mod->name, mod_name)) {
             return (srch_mod);
         }
@@ -274,7 +278,7 @@ int rcu_mod_exists(rcu_registry *reg, rcu_module *srch_mod) {
     }
 
     RCU_FOR_EACH_ENTRY(&reg->mod_list, cursor) {
-        mod = (rcu_module*) cursor;
+        mod = (rcu_module *) cursor;
         if (mod == srch_mod) {
             return RCU_TRUE;
         }
@@ -292,11 +296,11 @@ void rcu_dump_test_reg(rcu_registry *reg) {
     RCU_LOG_INFO("|   +- registry [name = %s]", reg->name);
 
     RCU_FOR_EACH_ENTRY(&reg->mod_list, cursor1) {
-        mod = (rcu_module*) cursor1;
+        mod = (rcu_module *) cursor1;
         RCU_LOG_INFO("|   |   +- module [name = %s]", mod->name);
 
         RCU_FOR_EACH_ENTRY(&mod->func_list, cursor2) {
-            func = (rcu_test*) cursor2;
+            func = (rcu_test *) cursor2;
             RCU_LOG_INFO("|   |   |   +- test [name = %s]", func->name);
         }
     }
@@ -337,8 +341,7 @@ RCU_API int rcu_run_test_reg_by_name(const char *name) {
     machine = &the_test_machine;
 
     if (name == NULL) {
-        reg = rcu_get_default_reg();
-        ;
+        reg = rcu_get_default_reg();;
     } else {
         reg = rcu_srch_reg_by_name(machine, name);
     }
@@ -357,7 +360,7 @@ int rcu_reg_exists(rcu_test_machine *machine, rcu_registry *reg) {
     if (machine != NULL && reg != NULL) {
 
         RCU_FOR_EACH_ENTRY(&machine->reg_list, cursor) {
-            srch_reg = (rcu_registry*) cursor;
+            srch_reg = (rcu_registry *) cursor;
             if (srch_reg == reg) {
                 return 1;
             }
@@ -388,7 +391,7 @@ int rcu_run_test_reg_impl(rcu_test_machine *machine, rcu_registry *reg) {
     RCU_LOG_DEBUG("Running tests from registry : %s", reg->name);
 
     RCU_FOR_EACH_ENTRY(&reg->mod_list, cursor2) {
-        mod = (rcu_module*) cursor2;
+        mod = (rcu_module *) cursor2;
         RCU_SET_CURR_MOD(machine, mod);
         rcu_run_test_mod_impl(machine, mod);
         /*
@@ -401,7 +404,7 @@ int rcu_run_test_reg_impl(rcu_test_machine *machine, rcu_registry *reg) {
 
             /* Override all tests results */
             RCU_FOR_EACH_ENTRY(&mod->func_list, cursor3) {
-                func = (rcu_test*) cursor3;
+                func = (rcu_test *) cursor3;
                 RCU_SET_RUN_STAT(func, RCU_RUN_STAT_TEST_FAILED);
                 RCU_RESET(func->nr_fail_assert);
                 RCU_RESET(func->nr_succ_assert);

@@ -32,26 +32,38 @@
 
 /* Test function APIs */
 RCU_API int rcu_add_test(rcu_generic_function test);
+
 RCU_API int rcu_add_test_to_mod(rcu_module *mod, rcu_generic_function test);
+
 RCU_API int rcu_add_test_fxt(rcu_generic_function test, rcu_generic_function setup, rcu_generic_function teardown);
-RCU_API int rcu_add_test_fxt_to_mod(rcu_module *mod, rcu_generic_function test, rcu_generic_function setup, rcu_generic_function teardown);
+
+RCU_API int rcu_add_test_fxt_to_mod(rcu_module *mod, rcu_generic_function test, rcu_generic_function setup,
+                                    rcu_generic_function teardown);
 
 /* Test module interfaces */
 RCU_API rcu_module *rcu_get_mod(const char *name);
+
 RCU_API rcu_module *rcu_get_default_mod();
+
 RCU_API void rcu_set_mod_fxt(rcu_module *mod, rcu_generic_function setup,
-        rcu_generic_function teardown);
+                             rcu_generic_function teardown);
 
 /* Test registry APIs */
 RCU_API rcu_registry *rcu_get_reg(const char *name);
+
 RCU_API rcu_registry *rcu_get_default_reg();
+
 RCU_API int rcu_add_mod_to_reg(rcu_registry *reg, rcu_module *mod);
 
 /* Main APIs*/
 RCU_API int rcu_init();
+
 RCU_API int rcu_destroy();
+
 RCU_API int rcu_run_tests();
+
 RCU_API void rcu_dump_test_dbase();
+
 RCU_API int rcu_set_run_hook(rcu_generic_function hook);
 
 #define RCU_DEF_GENERIC_FUNC(name) void name(void *param)

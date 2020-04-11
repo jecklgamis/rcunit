@@ -41,12 +41,12 @@ int rcu_cre_ptr_tbl(rcu_pointer_cache *ptr_cache) {
     rcu_pointer_table *ptr_tbl = NULL;
     int a = 0;
 
-    ptr_tbl = rcu_native_malloc(sizeof (rcu_pointer_table));
+    ptr_tbl = rcu_native_malloc(sizeof(rcu_pointer_table));
     if (ptr_tbl == NULL) {
         RCU_LOG_FATAL("Unable to allocate pointer table");
         return RCU_E_NG;
     }
-    memset(ptr_tbl, 0, sizeof (rcu_pointer_table));
+    memset(ptr_tbl, 0, sizeof(rcu_pointer_table));
     for (a = 0; a < rcu_pointer_table_SIZE; a++) {
         ptr_tbl->tbl[a].ptr = NULL;
         ptr_tbl->tbl[a].size = 0L;
@@ -68,7 +68,7 @@ rcu_pointer_info *rcu_find_free_slot(rcu_pointer_cache *ptr_cache) {
     int a;
 
     RCU_FOR_EACH_ENTRY(&ptr_cache->ptr_tbl_list, cursor) {
-        ptr_tbl = (rcu_pointer_table*) cursor;
+        ptr_tbl = (rcu_pointer_table *) cursor;
         for (a = 0; a < rcu_pointer_table_SIZE; a++) {
             ptr_info = &ptr_tbl->tbl[a];
             if (!ptr_info->used) {
@@ -86,7 +86,7 @@ rcu_pointer_info *rcu_srch_ptr_info(void *ptr, rcu_pointer_cache *ptr_cache) {
     int a = 0;
 
     RCU_FOR_EACH_ENTRY_WITH_CURSOR(&ptr_cache->ptr_tbl_list, cursor) {
-        rcu_pointer_table *ptr_tbl = (rcu_pointer_table*) cursor;
+        rcu_pointer_table *ptr_tbl = (rcu_pointer_table *) cursor;
         for (a = 0; a < rcu_pointer_table_SIZE; a++) {
             rcu_pointer_info *ptr_info = &ptr_tbl->tbl[a];
             if (ptr_info->ptr == ptr) {
@@ -147,7 +147,7 @@ int rcu_dump_ptr_cache(rcu_pointer_cache *ptr_cache) {
     RCU_LOG_INFO("[MTRACE POINTER CACHE DUMP]");
 
     RCU_FOR_EACH_ENTRY(&ptr_cache->ptr_tbl_list, cursor) {
-        ptr_tbl = (rcu_pointer_table*) cursor;
+        ptr_tbl = (rcu_pointer_table *) cursor;
         memset(tbl_name, 0x00, 16);
         sprintf(tbl_name, "", ptr_tbl);
         rcu_dump_ptr_tble(ptr_tbl, tbl_name);
@@ -177,8 +177,8 @@ int rcu_cmpct_ptr_tble(rcu_pointer_cache *ptr_cache) {
         src_cursor = ptr_cache->ptr_tbl_list.next;
         dst_cursor = ptr_cache->ptr_tbl_list.prev;
         while (src_cursor != dst_cursor) {
-            src_ptr_tbl = (rcu_pointer_table*) src_cursor;
-            dst_ptr_tbl = (rcu_pointer_table*) dst_cursor;
+            src_ptr_tbl = (rcu_pointer_table *) src_cursor;
+            dst_ptr_tbl = (rcu_pointer_table *) dst_cursor;
 #if RCU_ENABLE_DEBUG_MTRACE
             rcu_dump_ptr_tble(src_ptr_tbl, "src_ptr_tbl(before compaction)");
             rcu_dump_ptr_tble(dst_ptr_tbl, "dst_ptr_tbl(before compaction)");
@@ -196,10 +196,10 @@ int rcu_cmpct_ptr_tble(rcu_pointer_cache *ptr_cache) {
                         continue;
                     }
                     memcpy(&dst_ptr_tbl->tbl[b], &src_ptr_tbl->tbl[a],
-                            sizeof (rcu_pointer_info));
+                           sizeof(rcu_pointer_info));
 #if RCU_ENABLE_DEBUG_MTRACE
                     RCU_LOG_INFO("moved : si=%lu di=%lu addr= %p",
-                            a, b, src_ptr_tbl->tbl[a].ptr);
+                                 a, b, src_ptr_tbl->tbl[a].ptr);
 #endif
                     src_ptr_tbl->tbl[a].ptr = NULL;
                     src_ptr_tbl->tbl[a].used = RCU_FALSE;
@@ -219,9 +219,9 @@ int rcu_cmpct_ptr_tble(rcu_pointer_cache *ptr_cache) {
             if (src_tbl_empty || moved_src_index == rcu_pointer_table_SIZE - 1) {
                 {
                     RCU_SAVE_CURSOR(src_cursor)
-                    rcu_remove_list(src_cursor);
-                    free(src_cursor);
-                    RCU_INCR(nr_shrink);
+                        rcu_remove_list(src_cursor);
+                        free(src_cursor);
+                        RCU_INCR(nr_shrink);
                     RCU_RESTORE_CURSOR(src_cursor)
                 }
             }
@@ -270,12 +270,13 @@ int rcu_uncache_ptr(void *ptr, rcu_pointer_cache *ptr_cache) {
  *  Memory allocation trace implementation
  */
 RCU_API int rcu_trace_alloc_impl(void *ptr, size_t size,
-        const char *filename, const char *function, const int line, rcu_pointer_cache *ptr_cache) {
+                                 const char *filename, const char *function, const int line,
+                                 rcu_pointer_cache *ptr_cache) {
     rcu_ensure_mtrace_init();
     RCU_INCR(ptr_cache->nr_alloc);
     rcu_cache_ptr(ptr, size, ptr_cache);
     ptr_cache->max_alloc_size = (size > ptr_cache->max_alloc_size) ? size
-            : ptr_cache->max_alloc_size;
+                                                                   : ptr_cache->max_alloc_size;
     ptr_cache->max_total_alloc_size += size;
     return RCU_E_OK;
 }
@@ -284,7 +285,7 @@ RCU_API int rcu_trace_alloc_impl(void *ptr, size_t size,
  *  Memory deallocation trace implementation
  */
 RCU_API int rcu_trace_free_impl(void *ptr, const char *filename, const char *function,
-        const int line, rcu_pointer_cache *ptr_cache) {
+                                const int line, rcu_pointer_cache *ptr_cache) {
     rcu_pointer_info *ptr_info = NULL;
     rcu_ensure_mtrace_init();
     RCU_INCR(ptr_cache->nr_free);
@@ -293,7 +294,7 @@ RCU_API int rcu_trace_free_impl(void *ptr, const char *filename, const char *fun
 }
 
 RCU_API int rcu_check_mem_leak_impl(const char *filename, const char *function,
-        const int line, rcu_pointer_cache *ptr_cache) {
+                                    const int line, rcu_pointer_cache *ptr_cache) {
     rcu_list *cursor;
     rcu_pointer_table *ptr_tbl;
     rcu_pointer_info *ptr_info;
@@ -306,7 +307,7 @@ RCU_API int rcu_check_mem_leak_impl(const char *filename, const char *function,
     RCU_LOG_INFO("Checking memory leak in %s:%d", filename, line);
 
     RCU_FOR_EACH_ENTRY(&ptr_cache->ptr_tbl_list, cursor) {
-        ptr_tbl = (rcu_pointer_table*) cursor;
+        ptr_tbl = (rcu_pointer_table *) cursor;
         for (a = 0; a < rcu_pointer_table_SIZE; a++) {
             ptr_info = &ptr_tbl->tbl[a];
             if (ptr_info->used) {
@@ -318,9 +319,9 @@ RCU_API int rcu_check_mem_leak_impl(const char *filename, const char *function,
     }
     RCU_LOG_INFO("[ MEMORY LEAK CHECK REPORT  (%s) ]", ptr_cache->name);
     RCU_LOG_INFO("alloc = %lu calls, free = %lu calls, nr_leaks = %d, size = %lu bytes",
-            ptr_cache->nr_alloc, ptr_cache->nr_free, nr_leaks, leak_size);
+                 ptr_cache->nr_alloc, ptr_cache->nr_free, nr_leaks, leak_size);
     RCU_LOG_INFO("max_alloc_size = %lu bytes, total_alloc_size = %lu bytes",
-            ptr_cache->max_alloc_size, ptr_cache->max_total_alloc_size);
+                 ptr_cache->max_alloc_size, ptr_cache->max_total_alloc_size);
     return RCU_E_OK;
 }
 
@@ -331,13 +332,12 @@ RCU_API int rcu_has_mem_leak() {
     return nr_leaks > 0 ? RCU_TRUE : RCU_FALSE;
 }
 
-void rcu_get_mtrace_results(rcu_pointer_cache *ptr_cache,
-        int *nr_leaks, size_t *leak_size) {
+void rcu_get_mtrace_results(rcu_pointer_cache *ptr_cache, int *nr_leaks, size_t *leak_size) {
     int a = 0;
     rcu_ensure_mtrace_init();
 
     RCU_FOR_EACH_ENTRY_WITH_CURSOR(&ptr_cache->ptr_tbl_list, cursor) {
-        rcu_pointer_table *ptr_tbl = (rcu_pointer_table*) cursor;
+        rcu_pointer_table *ptr_tbl = (rcu_pointer_table *) cursor;
         for (a = 0; a < rcu_pointer_table_SIZE; a++) {
             rcu_pointer_info *ptr_info = &ptr_tbl->tbl[a];
             if (ptr_info->used) {
@@ -355,7 +355,7 @@ int rcu_init_ptr_cache(rcu_pointer_cache *ptr_cache, const char *name) {
     int ercd;
     int a = 0;
 
-    memset(ptr_cache, 0, sizeof (rcu_pointer_cache));
+    memset(ptr_cache, 0, sizeof(rcu_pointer_cache));
     rcu_init_list(&ptr_cache->ptr_tbl_list);
     ercd = rcu_cre_ptr_tbl(ptr_cache);
     if (ercd == RCU_E_NG) {
@@ -375,10 +375,10 @@ int rcu_destroy_ptr_cache(rcu_pointer_cache *ptr_cache) {
     rcu_pointer_table *ptr_tbl;
 
     RCU_FOR_EACH_ENTRY(&ptr_cache->ptr_tbl_list, cursor) {
-        ptr_tbl = (rcu_pointer_table*) cursor;
+        ptr_tbl = (rcu_pointer_table *) cursor;
         RCU_SAVE_CURSOR(cursor)
-        rcu_remove_list(cursor);
-        rcu_native_free(cursor);
+            rcu_remove_list(cursor);
+            rcu_native_free(cursor);
         RCU_RESTORE_CURSOR(cursor)
     }
     return RCU_E_OK;

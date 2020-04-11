@@ -33,6 +33,7 @@
 #include "rcunit_types.h"
 
 void rcu_init_random_number();
+
 int rcu_gen_random_number(int min, int max);
 
 #endif /* RCUNIT_RANDOM_H */
