@@ -54,7 +54,6 @@
 #include <stdarg.h>
 #include <signal.h>
 
-#include "logmoko.h"
 #include "rcunit_config.h"
 #include "rcunit_types.h"
 #include "rcunit_list.h"
@@ -345,7 +344,6 @@ rcu_module *rcu_cre_test_mod(const char *name, rcu_generic_function init,
 extern const char *g_error_msg_tbl[];
 extern int g_ercd;
 extern rcu_test_machine the_test_machine;
-extern lmk_logger *the_rcu_logger;
 
 extern int rcu_add_fail_rec_to_mod(rcu_module *mod, const char *info, const char *filepath, const int line_no,
                                    int fatal);

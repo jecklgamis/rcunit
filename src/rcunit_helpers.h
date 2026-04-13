@@ -27,7 +27,7 @@
 #ifndef RCUNIT_HELPERS_H
 #define RCUNIT_HELPERS_H
 
-#include "logmoko.h"
+#include <stdio.h>
 #include "rcunit.h"
 
 /* Calculates the n-byte aligned value */
@@ -79,12 +79,12 @@
 #define RCU_DEC_OUT_HANDLER_IMPL(out_impl, param) \
     extern void out_impl(void *param);
 
-#define RCU_LOG_TRACE(format...) LMK_LOG_TRACE(the_rcu_logger, format);
-#define RCU_LOG_DEBUG(format...) LMK_LOG_DEBUG(the_rcu_logger, format);
-#define RCU_LOG_INFO(format...) LMK_LOG_INFO(the_rcu_logger, format);
-#define RCU_LOG_WARN(format...) LMK_LOG_WARN(the_rcu_logger, format);
-#define RCU_LOG_ERROR(format...) LMK_LOG_ERROR(the_rcu_logger, format);
-#define RCU_LOG_FATAL(format...) LMK_LOG_FATAL(the_rcu_logger, format);
+#define RCU_LOG_TRACE(fmt, ...) fprintf(stdout, "[TRACE] " fmt "\n", ##__VA_ARGS__)
+#define RCU_LOG_DEBUG(fmt, ...) fprintf(stdout, "[DEBUG] " fmt "\n", ##__VA_ARGS__)
+#define RCU_LOG_INFO(fmt, ...)  fprintf(stdout, "[INFO]  " fmt "\n", ##__VA_ARGS__)
+#define RCU_LOG_WARN(fmt, ...)  fprintf(stdout, "[WARN]  " fmt "\n", ##__VA_ARGS__)
+#define RCU_LOG_ERROR(fmt, ...) fprintf(stderr, "[ERROR] " fmt "\n", ##__VA_ARGS__)
+#define RCU_LOG_FATAL(fmt, ...) fprintf(stderr, "[FATAL] " fmt "\n", ##__VA_ARGS__)
 
 #define RCU_DEC_TEST_FUNC(func, param) \
     extern void func(void* param);

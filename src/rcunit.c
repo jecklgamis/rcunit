@@ -29,14 +29,6 @@
 /* The test machine */
 rcu_test_machine the_test_machine;
 
-/* The RCUNIT logger */
-lmk_logger *the_rcu_logger;
-
-/* The RCUNIT log file handler */
-lmk_log_handler *the_rcu_file_log_hnd;
-
-/* The RCUNIT console file handler */
-lmk_log_handler *the_rcu_console_log_hnd;
 
 extern rcu_test *rcu_srch_test_func_by_name(rcu_module *mod, const char *name);
 
@@ -140,36 +132,10 @@ RCU_API int rcu_set_run_hook(rcu_generic_function run_hook) {
 }
 
 int rcu_destroy_log() {
-    if (the_rcu_logger != NULL) {
-        return lmk_destroy_logger(&the_rcu_logger);
-    }
-    lmk_destroy();
     return RCU_E_OK;
 }
 
 int rcu_init_log() {
-    lmk_init();
-    if ((the_rcu_logger = lmk_get_logger("rcunit")) == NULL) {
-        fprintf(stdout, "Unable to get logger");
-        return RCU_E_NG;
-    }
-#if RCU_DEBUG
-    int log_level = LMK_LOG_LEVEL_DEBUG;
-#else
-    int log_level = LMK_LOG_LEVEL_INFO;
-#endif
-    lmk_set_log_level(the_rcu_logger, log_level);
-    the_rcu_file_log_hnd = lmk_get_file_log_handler("rcunit-flh", "rcunit.log");
-    if (the_rcu_file_log_hnd != NULL) {
-        the_rcu_file_log_hnd->log_level = LMK_LOG_LEVEL_TRACE;
-        lmk_attach_log_handler(the_rcu_logger, the_rcu_file_log_hnd);
-    }
-
-    the_rcu_console_log_hnd = lmk_get_console_log_handler();
-    if (the_rcu_console_log_hnd != NULL) {
-        the_rcu_console_log_hnd->log_level = log_level;
-        lmk_attach_log_handler(the_rcu_logger, the_rcu_console_log_hnd);
-    }
     return RCU_E_OK;
 }
 

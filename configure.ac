@@ -25,10 +25,8 @@ AC_PROG_CC
 # Checks for libraries.
 AC_PROG_RANLIB
 
-AC_SEARCH_LIBS([lmk_get_logger],[logmoko],,[AC_MSG_ERROR([Unable to find logmoko library])])
-
 # Checks for header files.
-AC_CHECK_HEADERS([stdio.h stdlib.h string.h setjmp.h time.h logmoko.h])
+AC_CHECK_HEADERS([stdio.h stdlib.h string.h setjmp.h time.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
