@@ -1,0 +1,46 @@
+# Build artifacts
+*.o
+*.a
+*.so
+*.la
+*.lo
+
+# Autotools generated
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache/
+compile
+config.guess
+config.guess~
+config.log
+config.status
+config.sub
+config.sub~
+configure
+configure~
+depcomp
+install-sh
+missing
+stamp-h1
+.deps/
+src/rcunit_config_env.h
+src/rcunit_config_env.h.in
+src/rcunit_config_env.h.in~
+
+# Generated install/docs
+INSTALL
+README
+
+# Compiled binaries
+samples/rcunit_sample_app_demo
+samples/rcunit_sample_app_exception
+samples/rcunit_sample_app_function_table
+samples/rcunit_sample_app_module
+samples/rcunit_sample_app_run_hook
+samples/rcunit_sample_app_signal
+samples/rcunit_sample_app_simple
+tests/rcunit_test
+
+# IDE
+.idea/
