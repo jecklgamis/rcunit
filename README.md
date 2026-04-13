@@ -1,3 +1,5 @@
+![build](https://github.com/jecklgamis/rcunit/actions/workflows/build.yaml/badge.svg)
+
 RCUNIT is a small framework for testing C programs. It uses non-local jumps to
 emulate exceptions and handles program terminating signals (e.g. SIGILL) 
 during test runs. RCUNIT allows creation of test fixtures, either per test
