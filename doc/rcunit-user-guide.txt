@@ -407,8 +407,7 @@ This is an example output of the above code.
 
 Logging
 ~~~~~~~
-RCUNIT uses http://github.com/jecklgamis/logmoko[Logmoko], simple logging 
-framework derived from the RCUNIT logging codes.
+RCUNIT includes built-in logging support.
 
 Testing
 ~~~~~~~

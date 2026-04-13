@@ -9,7 +9,6 @@ Documentation
 
 Building and Installing RCUNIT (Unix platform)
  
-* Build and install Logmoko logging library (git clone git@github.com:jecklgamis/logmoko.git)
 * Build and install RCUNIT
 
 ```
@@ -36,7 +35,6 @@ Changes from v0.9 to 1.0
 * Signal handling (a major contribution from Tomasz Kantecki at Intel IE). 
 * Simplified creation/retrieval of test module and test registry.
 * Added assertion macros for bit and byte array testing
-* Use of Logmoko, a logging framework based on RCUNIT logging codes itself
 * varargs are used for supporting fprintf-like argument passing
 * Refined API functions and helper macros
 * Removed enabled/disabled flag when adding test or module
