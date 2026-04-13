@@ -4,7 +4,7 @@ RCUNIT is a small framework for testing C programs. It uses non-local jumps to
 emulate exceptions and handles program terminating signals (e.g. SIGILL) 
 during test runs. RCUNIT allows creation of test fixtures, either per test
 or per test group. RCUNIT is free, you can use it in accordance with the terms
-of the MIT License.
+of the Apache License 2.0.
 
 Documentation
 * See doc/rcunit-docs.txt

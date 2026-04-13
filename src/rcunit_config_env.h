@@ -1,43 +1,37 @@
 /* src/rcunit_config_env.h.  Generated from rcunit_config_env.h.in by configure.  */
 /* src/rcunit_config_env.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define to 1 if you have the `ctime' function. */
+/* Define to 1 if you have the 'ctime' function. */
 #define HAVE_CTIME 1
 
-/* Define to 1 if you have the `fprintf' function. */
+/* Define to 1 if you have the 'fprintf' function. */
 #define HAVE_FPRINTF 1
 
-/* Define to 1 if you have the `free' function. */
+/* Define to 1 if you have the 'free' function. */
 #define HAVE_FREE 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
-/* Define to 1 if you have the <logmoko.h> header file. */
-#define HAVE_LOGMOKO_H 1
-
-/* Define to 1 if you have the `longjmp' function. */
+/* Define to 1 if you have the 'longjmp' function. */
 #define HAVE_LONGJMP 1
 
-/* Define to 1 if you have the `malloc' function. */
+/* Define to 1 if you have the 'malloc' function. */
 #define HAVE_MALLOC 1
 
-/* Define to 1 if you have the `memcpy' function. */
+/* Define to 1 if you have the 'memcpy' function. */
 #define HAVE_MEMCPY 1
 
-/* Define to 1 if you have the <memory.h> header file. */
-#define HAVE_MEMORY_H 1
-
-/* Define to 1 if you have the `memset' function. */
+/* Define to 1 if you have the 'memset' function. */
 #define HAVE_MEMSET 1
 
-/* Define to 1 if you have the `setjmp' function. */
+/* Define to 1 if you have the 'setjmp' function. */
 #define HAVE_SETJMP 1
 
 /* Define to 1 if you have the <setjmp.h> header file. */
 #define HAVE_SETJMP_H 1
 
-/* Define to 1 if you have the `sprintf' function. */
+/* Define to 1 if you have the 'sprintf' function. */
 #define HAVE_SPRINTF 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
@@ -49,10 +43,10 @@
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
 
-/* Define to 1 if you have the `strcmp' function. */
+/* Define to 1 if you have the 'strcmp' function. */
 #define HAVE_STRCMP 1
 
-/* Define to 1 if you have the `strcpy' function. */
+/* Define to 1 if you have the 'strcpy' function. */
 #define HAVE_STRCPY 1
 
 /* Define to 1 if cpp supports the ANSI # stringizing operator. */
@@ -64,7 +58,7 @@
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
 
-/* Define to 1 if you have the `strlen' function. */
+/* Define to 1 if you have the 'strlen' function. */
 #define HAVE_STRLEN 1
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
@@ -73,7 +67,7 @@
 /* Define to 1 if you have the <sys/types.h> header file. */
 #define HAVE_SYS_TYPES_H 1
 
-/* Define to 1 if you have the `time' function. */
+/* Define to 1 if you have the 'time' function. */
 #define HAVE_TIME 1
 
 /* Define to 1 if you have the <time.h> header file. */
@@ -103,22 +97,24 @@
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "1.0-beta"
 
-/* The size of `int', as computed by sizeof. */
+/* The size of 'int', as computed by sizeof. */
 #define SIZEOF_INT 4
 
-/* The size of `void*', as computed by sizeof. */
+/* The size of 'void*', as computed by sizeof. */
 #define SIZEOF_VOIDP 8
 
-/* Define to 1 if you have the ANSI C header files. */
+/* Define to 1 if all of the C89 standard headers exist (not just the ones
+   required in a freestanding environment). This macro is provided for
+   backward compatibility; new code need not use it. */
 #define STDC_HEADERS 1
 
 /* Version number of package */
 #define VERSION "1.0-beta"
 
-/* Define to empty if `const' does not conform to ANSI C. */
+/* Define to empty if 'const' does not conform to ANSI C. */
 /* #undef const */
 
-/* Define to `__inline__' or `__inline' if that's what the C compiler
+/* Define to '__inline__' or '__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */
 #ifndef __cplusplus
 /* #undef inline */
