@@ -82,17 +82,17 @@ void rcu_print_rcunit_info() {
 #endif
 
 #if RCU_ENABLE_MALLOC_ALIGNMENT
-    RCU_LOG_DEBUG("Memory allocation aligned to %u bytes", RCU_DEFAULT_MALLOC_ALIGNMENT);
+    RCU_LOG_DEBUG("Memory allocation aligned to %zu bytes", RCU_DEFAULT_MALLOC_ALIGNMENT);
 #endif
-    RCU_LOG_DEBUG("sizeof(char) is %u bytes", sizeof(char));
-    RCU_LOG_DEBUG("sizeof(rcu_short) is %u bytes", sizeof(rcu_short));
-    RCU_LOG_DEBUG("sizeof(int) is %u bytes", sizeof(int));
-    RCU_LOG_DEBUG("sizeof(rcu_long) is %u bytes", sizeof(rcu_long));
-    RCU_LOG_DEBUG("sizeof(rcu_float) is %u bytes", sizeof(rcu_float));
-    RCU_LOG_DEBUG("sizeof(rcu_double) is %u bytes", sizeof(rcu_double));
-    RCU_LOG_DEBUG("sizeof(rcu_long_long) is %u bytes", sizeof(rcu_long_long));
-    RCU_LOG_DEBUG("sizeof(rcu_long_double) is %u bytes", sizeof(rcu_long_double));
-    RCU_LOG_DEBUG("sizeof(void*) is %lu bytes", sizeof(void *));
+    RCU_LOG_DEBUG("sizeof(char) is %zu bytes", sizeof(char));
+    RCU_LOG_DEBUG("sizeof(rcu_short) is %zu bytes", sizeof(rcu_short));
+    RCU_LOG_DEBUG("sizeof(int) is %zu bytes", sizeof(int));
+    RCU_LOG_DEBUG("sizeof(rcu_long) is %zu bytes", sizeof(rcu_long));
+    RCU_LOG_DEBUG("sizeof(rcu_float) is %zu bytes", sizeof(rcu_float));
+    RCU_LOG_DEBUG("sizeof(rcu_double) is %zu bytes", sizeof(rcu_double));
+    RCU_LOG_DEBUG("sizeof(rcu_long_long) is %zu bytes", sizeof(rcu_long_long));
+    RCU_LOG_DEBUG("sizeof(rcu_long_double) is %zu bytes", sizeof(rcu_long_double));
+    RCU_LOG_DEBUG("sizeof(void*) is %zu bytes", sizeof(void *));
     RCU_LOG_DEBUG("[ RCUNIT INFORMATION END ]");
 }
 

@@ -135,7 +135,7 @@ int rcu_dump_ptr_tble(rcu_pointer_table *ptr_tbl, const char *info) {
     int a;
     RCU_LOG_INFO(" [MTRACE POINTER TABLE DUMP (addr =%p)]", ptr_tbl);
     for (a = 0; a < rcu_pointer_table_SIZE; a++) {
-        RCU_LOG_INFO("[%u] %s(%p)", a, (ptr_tbl->tbl[a].used) ? "USED" : "EMPTY", ptr_tbl->tbl[a]);
+        RCU_LOG_INFO("[%u] %s(%p)", a, (ptr_tbl->tbl[a].used) ? "USED" : "EMPTY", ptr_tbl->tbl[a].ptr);
     }
     RCU_LOG_INFO(" [MTRACE POINTER TABLE DUMP END");
     return RCU_E_OK;
@@ -200,7 +200,7 @@ int rcu_cmpct_ptr_tble(rcu_pointer_cache *ptr_cache) {
                     memcpy(&dst_ptr_tbl->tbl[b], &src_ptr_tbl->tbl[a],
                            sizeof(rcu_pointer_info));
 #if RCU_ENABLE_DEBUG_MTRACE
-                    RCU_LOG_INFO("moved : si=%lu di=%lu addr= %p",
+                    RCU_LOG_INFO("moved : si=%d di=%d addr= %p",
                                  a, b, src_ptr_tbl->tbl[a].ptr);
 #endif
                     src_ptr_tbl->tbl[a].ptr = NULL;
@@ -313,7 +313,7 @@ RCU_API int rcu_check_mem_leak_impl(const char *filename, const char *function,
         for (a = 0; a < rcu_pointer_table_SIZE; a++) {
             ptr_info = &ptr_tbl->tbl[a];
             if (ptr_info->used) {
-                RCU_LOG_WARN("Found leak : addr = %p size= % lu", ptr_info->ptr, ptr_info->size);
+                RCU_LOG_WARN("Found leak : addr = %p size= %zu", ptr_info->ptr, ptr_info->size);
                 RCU_INCR(nr_leaks);
                 RCU_INCR_BY(leak_size, ptr_info->size);
             }

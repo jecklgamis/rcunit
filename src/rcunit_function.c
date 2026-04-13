@@ -202,7 +202,7 @@ int rcu_run_test_func_impl(rcu_test_machine *machine, rcu_test *func) {
 
     if (RCU_IS_TEST_SUCCEDED(func)) {
         if (func->nr_succ_assert == 0 && func->nr_fail_assert == 0) {
-            RCU_LOG_WARN("No executed assertions", func->name);
+            RCU_LOG_WARN("No executed assertions in %s", func->name);
             RCU_SET_RUN_STAT(func, RCU_RUN_STAT_TEST_FAILED);
         } else {
             RCU_LOG_INFO("Test %s OK", func->name);
