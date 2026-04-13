@@ -9,7 +9,7 @@ AC_CONFIG_SRCDIR([src/rcunit.c])
 AM_INIT_AUTOMAKE
 
 # Configuration header
-AC_CONFIG_HEADER(src/rcunit_config_env.h)
+AC_CONFIG_HEADERS([src/rcunit_config_env.h])
 
 AC_ARG_ENABLE(debug,[  --enable-debug    Turn on debugging],
 	[case "${enableval}" in
@@ -28,8 +28,6 @@ AC_PROG_RANLIB
 AC_SEARCH_LIBS([lmk_get_logger],[logmoko],,[AC_MSG_ERROR([Unable to find logmoko library])])
 
 # Checks for header files.
-AC_HEADER_STDC
-
 AC_CHECK_HEADERS([stdio.h stdlib.h string.h setjmp.h time.h logmoko.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
