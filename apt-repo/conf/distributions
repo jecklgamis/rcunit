@@ -1,0 +1,7 @@
+Origin: rcunit
+Label: rcunit
+Codename: stable
+Architectures: amd64 arm64
+Components: main
+Description: RCUNIT C unit testing framework
+SignWith: yes

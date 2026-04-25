@@ -1,0 +1,20 @@
+Source: rcunit
+Section: libs
+Priority: optional
+Maintainer: Jerrico Gamis <jecklgamis@gmail.com>
+Build-Depends: debhelper-compat (= 13), autotools-dev
+Standards-Version: 4.6.2
+Homepage: https://github.com/jecklgamis/rcunit
+Rules-Requires-Root: no
+
+Package: librcunit-dev
+Architecture: any
+Depends: ${misc:Depends}
+Description: Unit testing framework for C programs
+ RCUNIT is a small framework for testing C programs. It uses non-local
+ jumps to emulate exceptions and handles program-terminating signals
+ (e.g. SIGILL) during test runs. RCUNIT allows creation of test
+ fixtures, either per test or per test group.
+ .
+ This package contains the static library and header files needed
+ to develop software using RCUNIT.
