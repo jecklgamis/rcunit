@@ -33,13 +33,13 @@ INSTALL
 README
 
 # Compiled binaries
-samples/rcunit_sample_app_demo
-samples/rcunit_sample_app_exception
-samples/rcunit_sample_app_function_table
-samples/rcunit_sample_app_module
-samples/rcunit_sample_app_run_hook
-samples/rcunit_sample_app_signal
-samples/rcunit_sample_app_simple
+examples/rcunit_sample_app_demo
+examples/rcunit_sample_app_exception
+examples/rcunit_sample_app_function_table
+examples/rcunit_sample_app_module
+examples/rcunit_sample_app_run_hook
+examples/rcunit_sample_app_signal
+examples/rcunit_sample_app_simple
 tests/rcunit_test
 
 # IDE
