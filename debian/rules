@@ -1,4 +1,12 @@
 #!/usr/bin/make -f
 
 %:
-	dh $@ --with autotools-dev
+	dh $@ --with autoreconf
+
+override_dh_auto_build:
+	$(MAKE) -C src all
+
+override_dh_auto_test:
+
+override_dh_auto_install:
+	$(MAKE) -C src DESTDIR=$(CURDIR)/debian/librcunit-dev install

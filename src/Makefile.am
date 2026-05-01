@@ -1,5 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = rcunit.pc
+
 lib_LIBRARIES = librcunit.a
 
 librcunit_a_SOURCES = \
