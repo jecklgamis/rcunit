@@ -2,7 +2,7 @@
 
 noinst_PROGRAMS = rcunit_test 
 
-rcunit_test_SOURCES = rcunit_test.c testmoko.c testmoko_exception.c
+rcunit_test_SOURCES = example_test.c testmoko.c testmoko_exception.c
 
 noinst_HEADERS = \
     rcunit_test.h \
