@@ -2,7 +2,7 @@ Source: rcunit
 Section: libs
 Priority: optional
 Maintainer: Jerrico Gamis <jecklgamis@gmail.com>
-Build-Depends: debhelper-compat (= 13), autoconf, automake
+Build-Depends: debhelper-compat (= 13), dh-autoreconf, pkg-config
 Standards-Version: 4.6.2
 Homepage: https://github.com/jecklgamis/rcunit
 Rules-Requires-Root: no
