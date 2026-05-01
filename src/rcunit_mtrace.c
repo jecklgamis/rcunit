@@ -134,7 +134,7 @@ int rcu_dump_ptr_tble(rcu_pointer_table *ptr_tbl, const char *info) {
 int rcu_dump_ptr_cache(rcu_pointer_cache *ptr_cache) {
     rcu_list *cursor = NULL;
     rcu_pointer_table *ptr_tbl = NULL;
-    char tbl_name[16];
+    char tbl_name[32];
 
     RCU_LOG_INFO("[MTRACE POINTER CACHE DUMP]");
 

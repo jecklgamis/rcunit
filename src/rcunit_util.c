@@ -31,7 +31,7 @@ int rcu_get_timestamp(char *ts_buff, int ts_buff_len) {
     }
     memset(ts_buff, 0x00, ts_buff_len);
     time(&t);
-    sprintf(ts_buff, "%s", ctime(&t));
+    snprintf(ts_buff, ts_buff_len, "%s", ctime(&t));
     len = strlen(ts_buff);
     memset(&ts_buff[len - 1], 0x00, 1);
     return RCU_E_OK;
@@ -128,7 +128,7 @@ rcu_test *rcu_srch_test_func_by_name_global(const char *name,
 
 int rcu_srch_mod_by_ref_global(rcu_module *srch_mod,
                                rcu_registry **which_reg) {
-    rcu_test_machine *machine = &the_test_machine;;
+    rcu_test_machine *machine = &the_test_machine;
 
     *which_reg = NULL;
 

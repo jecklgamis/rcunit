@@ -25,8 +25,9 @@ void rcu_init_random_number() {
 }
 
 int rcu_gen_random_number(int min, int max) {
-    int j;
-    j = min + (int) (((double) max) * rand() * (RAND_MAX + ((double) min)));
-    return (j);
+    if (min > max) {
+        return min;
+    }
+    return min + (int) ((double)(max - min + 1) * rand() / (RAND_MAX + 1.0));
 }
 

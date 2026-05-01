@@ -110,23 +110,19 @@ TMK_TEST(rcu_test_mod_on_null_reg) {
     TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_mod_tbl(NULL, rcu_test_mod_017_mtbl1));
 }
 
-//TODO revisit this
 TMK_TEST(rcu_test_run_mod) {
-    RCU_DEF_TEST_REG(r1)
     RCU_DEF_TEST_MOD(m1)
     TMK_ASSERT_NOT_NULL(m1 = rcu_get_mod("m1"));
     TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_test_mod(m1));
 }
 
 TMK_TEST(rcu_test_run_mod_by_name) {
-    RCU_DEF_TEST_REG(r1)
     RCU_DEF_TEST_MOD(m1)
     TMK_ASSERT_NOT_NULL(m1 = rcu_get_mod("m1"));
     TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_test_mod_by_name("m1"));
 }
 
 TMK_TEST(rcu_test_run_mod_by_unknown_name) {
-    RCU_DEF_TEST_REG(r1)
     RCU_DEF_TEST_MOD(m1)
     TMK_ASSERT_NOT_NULL(m1 = rcu_get_mod("m1"));
     TMK_ASSERT_EQUAL(RCU_E_NG, rcu_run_test_mod_by_name("unknown_module_name"));

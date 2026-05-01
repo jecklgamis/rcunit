@@ -141,7 +141,6 @@ RCU_API int rcu_add_test_mod(rcu_module *mod) {
     return rcu_add_mod_to_reg(rcu_get_default_reg(), mod);
 }
 
-/* TODO clean this up */
 RCU_API int rcu_add_mod_to_reg(rcu_registry *reg, rcu_module *mod) {
     rcu_registry *which_reg = NULL;
     rcu_module *srch_mod = NULL;

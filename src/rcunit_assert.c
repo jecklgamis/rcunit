@@ -1,27 +1,17 @@
 /*
- * The MIT License (MIT)
- * 
- * RCUNIT - A unit testing framework for C.
  * Copyright 2013 Jerrico Gamis <jecklgamis@gmail.com>
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #include "rcunit.h"
@@ -40,7 +30,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
     va_list ap;
     memset(&assert_msg_buff[0], 0, RCU_TEMP_BUFF_SIZE);
     va_start(ap, format);
-    vsprintf(assert_msg_buff, format, ap);
+    vsnprintf(assert_msg_buff, RCU_TEMP_BUFF_SIZE, format, ap);
     va_end(ap);
 
     rcu_init();
@@ -166,7 +156,7 @@ rcu_failure_record *rcu_cre_fail_rec(const char *info, const char *filename, con
     }
     memset(g_temp_buff, 0, RCU_TEMP_BUFF_SIZE);
     error_str = "failed";
-    sprintf(g_temp_buff, "%s(%d) : %s", filename, line_no, info);
+    snprintf(g_temp_buff, RCU_TEMP_BUFF_SIZE, "%s(%d) : %s", filename, line_no, info);
     info_len = strlen(g_temp_buff) + 1;
 
     if ((fail_rec->info = rcu_malloc(info_len)) == NULL) {
@@ -174,7 +164,7 @@ rcu_failure_record *rcu_cre_fail_rec(const char *info, const char *filename, con
         return NULL;
     }
     rcu_init_list(&fail_rec->link);
-    strcpy(fail_rec->info, g_temp_buff);
+    memcpy(fail_rec->info, g_temp_buff, info_len);
     return fail_rec;
 }
 
