@@ -1,3 +1,13 @@
+rcunit (2.0.0~rc1-1) stable; urgency=low
+
+  * Release candidate 2.0.0-rc1.
+  * Fix buffer overflows in assert and mtrace (vsprintf, sprintf, strcpy).
+  * Fix broken random number generator formula.
+  * Remove duplicate declarations and macros in rcunit_api.h.
+  * Standardize license headers to Apache 2.0 across all source files.
+
+ -- Jerrico Gamis <jecklgamis@gmail.com>  Thu, 01 May 2026 00:00:00 +0000
+
 rcunit (1.0.0-1) stable; urgency=low
 
   * Initial release.
