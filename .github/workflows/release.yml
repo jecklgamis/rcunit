@@ -1,0 +1,31 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create source archive
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          git archive --format=tar.gz --prefix=rcunit-${VERSION}/ HEAD \
+            -o rcunit-${VERSION}.tar.gz
+          git archive --format=zip --prefix=rcunit-${VERSION}/ HEAD \
+            -o rcunit-${VERSION}.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            rcunit-*.tar.gz
+            rcunit-*.zip
+          generate_release_notes: true
