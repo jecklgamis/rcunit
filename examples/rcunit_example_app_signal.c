@@ -14,6 +14,7 @@ RCU_TEST(my_test) {
 }
 
 int main(int argc, char *argv[]) {
-    rcu_add_test(my_test);
+    rcu_init();
+    RCU_ADD_TEST(my_test);
     return rcu_run_tests();
 }

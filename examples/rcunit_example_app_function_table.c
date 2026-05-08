@@ -25,6 +25,5 @@ RCU_DEF_FUNC_TBL_END
 
 int main(int argc, char *argv[]) {
     rcu_add_test_func_tbl(rcu_get_default_mod(), calc_tests_table);
-    rcu_run_tests();
-    return EXIT_SUCCESS;
+    return rcu_run_tests();
 }

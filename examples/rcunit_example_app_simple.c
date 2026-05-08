@@ -6,7 +6,6 @@ RCU_TEST(test_something) {
 }
 
 int main(int argc, char *argv[]) {
-    rcu_add_test(test_something);
-    rcu_run_tests();
-    return EXIT_SUCCESS;
+    RCU_ADD_TEST(test_something);
+    return rcu_run_tests();
 }

@@ -14,6 +14,5 @@ RCU_RUN_HOOK(run_hook) {
 int main(int argc, char *argv[]) {
     rcu_init();
     rcu_set_run_hook(run_hook);
-    rcu_run_tests();
-    return EXIT_SUCCESS;
+    return rcu_run_tests();
 }

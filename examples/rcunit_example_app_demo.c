@@ -62,7 +62,6 @@ int main(int argc, char **argv) {
     rcu_add_test_func_tbl(rcu_get_default_mod(), test_table_with_all_kinds_test_failures);
     rcu_add_test_mod_tbl(rcu_get_default_reg(), module_table);
     rcu_dump_test_dbase();
-    rcu_run_tests();
-    return EXIT_SUCCESS;
+    return rcu_run_tests();
 }
 

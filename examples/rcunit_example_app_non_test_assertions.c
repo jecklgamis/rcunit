@@ -38,6 +38,6 @@ int sample_test_codes_7(){
 int main(int argc,char **argv){
     fprintf(stdout,"Running sample_test_codes_7...\n");
     sample_test_codes_7();
-    return(0);
+    return(EXIT_SUCCESS);
 }
 

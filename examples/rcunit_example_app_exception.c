@@ -67,6 +67,6 @@ int retcode;
 int main(int argc,char **argv){
     fprintf(stdout,"Running sample_test_codes_6...\n");
     sample_test_codes_6();
-    return(0);
+    return(EXIT_SUCCESS);
 }
 

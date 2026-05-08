@@ -22,6 +22,7 @@
 
 /* Test function APIs */
 RCU_API int rcu_add_test(rcu_generic_function test);
+#define RCU_ADD_TEST(fn) rcu_add_test_func(NULL, fn, NULL, NULL, #fn)
 
 RCU_API int rcu_add_test_to_mod(rcu_module *mod, rcu_generic_function test);
 
