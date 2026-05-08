@@ -14,7 +14,7 @@ RCUNIT is a small framework for testing C programs. It uses non-local jumps to
 emulate exceptions and handles program terminating signals (e.g. SIGILL) 
 during test runs. RCUNIT allows creation of test fixtures, either per test
 or per test group. RCUNIT is free, you can use it in accordance with the terms
-of the http://en.wikipedia.org/wiki/MIT_License[MIT License].
+of the http://www.apache.org/licenses/LICENSE-2.0[Apache License].
 
 Introduction to Test Design Methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,11 +76,11 @@ Writing Simple Test
 #include <stdio.h>
 #include "rcunit.h"
 
-RCU_TEST(test_something){
+RCU_TEST(test_func){
 }
 
 int main(int argc,char *argv[]){
-    rcu_add_test(test_something);
+    RCU_ADD_TEST(test_func);
     return rcu_run_tests();
 }
 ---------
@@ -95,7 +95,7 @@ before and after the test, respectively.
 #include <stdio.h>
 #include "rcunit.h"
 
-RCU_TEST(test_something){
+RCU_TEST(test_func){
 }
 
 RCU_SETUP(setup){
@@ -105,7 +105,7 @@ RCU_TEARDOWN(teardown){
 }
 
 int main(int argc,char *argv[]){
-    rcu_add_test_fxt(test_something, setup, teardown);
+    rcu_add_test_fxt(test_func, setup, teardown);
     return rcu_run_tests();
 }
 --------
@@ -121,7 +121,7 @@ CAUTION: A test without any assertion statement will fail.
 
 .Example
 -----------------
-RCU_TEST(test_something){
+RCU_TEST(test_func){
     unsigned char data = 128
     RCU_ASSERT_BIT_SET(data, 7); /* Asserts that bit 7 is set */
 }
@@ -139,12 +139,12 @@ A module (known as test suite or test group) is used for grouping one or more
 #include <stdio.h>
 #include "rcunit.h"
 
-RCU_TEST(test_something){
+RCU_TEST(test_func){
 }
 
 int main(int argc,char *argv[]){
     rcu_module *mod = rcu_get_mod("module");
-    rcu_add_test_to_mod(mod, test_something);
+    rcu_add_test_to_mod(mod, test_func);
     return rcu_run_tests();
 }
 
@@ -185,10 +185,10 @@ be used if there is no user-defined module.
 
 .Example
 --------
-rcu_add_test(test_something);
+RCU_ADD_TEST(test_func);
 --------
 
-This adds `test_something` to the default test module.
+This adds `test_func` to the default test module.
 
 Writing Test Module With Setup and Teardown Functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -201,7 +201,7 @@ before and after all the tests within that module.
 #include <stdio.h>
 #include "rcunit.h"
 
-RCU_TEST(test_something){
+RCU_TEST(test_func){
 }
 
 RCU_SETUP(mod_setup){
@@ -213,7 +213,7 @@ RCU_TEARDOWN(mod_teardown){
 int main(int argc,char *argv[]){
     rcu_module *mod = rcu_get_mod("module");
     rcu_set_mod_fxt(mod, mod_setup, mod_teardown);
-    rcu_add_test_to_mod(mod, test_something);
+    rcu_add_test_to_mod(mod, test_func);
     return rcu_run_tests();
 }
 --------
@@ -233,7 +233,7 @@ Using Test Function Table
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A test function table is used for grouping test functions and added into a module.
-Instead of calling `rcu_add_test` repeatedly, you can simply include all the tests
+Instead of calling `RCU_ADD_TEST` repeatedly, you can simply include all the tests
 in a function table and add it once.
 
 .Example
