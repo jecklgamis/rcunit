@@ -386,7 +386,7 @@ RCU_TEST(my_test) {
 }
 
 int main(int argc, char *argv[]) {
-    rcu_add_named_test(my_test,"my_test");
+    RCU_ADD_TEST(my_test);
     return rcu_run_tests();
 } 
 --------

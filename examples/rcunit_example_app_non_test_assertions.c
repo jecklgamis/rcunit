@@ -25,8 +25,8 @@ int x=100;
 }
 
 RCU_ASSERT_HOOK(sample_test_codes_7_assert_hook){
-rcu_failure_record *fail_rec;
-    fail_rec = (rcu_failure_record*)param;
+struct rcu_failure_record *fail_rec;
+    fail_rec = (struct rcu_failure_record*)param;
     fprintf(stdout,"Assertion failure : %s\n",fail_rec->info);
 }
 

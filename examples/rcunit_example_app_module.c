@@ -26,6 +26,6 @@ RCU_TEST(test_calc_sum) {
 }
 
 int main(int argc, char *argv[]) {
-    rcu_module *math = rcu_get_mod("math");
+    struct rcu_module *math = rcu_get_module("math");
     return rcu_run_tests();
 }

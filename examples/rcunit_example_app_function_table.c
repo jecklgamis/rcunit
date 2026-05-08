@@ -39,6 +39,6 @@ RCU_INC_TEST(test_calc_diff)
 RCU_DEF_FUNC_TBL_END
 
 int main(int argc, char *argv[]) {
-    rcu_add_test_func_tbl(rcu_get_default_mod(), calc_tests_table);
+    rcu_add_test_func_tbl(rcu_get_default_module(), calc_tests_table);
     return rcu_run_tests();
 }

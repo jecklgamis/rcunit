@@ -30,7 +30,7 @@ void rcu_insert_queue(rcu_queue *queue, rcu_queue *element) {
 
 rcu_queue *rcu_remove_queue(rcu_queue *queue) {
     rcu_queue *element;
-    if (queue != NULL && !rcu_is_list_empty(queue)) {
+    if (queue && !rcu_is_list_empty(queue)) {
         element = queue->prev;
     }
     return element;

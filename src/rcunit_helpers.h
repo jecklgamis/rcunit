@@ -55,11 +55,11 @@
 
 /* Traverses a test function table */
 #define RCU_FOR_EACH_FUNC_ENTRY(func_tbl, cursor, index) \
-    for(index = 0, cursor = func_tbl; cursor->name != NULL; cursor++, index++)
+    for(index = 0, cursor = func_tbl; cursor->name; cursor++, index++)
 
 /* Traverses a test module table */
-#define RCU_FOR_EACH_MOD_ENTRY(mod_tbl, cursor, index) \
-    for(index = 0,cursor = mod_tbl; cursor->name != NULL; cursor++, index++)
+#define RCU_FOR_EACH_MODULE_ENTRY(mod_tbl, cursor, index) \
+    for(index = 0,cursor = mod_tbl; cursor->name; cursor++, index++)
 
 /* Declares a log handler implementation */
 #define RCU_DEC_LOG_HANDLER_IMPL(log_impl, param) \
@@ -85,21 +85,21 @@
 
 /* Declares a test function table */
 #define RCU_DEC_TEST_FUNC_TBL(func_tbl) \
-    extern rcu_test_function_entry func_tbl[];
+    extern struct rcu_test_function_entry func_tbl[];
 
 /* Declares a test module */
-#define RCU_DEC_TEST_MOD(mod) \
-    extern rcu_module mod;
+#define RCU_DEC_TEST_MODULE(module) \
+    extern struct rcu_module module;
 
 /* Declares a test module table */
-#define RCU_DEC_TEST_MOD_TBL(mod) \
-    extern rcu_module_entry mod[];
+#define RCU_DEC_TEST_MODULE_TBL(module) \
+    extern struct rcu_module_entry module[];
 
 #define RCU_RET_IF_NULL(ptr) \
-    if ((ptr) == NULL) return;
+    if (!(ptr)) return;
 
 #define RCU_RET_VALUE_IF_NULL(ptr, value) \
-    if ((ptr) == NULL) return value;
+    if (!(ptr)) return value;
 
 #endif /* RCUNIT_HELPERS_H */
 

@@ -16,7 +16,7 @@
 
 #include "rcunit.h"
 
-int rcu_gen_html_report(rcu_test_engine *engine) {
+int rcu_gen_html_report(struct rcu_test_engine *engine) {
     return RCU_E_OK;
 }
 

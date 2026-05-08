@@ -1169,7 +1169,7 @@ RCU_TEST(my_test) {
 }
 
 int main(int argc, char *argv[]) {
-    rcu_add_named_test(my_test,"my_test");
+    RCU_ADD_TEST(my_test);
     return rcu_run_tests();
 }</code></pre>
 </div></div>
@@ -1219,7 +1219,7 @@ Abigail Gamis (SHFL, Australia) - user guide, API refinements
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2026-05-09 07:05:28 AEST
+ 2026-05-09 07:33:05 AEST
 </div>
 </div>
 </body>

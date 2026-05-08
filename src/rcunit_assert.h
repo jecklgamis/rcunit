@@ -37,11 +37,11 @@ extern void rcu_assert_impl(int cond, const char *filename, const char *func_nam
 
 /* Asserts a null pointer */
 #define RCU_ASSERT_NULL(ptr) \
- { rcu_assert_impl(((ptr) == NULL), __FILE__,__func__,__LINE__, "expecting null pointer"); }
+ { rcu_assert_impl(!((ptr)), __FILE__,__func__,__LINE__, "expecting null pointer"); }
 
 /* Asserts a non-null pointer */
 #define RCU_ASSERT_NOT_NULL(ptr) \
- { rcu_assert_impl(((ptr) != NULL), __FILE__,__func__,__LINE__,"expecting non-null pointer"); }
+ { rcu_assert_impl(!!(ptr), __FILE__,__func__,__LINE__,"expecting non-null pointer"); }
 
 /* Asserts that the two values/variables are equal (integer types) */
 #define RCU_ASSERT_EQUAL(expected, actual) \

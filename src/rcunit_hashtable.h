@@ -27,11 +27,11 @@
  */
 
 /* A generic hash table */
-typedef struct rcu_hashtable {
+struct rcu_hashtable {
     int nr_bucket;
     int nr_elem;
-    rcu_list bucket[1];
-} rcu_hashtable;
+    struct rcu_list bucket[1];
+};
 
 /* Calculates the number of memory cells required to store nbytes */
 #define RCU_SIZEIN_MEMCELL(nbytes) (((nbytes)+3) >> 2)
@@ -40,6 +40,6 @@ typedef struct rcu_hashtable {
  *  nr_bucket buckets.
  */
 #define RCU_SIZEOF_HASHTABLE(nr_bucket) \
-    (RCU_SIZEIN_MEMCELL(sizeof(rcu_hashtable)) + RCU_SIZEIN_MEMCELL(sizeof(rcu_list))*((nr_bucket)-1))
+    (RCU_SIZEIN_MEMCELL(sizeof(struct rcu_hashtable)) + RCU_SIZEIN_MEMCELL(sizeof(struct rcu_list))*((nr_bucket)-1))
 
 #endif /* RCUNIT_HASHTABLE_H */

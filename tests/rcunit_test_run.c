@@ -242,49 +242,13 @@ RCU_DEF_FUNC_TBL(user_ftbl6)
 
 RCU_DEF_FUNC_TBL_END
 
-RCU_DEF_MOD_TBL(user_mtbl1)
-    RCU_INC_MOD("m0",RCU_NULL,RCU_NULL,user_ftbl0,RCU_TRUE)
-    RCU_INC_MOD("m1",user_m1_init,user_m1_destroy,user_ftbl1,RCU_TRUE)
-    RCU_INC_MOD("m2",user_m2_init,user_m2_destroy,user_ftbl2,RCU_TRUE)
-    RCU_INC_MOD("m3",user_m3_init,user_m3_destroy,user_ftbl3,RCU_TRUE)
-    RCU_INC_MOD("m4",user_m4_init,user_m4_destroy,user_ftbl4,RCU_TRUE)
-    RCU_INC_MOD("m5",user_m4_init,user_m4_destroy,user_ftbl5,RCU_FALSE)
-RCU_DEF_MOD_TBL_END
+RCU_DEF_MODULE_TBL(user_mtbl1)
+    RCU_INC_MODULE("m0",RCU_NULL,RCU_NULL,user_ftbl0,RCU_TRUE)
+    RCU_INC_MODULE("m1",user_m1_init,user_m1_destroy,user_ftbl1,RCU_TRUE)
+    RCU_INC_MODULE("m2",user_m2_init,user_m2_destroy,user_ftbl2,RCU_TRUE)
+    RCU_INC_MODULE("m3",user_m3_init,user_m3_destroy,user_ftbl3,RCU_TRUE)
+    RCU_INC_MODULE("m4",user_m4_init,user_m4_destroy,user_ftbl4,RCU_TRUE)
+    RCU_INC_MODULE("m5",user_m4_init,user_m4_destroy,user_ftbl5,RCU_FALSE)
+RCU_DEF_MODULE_TBL_END
 
-RCU_DEF_GENERIC_FUNC(rcu_test_run_001_out_hnd_int,param){
-    fprintf(stdout,"rcu_test_run_001_out_hnd_int invoked\n");
-}
-
-RCU_DEF_GENERIC_FUNC(rcu_test_run_001_out_hnd_destroy,param){
-    fprintf(stdout,"rcu_test_run_001_out_hnd_destroy invoked\n");
-}
-
-RCU_DEF_GENERIC_FUNC(rcu_test_run_001_out_hnd_out_impl,param){
-RCU_OUTPUT_RECORD *out_rec = (RCU_OUTPUT_RECORD*)param;
-    fprintf(stdout,"%s",out_rec->data);
-}
-
-DEF_LOCAL_TEST_FUNC(rcu_test_run_001){
-RCU_DEF_TEST_MOD(m1)
-RCU_DEF_TEST_MOD(m2)
-RCU_DEF_TEST_MOD(m3)
-RCU_DEF_TEST_REG(r1)
-RCU_DEF_TEST_REG(r2)
-RCU_OUTPUT_HANDLER out_hnd;
-    rcu_init();
-    out_hnd.init = rcu_test_run_001_out_hnd_int;
-    out_hnd.destroy = rcu_test_run_001_out_hnd_destroy;
-    out_hnd.out_impl = rcu_test_run_001_out_hnd_out_impl;
-    rcu_add_out_hnd(&out_hnd);
-    r1=rcu_cre_test_reg("r1",RCU_TRUE);
-    rcu_add_test_reg(r1);
-    r2=rcu_cre_test_reg("r2",RCU_FALSE);
-    rcu_add_test_reg(r2);
-    rcu_add_test_func_tbl(RCU_DEFAULT_MODULE,user_ftbl6);
-    rcu_add_test_mod_tbl(RCU_DEFAULT_REGISTRY,user_mtbl1);
-    rcu_dump_test_dbase();
-    rcu_run_test_mach();
-    rcu_destroy();
-    return(0);
-}
 

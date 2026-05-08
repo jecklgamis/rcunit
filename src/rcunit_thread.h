@@ -30,17 +30,17 @@
 
 typedef void (*rcu_thread_routine)(void *);
 
-typedef struct {
-    rcu_list link;
+struct rcu_thread {
+    struct rcu_list link;
     const char *name;
     pthread_t id;
     pthread_attr_t attr;
     int running;
-} rcu_thread;
+};
 
-RCU_API rcu_thread *rcu_get_thread(const char *name, rcu_thread_routine run, void *arg);
+RCU_API struct rcu_thread *rcu_get_thread(const char *name, rcu_thread_routine run, void *arg);
 
-RCU_API void rcu_join_thread(rcu_thread *thread);
+RCU_API void rcu_join_thread(struct rcu_thread *thread);
 
 #endif /* RCUNIT_THREAD_H **/
 

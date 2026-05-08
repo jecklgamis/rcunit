@@ -16,7 +16,7 @@
 
 #include "rcunit_thread.h"
 
-rcu_list g_rcu_thread_list;
+struct rcu_list g_rcu_thread_list;
 static int g_rcu_threads_initialized;
 
 RCU_API void rcu_init_threads() {
@@ -32,25 +32,25 @@ RCU_API void rcu_destroy_threads() {
     }
 }
 
-void rcu_init_thread(rcu_thread *thread) {
-    if (thread != NULL) {
+void rcu_init_thread(struct rcu_thread *thread) {
+    if (thread) {
         rcu_init_list(&thread->link);
     }
 }
 
-void rcu_destroy_thread(rcu_thread **thread_addr) {
+void rcu_destroy_thread(struct rcu_thread **thread_addr) {
     rcu_init_threads();
-    if (thread_addr != NULL && *thread_addr != NULL) {
+    if (thread_addr && *thread_addr) {
         rcu_native_free(*thread_addr);
     }
     *thread_addr = NULL;
 }
 
-rcu_thread *rcu_srch_thread_by_name(const char *name) {
-    rcu_list *cursor = NULL;
+struct rcu_thread *rcu_search_thread_by_name(const char *name) {
+    struct rcu_list *cursor = NULL;
 
     RCU_FOR_EACH_ENTRY(&g_rcu_thread_list, cursor) {
-        rcu_thread *thread = (rcu_thread *) cursor;
+        struct rcu_thread *thread = (struct rcu_thread *) cursor;
         if (!strcmp(thread->name, name)) {
             return thread;
         }
@@ -58,14 +58,14 @@ rcu_thread *rcu_srch_thread_by_name(const char *name) {
     return NULL;
 }
 
-RCU_API rcu_thread *rcu_get_thread(const char *name, rcu_thread_routine routine, void *arg) {
-    rcu_thread *thread = NULL;
+RCU_API struct rcu_thread *rcu_get_thread(const char *name, rcu_thread_routine routine, void *arg) {
+    struct rcu_thread *thread = NULL;
     rcu_init_threads();
-    if (name == NULL) {
+    if (!name) {
         return NULL;
     }
-    if ((thread = rcu_srch_thread_by_name(name)) == NULL) {
-        if ((thread = rcu_native_malloc(sizeof(rcu_thread))) != NULL) {
+    if ((!(thread = rcu_search_thread_by_name(name)))) {
+        if ((thread = rcu_native_malloc(sizeof(struct rcu_thread)))) {
             rcu_init_thread(thread);
             rcu_insert_list(&g_rcu_thread_list, &thread->link);
             thread->name = name;
@@ -80,11 +80,11 @@ RCU_API rcu_thread *rcu_get_thread(const char *name, rcu_thread_routine routine,
     return thread;
 }
 
-void rcu_start_thread(rcu_thread *thread) {
+void rcu_start_thread(struct rcu_thread *thread) {
 }
 
-void rcu_stop_thread(rcu_thread *thread) {
-    if (thread != NULL && rcu_srch_thread_by_name(thread->name) != NULL) {
+void rcu_stop_thread(struct rcu_thread *thread) {
+    if (thread && rcu_search_thread_by_name(thread->name)) {
         pthread_join(thread->id, (void **) NULL);
     }
 }

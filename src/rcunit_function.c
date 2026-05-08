@@ -16,61 +16,54 @@
 
 #include "rcunit.h"
 
-extern rcu_test *
-rcu_srch_test_func_entry_global(rcu_generic_function entry, rcu_module **which_mod, rcu_registry **which_reg);
+extern struct rcu_test *rcu_alloc_test_func(int nr_func);
 
-extern rcu_test *rcu_srch_test_func_by_name_global(const char *name, rcu_module **which_mod, rcu_registry **which_reg);
-
-extern rcu_test *rcu_alloc_test_func(int nr_func);
-
-extern rcu_module *rcu_srch_mod_by_name_global(const char *mod_name, rcu_registry **which_reg);
-
-rcu_test *rcu_srch_test_func_entry(rcu_module *mod, rcu_generic_function entry);
+struct rcu_test *rcu_search_test_func_entry(struct rcu_module *module, rcu_generic_function entry);
 
 RCU_API int rcu_add_test(rcu_generic_function test) {
-    return rcu_add_test_func(rcu_get_default_mod(), test, NULL, NULL, NULL);
+    return rcu_add_test_func(rcu_get_default_module(), test, NULL, NULL, NULL);
 }
 
-RCU_API int rcu_add_test_to_mod(rcu_module *mod, rcu_generic_function test) {
-    return rcu_add_test_func(mod, test, NULL, NULL, NULL);
+RCU_API int rcu_add_test_to_module(struct rcu_module *module, rcu_generic_function test) {
+    return rcu_add_test_func(module, test, NULL, NULL, NULL);
 }
 
-RCU_API int rcu_add_test_fxt(rcu_generic_function test, rcu_generic_function setup, rcu_generic_function teardown) {
-    return rcu_add_test_func(rcu_get_default_mod(), test, setup, teardown, NULL);
+RCU_API int rcu_add_test_fixture(rcu_generic_function test, rcu_generic_function setup, rcu_generic_function teardown) {
+    return rcu_add_test_func(rcu_get_default_module(), test, setup, teardown, NULL);
 }
 
-RCU_API int rcu_add_test_fxt_to_mod(rcu_module *mod, rcu_generic_function test,
+RCU_API int rcu_add_test_fixture_to_module(struct rcu_module *module, rcu_generic_function test,
                                     rcu_generic_function setup, rcu_generic_function teardown) {
-    return rcu_add_test_func(rcu_get_default_mod(), test, setup, teardown, NULL);
+    return rcu_add_test_func(rcu_get_default_module(), test, setup, teardown, NULL);
 }
 
-RCU_API int rcu_add_test_func(rcu_module *mod, rcu_generic_function entry, rcu_generic_function init,
+RCU_API int rcu_add_test_func(struct rcu_module *module, rcu_generic_function entry, rcu_generic_function init,
                               rcu_generic_function destroy, const char *name) {
-    rcu_test *func = NULL;
-    rcu_registry *which_reg = NULL;
-    rcu_test_engine *engine = NULL;
+    struct rcu_test *func = NULL;
+    struct rcu_registry *which_reg = NULL;
+    struct rcu_test_engine *engine = NULL;
     int name_len = 0;
 
     rcu_init();
     engine = &the_test_engine;
-    if (entry == NULL) {
+    if (!entry) {
         RCU_SET_ERCD(RCU_E_INVFUNCENTRY);
         RCU_LOG_WARN("%s (null)", RCU_GET_ERR_MSG());
         return RCU_E_NG;
     }
-    mod = (mod == NULL) ? rcu_get_default_mod() : mod;
-    func = rcu_srch_test_func_entry(mod, entry);
-    if (func != NULL) {
-        RCU_LOG_WARN("Similar test %s exists in %s", func->name, mod->name);
+    module = (!module) ? rcu_get_default_module() : module;
+    func = rcu_search_test_func_entry(module, entry);
+    if (func) {
+        RCU_LOG_WARN("Similar test %s exists in %s", func->name, module->name);
     }
-    if ((func = rcu_alloc_test_func(1)) == NULL) {
+    if ((!(func = rcu_alloc_test_func(1)))) {
         RCU_SET_ERCD(RCU_E_NOMEM);
         RCU_LOG_WARN("%s", RCU_GET_ERR_MSG());
         return RCU_E_NG;
     }
     rcu_init_list(&func->link);
     char test_name[RCU_TEST_FUNCTION_NAME_LENGTH];
-    if (name == NULL) {
+    if (!name) {
         memset(test_name, 0, RCU_TEST_FUNCTION_NAME_LENGTH);
         sprintf(test_name, "%p", entry);
         strncpy(func->name, test_name, strlen(test_name));
@@ -84,34 +77,34 @@ RCU_API int rcu_add_test_func(rcu_module *mod, rcu_generic_function entry, rcu_g
     func->destroy = destroy;
 
     rcu_init_list(&func->fail_rec_list);
-    rcu_insert_list(&mod->func_list, &func->link);
+    rcu_insert_list(&module->func_list, &func->link);
 
     RCU_SET_RUN_STAT(func, RCU_RUN_STAT_NOTTESTED);
-    RCU_INCR(mod->nr_test);
-    RCU_LOG_DEBUG("Test %s added to %s", func->name, mod->name);
+    RCU_INCR(module->nr_test);
+    RCU_LOG_DEBUG("Test %s added to %s", func->name, module->name);
     return RCU_E_OK;
 }
 
-RCU_API int rcu_add_test_func_tbl(rcu_module *mod, rcu_test_function_entry *func_tbl) {
-    rcu_test_function_entry *cursor = NULL;
+RCU_API int rcu_add_test_func_tbl(struct rcu_module *module, struct rcu_test_function_entry *func_tbl) {
+    struct rcu_test_function_entry *cursor = NULL;
     int index;
-    rcu_test_engine *engine = &the_test_engine;
+    struct rcu_test_engine *engine = &the_test_engine;
 
     rcu_init();
-    if (!rcu_is_mach_initialized(engine)) {
-        RCU_SET_ERCD(RCU_E_MACHNOINIT);
+    if (!rcu_is_engine_initialized(engine)) {
+        RCU_SET_ERCD(RCU_E_ENGNOINIT);
         return RCU_E_NG;
     }
-    if (func_tbl == NULL) {
+    if (!func_tbl) {
         RCU_SET_ERCD(RCU_E_INVFUNCTABLE);
         RCU_LOG_WARN("%s (null)", RCU_GET_ERR_MSG());
         return RCU_E_NG;
     }
 
-    mod = (mod == NULL) ? rcu_get_default_mod() : mod;
+    module = (!module) ? rcu_get_default_module() : module;
     RCU_FOR_EACH_FUNC_ENTRY(func_tbl, cursor, index) {
-        if (cursor->entry != NULL) {
-            rcu_add_test_func(mod, cursor->entry, cursor->init,
+        if (cursor->entry) {
+            rcu_add_test_func(module, cursor->entry, cursor->init,
                               cursor->destroy, cursor->name);
         } else {
             RCU_LOG_WARN("Invalid test function entry. (index = %d)", index);
@@ -120,20 +113,20 @@ RCU_API int rcu_add_test_func_tbl(rcu_module *mod, rcu_test_function_entry *func
     return RCU_E_OK;
 }
 
-rcu_test *rcu_alloc_test_func(int nr_func) {
-    rcu_test *func = NULL;
+struct rcu_test *rcu_alloc_test_func(int nr_func) {
+    struct rcu_test *func = NULL;
     if (nr_func <= 0) {
         return NULL;
     }
-    func = (rcu_test *) rcu_malloc(sizeof(rcu_test) * nr_func);
-    if (func != NULL) {
-        memset(func, 0, sizeof(rcu_test));
+    func = (struct rcu_test *) rcu_malloc(sizeof(struct rcu_test) * nr_func);
+    if (func) {
+        memset(func, 0, sizeof(struct rcu_test));
     }
     return func;
 }
 
-int rcu_free_test_func(rcu_test *func) {
-    if (func == NULL) {
+int rcu_free_test_func(struct rcu_test *func) {
+    if (!func) {
         RCU_LOG_WARN("%s", RCU_GET_ERR_MSG_OF(RCU_E_INVFUNC));
         return RCU_E_NG;
     }
@@ -142,21 +135,21 @@ int rcu_free_test_func(rcu_test *func) {
     return RCU_E_OK;
 }
 
-int rcu_add_fail_rec_to_func(rcu_test *func, const char *info, const char *filepath, const int line_no) {
+int rcu_add_fail_rec_to_func(struct rcu_test *func, const char *info, const char *filepath, const int line_no) {
     return rcu_add_fail_rec_impl(&func->fail_rec_list, info, filepath, "", line_no);
 }
 
-int rcu_del_all_fail_rec_from_func(rcu_test *func) {
+int rcu_del_all_fail_rec_from_func(struct rcu_test *func) {
     return (rcu_del_all_fail_rec_impl(&func->fail_rec_list));
 }
 
-int rcu_run_test_func_impl(rcu_test_engine *engine, rcu_test *func) {
+int rcu_run_test_func_impl(struct rcu_test_engine *engine, struct rcu_test *func) {
     RCU_SET_RUN_STAT(func, RCU_RUN_STAT_TEST_FAILED);
     RCU_SET_CURR_FUNC(engine, func);
     RCU_RESET(func->nr_fail_assert);
     RCU_RESET(func->nr_succ_assert);
 
-    if (func->init != NULL) {
+    if (func->init) {
         RCU_SET_RUN_CTX(engine, RCU_RUN_CTX_FUNC_INIT);
         RCU_TRY
                 {
@@ -199,7 +192,7 @@ int rcu_run_test_func_impl(rcu_test_engine *engine, rcu_test *func) {
         }
     }
 
-    if (func->destroy != NULL) {
+    if (func->destroy) {
         RCU_SET_RUN_CTX(engine, RCU_RUN_CTX_FUNC_DESTROY);
         RCU_TRY
                 {

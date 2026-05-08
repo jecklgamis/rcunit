@@ -17,7 +17,7 @@
 #include "rcunit_exception.h"
 
 /* Current exception stack frame */
-rcu_exception_frame *g_curr_excp_frame = NULL;
+struct rcu_exception_frame *g_curr_excp_frame = NULL;
 int g_excp_initialized = 0;
 
 /* Defines an exception object table entry */
@@ -25,7 +25,7 @@ int g_excp_initialized = 0;
     { id, name },
 
 /* Global exception object table */
-rcu_exception g_rcu_excp_tbl[] = {
+struct rcu_exception g_rcu_excp_tbl[] = {
         RCU_DEFINE_EXCEPTION(RCU_EXCP_ID_START, "Reserved (RCU_EXCP_ID_START)")
         RCU_DEFINE_EXCEPTION(RCU_EXCP_ABORTTESTRUN, "test function aborted")
         RCU_DEFINE_EXCEPTION(RCU_EXCP_ABORTMODRUN, "test module aborted")
@@ -40,8 +40,8 @@ rcu_exception g_rcu_excp_tbl[] = {
         RCU_DEFINE_EXCEPTION(RCU_EXCP_ID_UNKNOWN, "Unknown")
 };
 
-RCU_API rcu_exception *rcu_lookup_excp_by_id(rcu_exception_id id) {
-    rcu_exception *excp = &g_rcu_excp_tbl[RCU_EXCP_ID_UNKNOWN];
+RCU_API struct rcu_exception *rcu_lookup_excp_by_id(rcu_exception_id id) {
+    struct rcu_exception *excp = &g_rcu_excp_tbl[RCU_EXCP_ID_UNKNOWN];
     if (id > RCU_EXCP_ID_START && id < RCU_EXCP_ID_END) {
         excp = &g_rcu_excp_tbl[id];
     }
@@ -87,7 +87,7 @@ void rcu_sig_handler(int signo) {
 /*
  * Saves signal context 
  */
-void rcu_sig_save(rcu_exception_frame *frame) {
+void rcu_sig_save(struct rcu_exception_frame *frame) {
     sigaction(SIGSEGV, NULL, &frame->segv_act_old);
     sigaction(SIGILL, NULL, &frame->ill_act_old);
     sigaction(SIGFPE, NULL, &frame->fpe_act_old);
@@ -97,7 +97,7 @@ void rcu_sig_save(rcu_exception_frame *frame) {
 /*
  * Restores signal context
  */
-void rcu_sig_restore(rcu_exception_frame *frame) {
+void rcu_sig_restore(struct rcu_exception_frame *frame) {
     sigaction(SIGSEGV, &frame->segv_act_old, NULL);
     sigaction(SIGILL, &frame->ill_act_old, NULL);
     sigaction(SIGFPE, &frame->fpe_act_old, NULL);

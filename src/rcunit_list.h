@@ -20,28 +20,28 @@
 #include <stdio.h>
 
 /* A doubly linked list */
-typedef struct rcu_list {
+struct rcu_list {
     struct rcu_list *next;
     struct rcu_list *prev;
-} rcu_list;
+};
 
 /* Iterates a given list */
 #define RCU_FOR_EACH_ENTRY(list, cursor) \
     for((cursor) = (list)->next; (cursor) != (list); (cursor) = (cursor)->next)
 
 #define RCU_FOR_EACH_ENTRY_WITH_CURSOR(list, cursor) \
-    rcu_list *(cursor); \
+    struct rcu_list *(cursor); \
     for((cursor) = (list)->next; (cursor) != (list); (cursor) = (cursor)->next)
 
 #define RCU_FOR_EACH_ENTRY_WITH_CURSOR_INDEX(list, cursor, index) \
-    rcu_list *(cursor); \
+    struct rcu_list *(cursor); \
     int (index) = 0; \
     for((cursor) = (list)->next; (cursor) != (list); (cursor) = (cursor)->next, (index)++)
 
 /* Saves the current cursor */
 #define RCU_SAVE_CURSOR(cursor)                      \
     {                                                \
-    rcu_list *__saved_node__ = (cursor)->prev;
+    struct rcu_list *__saved_node__ = (cursor)->prev;
 
 /* Restores the current cursor */
 #define RCU_RESTORE_CURSOR(cursor) \
@@ -49,15 +49,15 @@ typedef struct rcu_list {
     }
 
 /** List operations function prototypes */
-void rcu_init_list(rcu_list *list);
+void rcu_init_list(struct rcu_list *list);
 
-int rcu_is_list_empty(rcu_list *list);
+int rcu_is_list_empty(struct rcu_list *list);
 
-void rcu_insert_list(rcu_list *list, rcu_list *entry);
+void rcu_insert_list(struct rcu_list *list, struct rcu_list *entry);
 
-void rcu_remove_list(rcu_list *entry);
+void rcu_remove_list(struct rcu_list *entry);
 
-int rcu_get_list_size(rcu_list *entry);
+int rcu_get_list_size(struct rcu_list *entry);
 
 #endif /* RCUNIT_LIST_H */
 

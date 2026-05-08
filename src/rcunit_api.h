@@ -24,27 +24,25 @@
 RCU_API int rcu_add_test(rcu_generic_function test);
 #define RCU_ADD_TEST(fn) rcu_add_test_func(NULL, fn, NULL, NULL, #fn)
 
-RCU_API int rcu_add_test_to_mod(rcu_module *mod, rcu_generic_function test);
+RCU_API int rcu_add_test_to_module(struct rcu_module *module, rcu_generic_function test);
 
-RCU_API int rcu_add_test_fxt(rcu_generic_function test, rcu_generic_function setup, rcu_generic_function teardown);
+RCU_API int rcu_add_test_fixture(rcu_generic_function test, rcu_generic_function setup, rcu_generic_function teardown);
 
-RCU_API int rcu_add_test_fxt_to_mod(rcu_module *mod, rcu_generic_function test, rcu_generic_function setup,
+RCU_API int rcu_add_test_fixture_to_module(struct rcu_module *module, rcu_generic_function test, rcu_generic_function setup,
                                     rcu_generic_function teardown);
 
 /* Test module interfaces */
-RCU_API rcu_module *rcu_get_mod(const char *name);
+RCU_API struct rcu_module *rcu_get_module(const char *name);
 
-RCU_API rcu_module *rcu_get_default_mod();
+RCU_API struct rcu_module *rcu_get_default_module();
 
-RCU_API void rcu_set_mod_fxt(rcu_module *mod, rcu_generic_function setup,
+RCU_API void rcu_set_module_fixture(struct rcu_module *module, rcu_generic_function setup,
                              rcu_generic_function teardown);
 
 /* Test registry APIs */
-RCU_API rcu_registry *rcu_get_reg(const char *name);
+RCU_API struct rcu_registry *rcu_get_default_reg();
 
-RCU_API rcu_registry *rcu_get_default_reg();
-
-RCU_API int rcu_add_mod_to_reg(rcu_registry *reg, rcu_module *mod);
+RCU_API int rcu_add_module_to_reg(struct rcu_registry *reg, struct rcu_module *module);
 
 /* Main APIs*/
 RCU_API int rcu_init();
@@ -67,7 +65,7 @@ RCU_API int rcu_set_run_hook(rcu_generic_function hook);
 
 /* Test function table APIs */
 #define RCU_DEF_FUNC_TBL(name) \
-rcu_test_function_entry name[] = {
+struct rcu_test_function_entry name[] = {
 
 #define RCU_INC_TEST(name) \
     { #name, name, NULL, NULL },
@@ -79,24 +77,21 @@ rcu_test_function_entry name[] = {
     { NULL, NULL, NULL, NULL }};
 
 /* Test module table APIs */
-#define RCU_DEF_MOD_TBL(name) \
-    rcu_module_entry name[] = {
+#define RCU_DEF_MODULE_TBL(name) \
+    struct rcu_module_entry name[] = {
 
-#define RCU_INC_MOD(name, tbl) \
+#define RCU_INC_MODULE(name, tbl) \
     { name, NULL, NULL, tbl },
 
-#define RCU_INC_MOD_FXT(name, setup, teardown, tbl) \
+#define RCU_INC_MODULE_FXT(name, setup, teardown, tbl) \
     { name, setup, teardown, tbl},
 
-#define RCU_DEF_MOD_TBL_END \
+#define RCU_DEF_MODULE_TBL_END \
     { NULL, NULL, NULL, NULL }};
 
 /* For Backward compatibility */
-#define RCU_DEF_TEST_MOD(name) \
-    rcu_module *name;
-
-#define RCU_DEF_TEST_REG(name) \
-    rcu_registry *name;
+#define RCU_DEF_TEST_MODULE(name) \
+    struct rcu_module *name;
 
 #define RCU_DEF_INIT_FUNC(name) \
     RCU_SETUP(name)
@@ -104,17 +99,9 @@ rcu_test_function_entry name[] = {
 #define RCU_DEF_DESTROY_FUNC(name) \
     RCU_TEARDOWN(name)
 
-extern RCU_API rcu_registry *rcu_cre_test_reg(const char *name);
+extern RCU_API int rcu_add_test_module(struct rcu_module *module);
 
-extern RCU_API int rcu_add_test_mod(rcu_module *mod);
-
-extern RCU_API int rcu_destroy_test_reg(rcu_registry *reg);
-
-extern RCU_API int rcu_destroy_test_mod(rcu_module *mod);
-
-extern RCU_API int rcu_destroy_test_reg(rcu_registry *reg);
-
-extern RCU_API int rcu_destroy_test_reg(rcu_registry *reg);
+extern RCU_API int rcu_destroy_test_module(struct rcu_module *module);
 
 extern RCU_API int rcu_get_err();
 
@@ -124,13 +111,9 @@ extern RCU_API int rcu_have_asserts();
 
 extern RCU_API int rcu_init();
 
-extern RCU_API int rcu_run_test_mach();
+extern RCU_API int rcu_run_test_engine();
 
-extern RCU_API int rcu_run_test_mod_by_name(const char *name);
-
-extern RCU_API int rcu_run_test_reg_by_name(const char *name);
-
-extern RCU_API int rcu_run_test_reg_unsupported(rcu_registry *reg);
+extern RCU_API int rcu_run_test_module_by_name(const char *name);
 
 extern RCU_API int rcu_run_tests();
 
@@ -138,16 +121,14 @@ extern RCU_API int rcu_set_assert_hook(rcu_generic_function assert_hook);
 
 extern RCU_API int rcu_set_run_hook(rcu_generic_function run_hook);
 
-extern RCU_API rcu_exception *rcu_lookup_excp_by_id(rcu_exception_id id);
+extern RCU_API struct rcu_exception *rcu_lookup_excp_by_id(rcu_exception_id id);
 
-extern RCU_API rcu_module *rcu_get_default_mod();
+extern RCU_API struct rcu_module *rcu_get_default_module();
 
-extern RCU_API rcu_module *rcu_get_mod(const char *name);
+extern RCU_API struct rcu_module *rcu_get_module(const char *name);
 
 
-extern RCU_API rcu_registry *rcu_get_reg(const char *name);
-
-extern RCU_API rcu_thread *rcu_get_thread(const char *name, rcu_thread_routine routine, void *arg);
+extern RCU_API struct rcu_thread *rcu_get_thread(const char *name, rcu_thread_routine routine, void *arg);
 
 extern RCU_API void *rcu_malloc(size_t size);
 
@@ -161,14 +142,14 @@ extern RCU_API void rcu_free(void *addr);
 
 extern RCU_API void rcu_init_threads();
 
-extern RCU_API int rcu_add_test_func_tbl(rcu_module *mod, rcu_test_function_entry *func_tbl);
+extern RCU_API int rcu_add_test_func_tbl(struct rcu_module *module, struct rcu_test_function_entry *func_tbl);
 
-extern RCU_API int rcu_add_test_mod_tbl(rcu_registry *reg, rcu_module_entry *mod_tbl);
+extern RCU_API int rcu_add_test_module_tbl(struct rcu_registry *reg, struct rcu_module_entry *mod_tbl);
 
-extern RCU_API int rcu_run_test_mod(rcu_module *module);
+extern RCU_API int rcu_run_test_module(struct rcu_module *module);
 
-extern RCU_API void rcu_dump_test_reg(rcu_registry *reg);
-extern int rcu_destroy_test_mach(rcu_test_engine *engine);
+extern RCU_API void rcu_dump_test_reg(struct rcu_registry *reg);
+extern int rcu_destroy_test_engine(struct rcu_test_engine *engine);
 
 
 #endif /* RCUNIT_API_H */

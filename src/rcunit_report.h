@@ -57,7 +57,7 @@
     sprintf(g_report_buff, format, p1, p2, p3, p4); \
     rcu_report_iface_impl(g_report_buff);
 
-void rcu_gen_test_run_report(rcu_test_engine *engine);
+void rcu_gen_test_run_report(struct rcu_test_engine *engine);
 
 const char *rcu_get_stat_str(int stat);
 

@@ -27,7 +27,7 @@ const char *rcu_get_stat_str(int stat);
 
 int rcu_indent(FILE *fp, int nr_spaces);
 
-int rcu_gen_plaintext_report(rcu_test_engine *engine) {
+int rcu_gen_plaintext_report(struct rcu_test_engine *engine) {
     char ts_buff[RCU_TSTAMP_BUFF_SIZE];
     rcu_get_timestamp(ts_buff, RCU_TSTAMP_BUFF_SIZE);
     FILE *fp = NULL;
@@ -35,7 +35,7 @@ int rcu_gen_plaintext_report(rcu_test_engine *engine) {
     const char *sub_title = "http://github.com/jecklgamis/rcunit";
 
     RCU_LOG_DEBUG("Generating test run report : %s", RCU_TEST_RUN_REPORT_FILENAME_PLAINTEXT);
-    if ((fp = fopen(RCU_TEST_RUN_REPORT_FILENAME_PLAINTEXT, "wt")) == NULL) {
+    if ((!(fp = fopen(RCU_TEST_RUN_REPORT_FILENAME_PLAINTEXT, "wt")))) {
         return RCU_E_NG;
     }
     fprintf(fp, "%s%s\n", RCU_LINE_MARKER_1, RCU_LINE_MARKER_1);
@@ -45,39 +45,37 @@ int rcu_gen_plaintext_report(rcu_test_engine *engine) {
     fprintf(fp, "%s\n", sub_title);
     fprintf(fp, "%s%s\n", RCU_LINE_MARKER_1, RCU_LINE_MARKER_1);
 
-    RCU_FOR_EACH_ENTRY_WITH_CURSOR_INDEX(&engine->reg_list, reg_cursor, reg_no) {
-        rcu_registry *reg = (rcu_registry *) reg_cursor;
-        fprintf(fp, "%d. [registry = \"%s\", %d modules]\n", reg_no, reg->name, reg->nr_mod);
+    struct rcu_registry *reg = &engine->def_reg;
+    fprintf(fp, "[registry = \"%s\", %d modules]\n", reg->name, reg->nr_module);
 
-        RCU_FOR_EACH_ENTRY_WITH_CURSOR_INDEX(&reg->mod_list, mod_cursor, mod_no) {
-            rcu_module *mod = (rcu_module *) mod_cursor;
-            rcu_indent(fp, 4);
-            fprintf(fp, "%d.%d [module = \"%s\", %d tests]\n", reg_no, mod_no, mod->name, mod->nr_test);
+    RCU_FOR_EACH_ENTRY_WITH_CURSOR_INDEX(&reg->mod_list, mod_cursor, mod_no) {
+        struct rcu_module *module = (struct rcu_module *) mod_cursor;
+        rcu_indent(fp, 4);
+        fprintf(fp, "%d. [module = \"%s\", %d tests]\n", mod_no, module->name, module->nr_test);
 
-            RCU_FOR_EACH_ENTRY_WITH_CURSOR(&mod->fail_rec_list, fail_rec_cursor) {
-                rcu_failure_record *fail_rec = (rcu_failure_record *) fail_rec_cursor;
+        RCU_FOR_EACH_ENTRY_WITH_CURSOR(&module->fail_rec_list, fail_rec_cursor) {
+            struct rcu_failure_record *fail_rec = (struct rcu_failure_record *) fail_rec_cursor;
+            rcu_indent(fp, 12);
+            fprintf(fp, "%s\n", fail_rec->info);
+        }
+
+        RCU_FOR_EACH_ENTRY_WITH_CURSOR_INDEX(&module->func_list, func_cursor, func_no) {
+            struct rcu_test *func = (struct rcu_test *) func_cursor;
+            rcu_indent(fp, 8);
+            fprintf(fp, "[test = \"%s\", result = %s]\n",
+                    func->name,
+                    rcu_get_stat_str(func->run_stat));
+            if (func->nr_succ_assert == 0 && func->nr_fail_assert == 0
+                && RCU_IS_TEST_SUCCEDED(func)) {
                 rcu_indent(fp, 12);
-                fprintf(fp, "%s\n", fail_rec->info);
+                fprintf(fp, "[failure = No assertions executed!]\n");
             }
+            struct rcu_list *fail_rec_cursor;
 
-            RCU_FOR_EACH_ENTRY_WITH_CURSOR_INDEX(&mod->func_list, func_cursor, func_no) {
-                rcu_test *func = (rcu_test *) func_cursor;
-                rcu_indent(fp, 8);
-                fprintf(fp, "[test = \"%s\", result = %s]\n",
-                        func->name,
-                        rcu_get_stat_str(func->run_stat));
-                if (func->nr_succ_assert == 0 && func->nr_fail_assert == 0
-                    && RCU_IS_TEST_SUCCEDED(func)) {
-                    rcu_indent(fp, 12);
-                    fprintf(fp, "[failure = No assertions executed!]\n");
-                }
-                rcu_list *fail_rec_cursor;
-
-                RCU_FOR_EACH_ENTRY(&func->fail_rec_list, fail_rec_cursor) {
-                    rcu_failure_record *fail_rec = (rcu_failure_record *) fail_rec_cursor;
-                    rcu_indent(fp, 12);
-                    fprintf(fp, "[failure = %s]\n", fail_rec->info);
-                }
+            RCU_FOR_EACH_ENTRY(&func->fail_rec_list, fail_rec_cursor) {
+                struct rcu_failure_record *fail_rec = (struct rcu_failure_record *) fail_rec_cursor;
+                rcu_indent(fp, 12);
+                fprintf(fp, "[failure = %s]\n", fail_rec->info);
             }
         }
     }
@@ -94,7 +92,7 @@ int rcu_gen_plaintext_report(rcu_test_engine *engine) {
     fprintf(fp, "\n%s%s\n", RCU_LINE_MARKER_1, RCU_LINE_MARKER_1);
     fprintf(fp, "Generated last %s by RCUNIT version %s.\n\n", ts_buff, RCU_VERSION_STRING);
 
-    if (fp != NULL) {
+    if (fp) {
         fclose(fp);
     }
     RCU_LOG_INFO("Test run report generated : %s", RCU_TEST_RUN_REPORT_FILENAME_PLAINTEXT);

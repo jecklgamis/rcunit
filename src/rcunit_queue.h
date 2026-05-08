@@ -21,7 +21,7 @@
 #include "rcunit_types.h"
 #include "rcunit_list.h"
 
-typedef rcu_list rcu_queue;
+typedef struct rcu_list rcu_queue;
 
 void rcu_init_queue(rcu_queue *queue);
 

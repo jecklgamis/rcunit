@@ -18,8 +18,8 @@
 
 #define RCU_ENABLE_DEBUG_MTRACE 1
 
-rcu_pointer_cache g_ptr_cache_1;
-rcu_pointer_cache g_ptr_cache_2;
+struct rcu_pointer_cache g_ptr_cache_1;
+struct rcu_pointer_cache g_ptr_cache_2;
 int gs_mtrace_init_done = RCU_FALSE;
 
 /* Enable pointer table compaction. Warning do not enable
@@ -27,18 +27,18 @@ int gs_mtrace_init_done = RCU_FALSE;
  */
 #define RCU_ENABLE_POINTER_TABLE_COMPACTION 0
 
-void rcu_get_mtrace_results(rcu_pointer_cache *ptr_cache, int *nr_leaks, size_t *leak_size);
+void rcu_get_mtrace_results(struct rcu_pointer_cache *ptr_cache, int *nr_leaks, size_t *leak_size);
 
-int rcu_cre_ptr_tbl(rcu_pointer_cache *ptr_cache) {
-    rcu_pointer_table *ptr_tbl = NULL;
+int rcu_create_ptr_tbl(struct rcu_pointer_cache *ptr_cache) {
+    struct rcu_pointer_table *ptr_tbl = NULL;
     int a = 0;
 
-    ptr_tbl = rcu_native_malloc(sizeof(rcu_pointer_table));
-    if (ptr_tbl == NULL) {
+    ptr_tbl = rcu_native_malloc(sizeof(struct rcu_pointer_table));
+    if (!ptr_tbl) {
         RCU_LOG_FATAL("Unable to allocate pointer table");
         return RCU_E_NG;
     }
-    memset(ptr_tbl, 0, sizeof(rcu_pointer_table));
+    memset(ptr_tbl, 0, sizeof(struct rcu_pointer_table));
     for (a = 0; a < rcu_pointer_table_SIZE; a++) {
         ptr_tbl->tbl[a].ptr = NULL;
         ptr_tbl->tbl[a].size = 0L;
@@ -53,14 +53,14 @@ int rcu_cre_ptr_tbl(rcu_pointer_cache *ptr_cache) {
 /*
  *  Finds a free slot from any of the pointer tables in the pointer cache
  */
-rcu_pointer_info *rcu_find_free_slot(rcu_pointer_cache *ptr_cache) {
-    rcu_list *cursor = NULL;
-    rcu_pointer_table *ptr_tbl = NULL;
-    rcu_pointer_info *ptr_info = NULL;
+struct rcu_pointer_info *rcu_find_free_slot(struct rcu_pointer_cache *ptr_cache) {
+    struct rcu_list *cursor = NULL;
+    struct rcu_pointer_table *ptr_tbl = NULL;
+    struct rcu_pointer_info *ptr_info = NULL;
     int a;
 
     RCU_FOR_EACH_ENTRY(&ptr_cache->ptr_tbl_list, cursor) {
-        ptr_tbl = (rcu_pointer_table *) cursor;
+        ptr_tbl = (struct rcu_pointer_table *) cursor;
         for (a = 0; a < rcu_pointer_table_SIZE; a++) {
             ptr_info = &ptr_tbl->tbl[a];
             if (!ptr_info->used) {
@@ -74,13 +74,13 @@ rcu_pointer_info *rcu_find_free_slot(rcu_pointer_cache *ptr_cache) {
 /**
  *  Searches the pointer information of the given pointer
  */
-rcu_pointer_info *rcu_srch_ptr_info(void *ptr, rcu_pointer_cache *ptr_cache) {
+struct rcu_pointer_info *rcu_search_ptr_info(void *ptr, struct rcu_pointer_cache *ptr_cache) {
     int a = 0;
 
     RCU_FOR_EACH_ENTRY_WITH_CURSOR(&ptr_cache->ptr_tbl_list, cursor) {
-        rcu_pointer_table *ptr_tbl = (rcu_pointer_table *) cursor;
+        struct rcu_pointer_table *ptr_tbl = (struct rcu_pointer_table *) cursor;
         for (a = 0; a < rcu_pointer_table_SIZE; a++) {
-            rcu_pointer_info *ptr_info = &ptr_tbl->tbl[a];
+            struct rcu_pointer_info *ptr_info = &ptr_tbl->tbl[a];
             if (ptr_info->ptr == ptr) {
                 return ptr_info;
             }
@@ -92,25 +92,25 @@ rcu_pointer_info *rcu_srch_ptr_info(void *ptr, rcu_pointer_cache *ptr_cache) {
 /**
  *  Caches the given pointer and size
  */
-int rcu_cache_ptr(void *ptr, size_t size, rcu_pointer_cache *ptr_cache) {
-    rcu_pointer_info *ptr_info = NULL;
+int rcu_cache_ptr(void *ptr, size_t size, struct rcu_pointer_cache *ptr_cache) {
+    struct rcu_pointer_info *ptr_info = NULL;
     int ercd;
 
-    if (ptr == NULL) {
+    if (!ptr) {
         RCU_LOG_WARN("Trying to cache a null pointer");
         return RCU_E_NG;
     }
-    ptr_info = rcu_srch_ptr_info(ptr, ptr_cache);
-    if (ptr_info != NULL) {
+    ptr_info = rcu_search_ptr_info(ptr, ptr_cache);
+    if (ptr_info) {
         RCU_LOG_FATAL("Pointer is currently cached (addr = %p, size = %lu)", ptr_info->ptr, ptr_info->size);
         return RCU_E_NG;
     }
     ptr_info = rcu_find_free_slot(ptr_cache);
-    if (ptr_info == NULL) {
+    if (!ptr_info) {
         RCU_LOG_DEBUG("All pointer tables are full. Trying to allocate one");
-        ercd = rcu_cre_ptr_tbl(ptr_cache);
+        ercd = rcu_create_ptr_tbl(ptr_cache);
         ptr_info = rcu_find_free_slot(ptr_cache);
-        if (ptr_info == NULL) {
+        if (!ptr_info) {
             RCU_LOG_WARN("Cannot allocate pointer table. Giving up");
             return RCU_E_NG;
         }
@@ -121,7 +121,7 @@ int rcu_cache_ptr(void *ptr, size_t size, rcu_pointer_cache *ptr_cache) {
     return RCU_E_OK;
 }
 
-int rcu_dump_ptr_tble(rcu_pointer_table *ptr_tbl, const char *info) {
+int rcu_dump_ptr_tble(struct rcu_pointer_table *ptr_tbl, const char *info) {
     int a;
     RCU_LOG_INFO(" [MTRACE POINTER TABLE DUMP (addr =%p)]", ptr_tbl);
     for (a = 0; a < rcu_pointer_table_SIZE; a++) {
@@ -131,15 +131,15 @@ int rcu_dump_ptr_tble(rcu_pointer_table *ptr_tbl, const char *info) {
     return RCU_E_OK;
 }
 
-int rcu_dump_ptr_cache(rcu_pointer_cache *ptr_cache) {
-    rcu_list *cursor = NULL;
-    rcu_pointer_table *ptr_tbl = NULL;
+int rcu_dump_ptr_cache(struct rcu_pointer_cache *ptr_cache) {
+    struct rcu_list *cursor = NULL;
+    struct rcu_pointer_table *ptr_tbl = NULL;
     char tbl_name[16];
 
     RCU_LOG_INFO("[MTRACE POINTER CACHE DUMP]");
 
     RCU_FOR_EACH_ENTRY(&ptr_cache->ptr_tbl_list, cursor) {
-        ptr_tbl = (rcu_pointer_table *) cursor;
+        ptr_tbl = (struct rcu_pointer_table *) cursor;
         memset(tbl_name, 0x00, 16);
         sprintf(tbl_name, "%p", ptr_tbl);
         rcu_dump_ptr_tble(ptr_tbl, tbl_name);
@@ -148,11 +148,11 @@ int rcu_dump_ptr_cache(rcu_pointer_cache *ptr_cache) {
     return RCU_E_OK;
 }
 
-int rcu_cmpct_ptr_tble(rcu_pointer_cache *ptr_cache) {
-    rcu_pointer_table *dst_ptr_tbl = NULL;
-    rcu_pointer_table *src_ptr_tbl = NULL;
-    rcu_list *dst_cursor = NULL;
-    rcu_list *src_cursor = NULL;
+int rcu_cmpct_ptr_tble(struct rcu_pointer_cache *ptr_cache) {
+    struct rcu_pointer_table *dst_ptr_tbl = NULL;
+    struct rcu_pointer_table *src_ptr_tbl = NULL;
+    struct rcu_list *dst_cursor = NULL;
+    struct rcu_list *src_cursor = NULL;
     int a, b;
     int moved_src_index = 0;
     int moved_dst_index = 0;
@@ -169,8 +169,8 @@ int rcu_cmpct_ptr_tble(rcu_pointer_cache *ptr_cache) {
         src_cursor = ptr_cache->ptr_tbl_list.next;
         dst_cursor = ptr_cache->ptr_tbl_list.prev;
         while (src_cursor != dst_cursor) {
-            src_ptr_tbl = (rcu_pointer_table *) src_cursor;
-            dst_ptr_tbl = (rcu_pointer_table *) dst_cursor;
+            src_ptr_tbl = (struct rcu_pointer_table *) src_cursor;
+            dst_ptr_tbl = (struct rcu_pointer_table *) dst_cursor;
 #if RCU_ENABLE_DEBUG_MTRACE
             rcu_dump_ptr_tble(src_ptr_tbl, "src_ptr_tbl(before compaction)");
             rcu_dump_ptr_tble(dst_ptr_tbl, "dst_ptr_tbl(before compaction)");
@@ -188,7 +188,7 @@ int rcu_cmpct_ptr_tble(rcu_pointer_cache *ptr_cache) {
                         continue;
                     }
                     memcpy(&dst_ptr_tbl->tbl[b], &src_ptr_tbl->tbl[a],
-                           sizeof(rcu_pointer_info));
+                           sizeof(struct rcu_pointer_info));
 #if RCU_ENABLE_DEBUG_MTRACE
                     RCU_LOG_INFO("moved : si=%d di=%d addr= %p",
                                  a, b, src_ptr_tbl->tbl[a].ptr);
@@ -233,15 +233,15 @@ int rcu_cmpct_ptr_tble(rcu_pointer_cache *ptr_cache) {
 /**
  *  Uncaches a given pointer
  */
-int rcu_uncache_ptr(void *ptr, rcu_pointer_cache *ptr_cache) {
-    rcu_pointer_info *ptr_info = NULL;
+int rcu_uncache_ptr(void *ptr, struct rcu_pointer_cache *ptr_cache) {
+    struct rcu_pointer_info *ptr_info = NULL;
 
-    if (ptr == NULL) {
+    if (!ptr) {
         RCU_LOG_WARN("Trying to uncache a null pointer");
         return RCU_E_NG;
     }
-    ptr_info = rcu_srch_ptr_info(ptr, ptr_cache);
-    if (ptr_info == NULL) {
+    ptr_info = rcu_search_ptr_info(ptr, ptr_cache);
+    if (!ptr_info) {
         RCU_LOG_FATAL("Pointer does not exist in cache : %p", ptr);
         return RCU_E_NG;
     }
@@ -263,7 +263,7 @@ int rcu_uncache_ptr(void *ptr, rcu_pointer_cache *ptr_cache) {
  */
 RCU_API int rcu_trace_alloc_impl(void *ptr, size_t size,
                                  const char *filename, const char *function, const int line,
-                                 rcu_pointer_cache *ptr_cache) {
+                                 struct rcu_pointer_cache *ptr_cache) {
     rcu_ensure_mtrace_init();
     RCU_INCR(ptr_cache->nr_alloc);
     rcu_cache_ptr(ptr, size, ptr_cache);
@@ -277,8 +277,8 @@ RCU_API int rcu_trace_alloc_impl(void *ptr, size_t size,
  *  Memory deallocation trace implementation
  */
 RCU_API int rcu_trace_free_impl(void *ptr, const char *filename, const char *function,
-                                const int line, rcu_pointer_cache *ptr_cache) {
-    rcu_pointer_info *ptr_info = NULL;
+                                const int line, struct rcu_pointer_cache *ptr_cache) {
+    struct rcu_pointer_info *ptr_info = NULL;
     rcu_ensure_mtrace_init();
     RCU_INCR(ptr_cache->nr_free);
     rcu_uncache_ptr(ptr, ptr_cache);
@@ -286,10 +286,10 @@ RCU_API int rcu_trace_free_impl(void *ptr, const char *filename, const char *fun
 }
 
 RCU_API int rcu_check_mem_leak_impl(const char *filename, const char *function,
-                                    const int line, rcu_pointer_cache *ptr_cache) {
-    rcu_list *cursor;
-    rcu_pointer_table *ptr_tbl;
-    rcu_pointer_info *ptr_info;
+                                    const int line, struct rcu_pointer_cache *ptr_cache) {
+    struct rcu_list *cursor;
+    struct rcu_pointer_table *ptr_tbl;
+    struct rcu_pointer_info *ptr_info;
     int a = 0;
     int nr_leaks = 0;
     size_t leak_size = 0;
@@ -299,7 +299,7 @@ RCU_API int rcu_check_mem_leak_impl(const char *filename, const char *function,
     RCU_LOG_INFO("Checking memory leak in %s:%d", filename, line);
 
     RCU_FOR_EACH_ENTRY(&ptr_cache->ptr_tbl_list, cursor) {
-        ptr_tbl = (rcu_pointer_table *) cursor;
+        ptr_tbl = (struct rcu_pointer_table *) cursor;
         for (a = 0; a < rcu_pointer_table_SIZE; a++) {
             ptr_info = &ptr_tbl->tbl[a];
             if (ptr_info->used) {
@@ -324,14 +324,14 @@ RCU_API int rcu_has_mem_leak() {
     return nr_leaks > 0 ? RCU_TRUE : RCU_FALSE;
 }
 
-void rcu_get_mtrace_results(rcu_pointer_cache *ptr_cache, int *nr_leaks, size_t *leak_size) {
+void rcu_get_mtrace_results(struct rcu_pointer_cache *ptr_cache, int *nr_leaks, size_t *leak_size) {
     int a = 0;
     rcu_ensure_mtrace_init();
 
     RCU_FOR_EACH_ENTRY_WITH_CURSOR(&ptr_cache->ptr_tbl_list, cursor) {
-        rcu_pointer_table *ptr_tbl = (rcu_pointer_table *) cursor;
+        struct rcu_pointer_table *ptr_tbl = (struct rcu_pointer_table *) cursor;
         for (a = 0; a < rcu_pointer_table_SIZE; a++) {
-            rcu_pointer_info *ptr_info = &ptr_tbl->tbl[a];
+            struct rcu_pointer_info *ptr_info = &ptr_tbl->tbl[a];
             if (ptr_info->used) {
                 RCU_INCR(*nr_leaks);
                 RCU_INCR_BY(*leak_size, ptr_info->size);
@@ -343,13 +343,13 @@ void rcu_get_mtrace_results(rcu_pointer_cache *ptr_cache, int *nr_leaks, size_t 
 /**
  *  Initializes a pointer cache
  */
-int rcu_init_ptr_cache(rcu_pointer_cache *ptr_cache, const char *name) {
+int rcu_init_ptr_cache(struct rcu_pointer_cache *ptr_cache, const char *name) {
     int ercd;
     int a = 0;
 
-    memset(ptr_cache, 0, sizeof(rcu_pointer_cache));
+    memset(ptr_cache, 0, sizeof(struct rcu_pointer_cache));
     rcu_init_list(&ptr_cache->ptr_tbl_list);
-    ercd = rcu_cre_ptr_tbl(ptr_cache);
+    ercd = rcu_create_ptr_tbl(ptr_cache);
     if (ercd == RCU_E_NG) {
         RCU_LOG_FATAL("Unable to create pointer table");
         return RCU_E_NG;
@@ -362,12 +362,12 @@ int rcu_init_ptr_cache(rcu_pointer_cache *ptr_cache, const char *name) {
 /**
  *  Destroys a pointer cache
  */
-int rcu_destroy_ptr_cache(rcu_pointer_cache *ptr_cache) {
-    rcu_list *cursor;
-    rcu_pointer_table *ptr_tbl;
+int rcu_destroy_ptr_cache(struct rcu_pointer_cache *ptr_cache) {
+    struct rcu_list *cursor;
+    struct rcu_pointer_table *ptr_tbl;
 
     RCU_FOR_EACH_ENTRY(&ptr_cache->ptr_tbl_list, cursor) {
-        ptr_tbl = (rcu_pointer_table *) cursor;
+        ptr_tbl = (struct rcu_pointer_table *) cursor;
         RCU_SAVE_CURSOR(cursor)
             rcu_remove_list(cursor);
             rcu_native_free(cursor);
@@ -407,11 +407,11 @@ void rcu_ensure_mtrace_init() {
     }
 }
 
-rcu_pointer_cache *rcu_get_rcunit_ptr_cache() {
+struct rcu_pointer_cache *rcu_get_rcunit_ptr_cache() {
     return &g_ptr_cache_1;
 }
 
-rcu_pointer_cache *rcu_get_user_ptr_cache() {
+struct rcu_pointer_cache *rcu_get_user_ptr_cache() {
     return &g_ptr_cache_2;
 }
 
