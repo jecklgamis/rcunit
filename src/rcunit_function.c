@@ -48,11 +48,11 @@ RCU_API int rcu_add_test_func(rcu_module *mod, rcu_generic_function entry, rcu_g
                               rcu_generic_function destroy, const char *name) {
     rcu_test *func = NULL;
     rcu_registry *which_reg = NULL;
-    rcu_test_machine *machine = NULL;
+    rcu_test_engine *engine = NULL;
     int name_len = 0;
 
     rcu_init();
-    machine = &the_test_machine;
+    engine = &the_test_engine;
     if (entry == NULL) {
         RCU_SET_ERCD(RCU_E_INVFUNCENTRY);
         RCU_LOG_WARN("%s (null)", RCU_GET_ERR_MSG());
@@ -95,10 +95,10 @@ RCU_API int rcu_add_test_func(rcu_module *mod, rcu_generic_function entry, rcu_g
 RCU_API int rcu_add_test_func_tbl(rcu_module *mod, rcu_test_function_entry *func_tbl) {
     rcu_test_function_entry *cursor = NULL;
     int index;
-    rcu_test_machine *machine = &the_test_machine;
+    rcu_test_engine *engine = &the_test_engine;
 
     rcu_init();
-    if (!rcu_is_mach_initialized(machine)) {
+    if (!rcu_is_mach_initialized(engine)) {
         RCU_SET_ERCD(RCU_E_MACHNOINIT);
         return RCU_E_NG;
     }
@@ -150,14 +150,14 @@ int rcu_del_all_fail_rec_from_func(rcu_test *func) {
     return (rcu_del_all_fail_rec_impl(&func->fail_rec_list));
 }
 
-int rcu_run_test_func_impl(rcu_test_machine *machine, rcu_test *func) {
+int rcu_run_test_func_impl(rcu_test_engine *engine, rcu_test *func) {
     RCU_SET_RUN_STAT(func, RCU_RUN_STAT_TEST_FAILED);
-    RCU_SET_CURR_FUNC(machine, func);
+    RCU_SET_CURR_FUNC(engine, func);
     RCU_RESET(func->nr_fail_assert);
     RCU_RESET(func->nr_succ_assert);
 
     if (func->init != NULL) {
-        RCU_SET_RUN_CTX(machine, RCU_RUN_CTX_FUNC_INIT);
+        RCU_SET_RUN_CTX(engine, RCU_RUN_CTX_FUNC_INIT);
         RCU_TRY
                 {
                     func->init(NULL);
@@ -173,7 +173,7 @@ int rcu_run_test_func_impl(rcu_test_machine *machine, rcu_test *func) {
         RCU_END_CATCH
     }
 
-    RCU_SET_RUN_CTX(machine, RCU_RUN_CTX_FUNC)
+    RCU_SET_RUN_CTX(engine, RCU_RUN_CTX_FUNC)
     RCU_LOG_DEBUG("Running test function : %s", func->name);
 
     RCU_TRY
@@ -200,7 +200,7 @@ int rcu_run_test_func_impl(rcu_test_machine *machine, rcu_test *func) {
     }
 
     if (func->destroy != NULL) {
-        RCU_SET_RUN_CTX(machine, RCU_RUN_CTX_FUNC_DESTROY);
+        RCU_SET_RUN_CTX(engine, RCU_RUN_CTX_FUNC_DESTROY);
         RCU_TRY
                 {
                     func->destroy(NULL);

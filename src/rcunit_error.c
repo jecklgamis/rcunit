@@ -26,7 +26,7 @@ const char *g_error_msg_tbl[] = {
         /* RCU_E_MACHINIT      */, "Machine initialization failed"
         /* RCU_E_MACHINITDONE  */, "Machine already initialized "
         /* RCU_E_MACHNOINIT    */, "Machine not initialized"
-        /* RCU_E_INVMACH       */, "Invalid machine"
+        /* RCU_E_INVMACH       */, "Invalid engine"
         /* RCU_E_ENTITYDISABLED */, "Test entity is disabled"
         /* RCU_E_EXEC          */, "Execution failed"
         /* RCU_E_REGNOINIT     */, "Registry not initialized"

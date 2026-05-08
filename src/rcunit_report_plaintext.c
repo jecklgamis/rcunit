@@ -27,7 +27,7 @@ const char *rcu_get_stat_str(int stat);
 
 int rcu_indent(FILE *fp, int nr_spaces);
 
-int rcu_gen_plaintext_report(rcu_test_machine *machine) {
+int rcu_gen_plaintext_report(rcu_test_engine *engine) {
     char ts_buff[RCU_TSTAMP_BUFF_SIZE];
     rcu_get_timestamp(ts_buff, RCU_TSTAMP_BUFF_SIZE);
     FILE *fp = NULL;
@@ -45,7 +45,7 @@ int rcu_gen_plaintext_report(rcu_test_machine *machine) {
     fprintf(fp, "%s\n", sub_title);
     fprintf(fp, "%s%s\n", RCU_LINE_MARKER_1, RCU_LINE_MARKER_1);
 
-    RCU_FOR_EACH_ENTRY_WITH_CURSOR_INDEX(&machine->reg_list, reg_cursor, reg_no) {
+    RCU_FOR_EACH_ENTRY_WITH_CURSOR_INDEX(&engine->reg_list, reg_cursor, reg_no) {
         rcu_registry *reg = (rcu_registry *) reg_cursor;
         fprintf(fp, "%d. [registry = \"%s\", %d modules]\n", reg_no, reg->name, reg->nr_mod);
 
@@ -82,8 +82,8 @@ int rcu_gen_plaintext_report(rcu_test_machine *machine) {
         }
     }
 
-    fprintf(fp, "\nTest Run Results: Passed : %d  Failed : %d\n", machine->nr_succ_test, machine->nr_failed_test);
-    if (machine->nr_failed_test == 0) {
+    fprintf(fp, "\nTest Run Results: Passed : %d  Failed : %d\n", engine->nr_succ_test, engine->nr_failed_test);
+    if (engine->nr_failed_test == 0) {
         fprintf(fp, "Test successful!\n");
     } else {
         fprintf(fp, "Test failed!\n");

@@ -16,40 +16,37 @@
 
 #include "rcunit.h"
 
-/* The test machine */
-rcu_test_machine the_test_machine;
+/* The test engine */
+rcu_test_engine the_test_engine;
 
 
 extern rcu_test *rcu_srch_test_func_by_name(rcu_module *mod, const char *name);
 
 extern rcu_test *rcu_srch_test_func_entry(rcu_module *mod, rcu_generic_function entry);
 
-extern int rcu_init_test_mach(rcu_test_machine *machine);
+extern int rcu_init_test_mach(rcu_test_engine *engine);
 
-int rcu_init_log();
-
-int rcu_destroy_log();
 
 RCU_API int rcu_run_test_mach() {
-    rcu_test_machine *machine = &the_test_machine;
+    rcu_test_engine *engine = &the_test_engine;
     char ts_buff[RCU_TSTAMP_BUFF_SIZE];
     rcu_init();
     rcu_get_timestamp(ts_buff, RCU_TSTAMP_BUFF_SIZE);
     RCU_LOG_INFO("Test run started %s", ts_buff);
-    RCU_SET_RUN_LEVEL(machine, RCU_RUN_LEVEL_MACH);
-    rcu_run_tests_impl(machine);
+    RCU_SET_RUN_LEVEL(engine, RCU_RUN_LEVEL_MACH);
+    rcu_run_tests_impl(engine);
     rcu_get_timestamp(ts_buff, RCU_TSTAMP_BUFF_SIZE);
-    rcu_stop_mach(machine);
-    rcu_gen_test_run_report(machine);
+    rcu_stop_mach(engine);
+    rcu_gen_test_run_report(engine);
     RCU_LOG_INFO("Test run finished %s", ts_buff);
-    RCU_LOG_INFO("Test Run Results: Passed : %d  Failed : %d", machine->nr_succ_test, machine->nr_failed_test);
-    if (machine->nr_failed_reg == 0 && rcu_get_nr_tests() > 0) {
+    RCU_LOG_INFO("Test Run Results: Passed : %d  Failed : %d", engine->nr_succ_test, engine->nr_failed_test);
+    if (engine->nr_failed_reg == 0 && rcu_get_nr_tests() > 0) {
         RCU_LOG_INFO("Test successful!");
     } else {
         RCU_LOG_INFO("Test failed!");
     }
     rcu_destroy();
-    return machine->nr_failed_reg > 0 ? RCU_E_NG : RCU_E_OK;
+    return engine->nr_failed_reg > 0 ? RCU_E_NG : RCU_E_OK;
 }
 
 RCU_API int rcu_run_tests() {
@@ -87,22 +84,20 @@ void rcu_print_rcunit_info() {
 }
 
 RCU_API int rcu_init() {
-    rcu_test_machine *machine = &the_test_machine;
-    if (!rcu_is_mach_initialized(machine)) {
-        rcu_init_log();
+    rcu_test_engine *engine = &the_test_engine;
+    if (!rcu_is_mach_initialized(engine)) {
         RCU_LOG_DEBUG("Initializing RCUNIT");
         rcu_print_rcunit_info();
-        rcu_init_test_mach(machine);
+        rcu_init_test_mach(engine);
     }
     return RCU_E_OK;
 }
 
 RCU_API int rcu_destroy() {
-    rcu_test_machine *machine = &the_test_machine;
+    rcu_test_engine *engine = &the_test_engine;
     RCU_LOG_DEBUG("Destroying RCUNIT");
-    if (rcu_is_mach_initialized(machine)) {
-        rcu_destroy_test_mach(machine);
-        rcu_destroy_log();
+    if (rcu_is_mach_initialized(engine)) {
+        rcu_destroy_test_mach(engine);
     }
     return RCU_E_OK;
 }
@@ -114,19 +109,10 @@ int rcu_exit_hook(void *param) {
 }
 
 RCU_API int rcu_set_run_hook(rcu_generic_function run_hook) {
-    rcu_test_machine *machine = &the_test_machine;
+    rcu_test_engine *engine = &the_test_engine;
     rcu_init();
-    machine->run_hook = run_hook;
+    engine->run_hook = run_hook;
     RCU_LOG_DEBUG("Test run hook set");
     return RCU_E_OK;
 }
-
-int rcu_destroy_log() {
-    return RCU_E_OK;
-}
-
-int rcu_init_log() {
-    return RCU_E_OK;
-}
-
 

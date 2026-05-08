@@ -16,15 +16,15 @@
 
 #include "rcunit.h"
 
-extern rcu_registry *rcu_srch_reg_by_name(rcu_test_machine *machine, const char *reg_name);
+extern rcu_registry *rcu_srch_reg_by_name(rcu_test_engine *engine, const char *reg_name);
 
 int rcu_add_test_reg(rcu_registry *reg) {
-    rcu_test_machine *machine = NULL;
+    rcu_test_engine *engine = NULL;
     rcu_registry *srch_reg = NULL;
 
     rcu_init();
-    machine = &the_test_machine;
-    if (!rcu_is_mach_initialized(machine)) {
+    engine = &the_test_engine;
+    if (!rcu_is_mach_initialized(engine)) {
         RCU_SET_ERCD(RCU_E_MACHNOINIT);
         return RCU_E_NG;
     }
@@ -33,68 +33,68 @@ int rcu_add_test_reg(rcu_registry *reg) {
         RCU_LOG_WARN("%s (null)", RCU_GET_ERR_MSG());
         return RCU_E_NG;
     }
-    if (rcu_reg_exists(machine, reg)) {
+    if (rcu_reg_exists(engine, reg)) {
         RCU_SET_ERCD(RCU_E_REGEXISTS);
         RCU_LOG_WARN("%s (%s)", RCU_GET_ERR_MSG(), reg->name);
         return RCU_E_NG;
     }
-    srch_reg = rcu_srch_reg_by_name(machine, reg->name);
+    srch_reg = rcu_srch_reg_by_name(engine, reg->name);
     if (srch_reg != NULL) {
         RCU_SET_ERCD(RCU_E_REGEXISTS);
         RCU_LOG_WARN("%s (%s)", RCU_GET_ERR_MSG(), srch_reg->name);
         return RCU_E_NG;
     }
     rcu_init_list(&reg->link);
-    rcu_insert_list(&machine->reg_list, &reg->link);
-    RCU_INCR(machine->nr_reg);
+    rcu_insert_list(&engine->reg_list, &reg->link);
+    RCU_INCR(engine->nr_reg);
     RCU_LOG_DEBUG("Test registry added : %s", reg->name);
     return RCU_E_OK;
 }
 
-int rcu_init_test_mach(rcu_test_machine *machine) {
-    if (machine != NULL) {
-        RCU_LOG_DEBUG("Initializing test machine");
-        memset(machine, 0x00, sizeof(rcu_test_machine));
-        rcu_init_list(&machine->reg_list);
-        rcu_init_list(&machine->ae.assert_list);
-        machine->name = RCU_DEFAULT_MACHINE_NAME;
-        machine->init_done = 1;
-        RCU_SET_RUN_CTX(machine, RCU_RUN_CTX_UNKNOWN);
+int rcu_init_test_mach(rcu_test_engine *engine) {
+    if (engine != NULL) {
+        RCU_LOG_DEBUG("Initializing test engine");
+        memset(engine, 0x00, sizeof(rcu_test_engine));
+        rcu_init_list(&engine->reg_list);
+        rcu_init_list(&engine->ae.assert_list);
+        engine->name = RCU_DEFAULT_MACHINE_NAME;
+        engine->init_done = 1;
+        RCU_SET_RUN_CTX(engine, RCU_RUN_CTX_UNKNOWN);
 #if RCU_ENABLE_MTRACE
         rcu_init_mtrace();
 #endif
         rcu_init_exception();
-        rcu_init_reg(&machine->def_reg, RCU_DEFAULT_REGISTRY_NAME);
-        rcu_add_test_reg(&machine->def_reg);
-        rcu_init_mod(&machine->def_mod, NULL, NULL, RCU_DEFAULT_MODULE_NAME);
-        rcu_add_mod_to_reg(&machine->def_reg, &machine->def_mod);
+        rcu_init_reg(&engine->def_reg, RCU_DEFAULT_REGISTRY_NAME);
+        rcu_add_test_reg(&engine->def_reg);
+        rcu_init_mod(&engine->def_mod, NULL, NULL, RCU_DEFAULT_MODULE_NAME);
+        rcu_add_mod_to_reg(&engine->def_reg, &engine->def_mod);
     }
     return RCU_E_OK;
 }
 
-int rcu_destroy_test_mach(rcu_test_machine *machine) {
-    RCU_LOG_DEBUG("Destroying test machine");
+int rcu_destroy_test_mach(rcu_test_engine *engine) {
+    RCU_LOG_DEBUG("Destroying test engine");
     rcu_destroy_exception();
-    rcu_del_all_fail_rec(machine);
-    rcu_destroy_test_dbase(machine);
+    rcu_del_all_fail_rec(engine);
+    rcu_destroy_test_dbase(engine);
 #if RCU_ENABLE_MTRACE
     rcu_destroy_mtrace();
 #endif
-    machine->init_done = 0;
+    engine->init_done = 0;
     return RCU_E_OK;
 }
 
-int rcu_destroy_test_dbase(rcu_test_machine *machine) {
+int rcu_destroy_test_dbase(rcu_test_engine *engine) {
     rcu_list *cursor = NULL;
     rcu_registry *reg = NULL;
     RCU_LOG_DEBUG("Destroying test database");
-    if (machine != NULL) {
-        if (!rcu_is_mach_initialized(machine)) {
+    if (engine != NULL) {
+        if (!rcu_is_mach_initialized(engine)) {
             RCU_LOG_WARN("%s", RCU_GET_ERR_MSG_OF(RCU_E_MACHNOINIT));
             return RCU_E_NG;
         }
 
-        RCU_FOR_EACH_ENTRY(&machine->reg_list, cursor) {
+        RCU_FOR_EACH_ENTRY(&engine->reg_list, cursor) {
             reg = (rcu_registry *) cursor;
             RCU_SAVE_CURSOR(cursor)
                 rcu_remove_list(cursor);
@@ -105,48 +105,48 @@ int rcu_destroy_test_dbase(rcu_test_machine *machine) {
     return RCU_E_OK;
 }
 
-int rcu_is_mach_initialized(rcu_test_machine *machine) {
-    return machine != NULL && machine->init_done;
+int rcu_is_mach_initialized(rcu_test_engine *engine) {
+    return engine != NULL && engine->init_done;
 }
 
-int rcu_restart_mach(rcu_test_machine *machine) {
-    RCU_LOG_DEBUG("Restarting machine");
+int rcu_restart_mach(rcu_test_engine *engine) {
+    RCU_LOG_DEBUG("Restarting engine");
     return RCU_E_OK;
 }
 
-int rcu_stop_mach(rcu_test_machine *machine) {
-    RCU_LOG_DEBUG("Stopping machine");
-    rcu_stop_assert_engine(machine);
+int rcu_stop_mach(rcu_test_engine *engine) {
+    RCU_LOG_DEBUG("Stopping engine");
+    rcu_stop_assert_engine(engine);
     return RCU_E_OK;
 }
 
-int rcu_run_tests_impl(rcu_test_machine *machine) {
+int rcu_run_tests_impl(rcu_test_engine *engine) {
     rcu_list *cursor1 = NULL;
     rcu_registry *reg = NULL;
     int run_event;
 
-    if (machine != NULL) {
-        if (machine->run_hook != NULL) {
+    if (engine != NULL) {
+        if (engine->run_hook != NULL) {
             run_event = RCU_TEST_RUN_STARTED;
-            machine->run_hook(&run_event);
+            engine->run_hook(&run_event);
         }
-        RCU_LOG_DEBUG("Running test machine : %s", machine->name);
+        RCU_LOG_DEBUG("Running test engine : %s", engine->name);
 
-        RCU_FOR_EACH_ENTRY(&machine->reg_list, cursor1) {
+        RCU_FOR_EACH_ENTRY(&engine->reg_list, cursor1) {
             reg = (rcu_registry *) cursor1;
-            RCU_SET_CURR_REG(machine, reg);
-            rcu_run_test_reg_impl(machine, reg);
+            RCU_SET_CURR_REG(engine, reg);
+            rcu_run_test_reg_impl(engine, reg);
         }
-        if (machine->run_hook != NULL) {
+        if (engine->run_hook != NULL) {
             run_event = RCU_TEST_RUN_FINISHED;
-            machine->run_hook(&run_event);
+            engine->run_hook(&run_event);
         }
     }
     return RCU_E_OK;
 }
 
 void rcu_reset_all_run_stat() {
-    rcu_test_machine *machine = &the_test_machine;
+    rcu_test_engine *engine = &the_test_engine;
     rcu_list *cursor1 = NULL;
     rcu_list *cursor2 = NULL;
     rcu_list *cursor3 = NULL;
@@ -154,7 +154,7 @@ void rcu_reset_all_run_stat() {
     rcu_registry *reg;
     rcu_test *func;
 
-    RCU_FOR_EACH_ENTRY(&machine->reg_list, cursor1) {
+    RCU_FOR_EACH_ENTRY(&engine->reg_list, cursor1) {
         reg = (rcu_registry *) cursor1;
 
         RCU_FOR_EACH_ENTRY(&reg->mod_list, cursor2) {
@@ -169,12 +169,12 @@ void rcu_reset_all_run_stat() {
     }
 }
 
-rcu_registry *rcu_srch_reg_by_name(rcu_test_machine *machine, const char *reg_name) {
+rcu_registry *rcu_srch_reg_by_name(rcu_test_engine *engine, const char *reg_name) {
     rcu_list *cursor = NULL;
     rcu_registry *srch_reg = NULL;
-    if (machine != NULL && reg_name != NULL) {
+    if (engine != NULL && reg_name != NULL) {
 
-        RCU_FOR_EACH_ENTRY(&machine->reg_list, cursor) {
+        RCU_FOR_EACH_ENTRY(&engine->reg_list, cursor) {
             srch_reg = (rcu_registry *) cursor;
             if (!strcmp(reg_name, srch_reg->name)) {
                 return srch_reg;

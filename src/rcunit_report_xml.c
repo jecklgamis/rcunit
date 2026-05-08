@@ -16,7 +16,7 @@
 
 #include "rcunit.h"
 
-int rcu_gen_xml_report(rcu_test_machine *machine) {
+int rcu_gen_xml_report(rcu_test_engine *engine) {
     return RCU_E_OK;
 }
 

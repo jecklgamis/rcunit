@@ -19,7 +19,7 @@
 
 RCU_API rcu_module *rcu_get_default_mod() {
     rcu_init();
-    return &the_test_machine.def_mod;
+    return &the_test_engine.def_mod;
 }
 
 RCU_API rcu_module *rcu_get_mod(const char *name) {
@@ -89,7 +89,7 @@ int rcu_init_mod(rcu_module *mod, rcu_generic_function init, rcu_generic_functio
 rcu_module *rcu_cre_test_mod(const char *name, rcu_generic_function init,
                              rcu_generic_function destroy) {
     rcu_module *mod;
-    rcu_test_machine *machine = &the_test_machine;
+    rcu_test_engine *engine = &the_test_engine;
     rcu_init();
     if ((mod = rcu_alloc_test_mod(1)) == NULL) {
         RCU_SET_ERCD(RCU_E_NOMEM);
@@ -113,9 +113,9 @@ rcu_module *rcu_cre_test_mod(const char *name, rcu_generic_function init,
 RCU_API int rcu_destroy_test_mod(rcu_module *mod) {
     rcu_list *cursor;
     rcu_test *func;
-    rcu_test_machine *machine;
+    rcu_test_engine *engine;
     rcu_init();
-    machine = &the_test_machine;
+    engine = &the_test_engine;
     if (mod == NULL) {
         RCU_SET_ERCD(RCU_E_INVMOD);
         RCU_LOG_WARN("%s (null)", RCU_GET_ERR_MSG());
@@ -163,25 +163,25 @@ rcu_test *rcu_srch_test_func_by_name(rcu_module *mod,
 }
 
 RCU_API int rcu_run_test_mod(rcu_module *module) {
-    rcu_test_machine *machine = NULL;
+    rcu_test_engine *engine = NULL;
     char ts_buff[RCU_TSTAMP_BUFF_SIZE];
     rcu_module *mod;
 
     rcu_init();
-    machine = &the_test_machine;
-    mod = (module == NULL) ? &machine->def_mod : module;
+    engine = &the_test_engine;
+    mod = (module == NULL) ? &engine->def_mod : module;
 
     rcu_get_timestamp(ts_buff, RCU_TSTAMP_BUFF_SIZE);
     RCU_LOG_INFO("Test run started %s", ts_buff);
-    rcu_restart_mach(machine);
-    RCU_SET_RUN_LEVEL(machine, RCU_RUN_LEVEL_MOD);
-    RCU_SET_CURR_MOD(machine, mod);
+    rcu_restart_mach(engine);
+    RCU_SET_RUN_LEVEL(engine, RCU_RUN_LEVEL_MOD);
+    RCU_SET_CURR_MOD(engine, mod);
     rcu_reset_all_run_stat();
-    rcu_run_test_mod_impl(machine, mod);
+    rcu_run_test_mod_impl(engine, mod);
     rcu_get_timestamp(ts_buff, RCU_TSTAMP_BUFF_SIZE);
     RCU_LOG_INFO("Test run finished %s", ts_buff);
-    rcu_stop_mach(machine);
-    rcu_gen_test_run_report(machine);
+    rcu_stop_mach(engine);
+    rcu_gen_test_run_report(engine);
     return RCU_E_OK;
 }
 
@@ -215,31 +215,31 @@ rcu_test *rcu_srch_test_func_entry(rcu_module *mod,
     return NULL;
 }
 
-int rcu_run_test_mod_impl(rcu_test_machine *machine, rcu_module *mod) {
+int rcu_run_test_mod_impl(rcu_test_engine *engine, rcu_module *mod) {
     rcu_list *cursor3 = NULL;
     rcu_test *func = NULL;
     rcu_registry *reg = NULL;
     int run_event;
     mod = (mod == NULL) ? rcu_get_default_mod() : mod;
     /** Execute test run hook if executed at module level */
-    if (RCU_GET_RUN_LEVEL(machine) == RCU_RUN_LEVEL_MOD) {
-        if (machine->run_hook != NULL) {
+    if (RCU_GET_RUN_LEVEL(engine) == RCU_RUN_LEVEL_MOD) {
+        if (engine->run_hook != NULL) {
             run_event = RCU_TEST_RUN_STARTED;
-            machine->run_hook(&run_event);
+            engine->run_hook(&run_event);
         }
-        machine->nr_failed_reg = 0;
-        machine->nr_succ_reg = 0;
-        machine->nr_failed_test = 0;
-        machine->nr_succ_test = 0;
+        engine->nr_failed_reg = 0;
+        engine->nr_succ_reg = 0;
+        engine->nr_failed_test = 0;
+        engine->nr_succ_test = 0;
         mod->nr_failed_test = 0;
         mod->nr_succ_test = 0;
     }
-    reg = RCU_GET_CURR_REG(machine);
+    reg = RCU_GET_CURR_REG(engine);
     RCU_LOG_DEBUG("Running tests from  module : %s", mod->name);
     if (mod->init != NULL) {
         RCU_TRY
                 {
-                    RCU_SET_RUN_CTX(machine, RCU_RUN_CTX_MOD_INIT);
+                    RCU_SET_RUN_CTX(engine, RCU_RUN_CTX_MOD_INIT);
                     mod->init(NULL);
                 }
 
@@ -247,10 +247,10 @@ int rcu_run_test_mod_impl(rcu_test_machine *machine, rcu_module *mod) {
                 {
                     RCU_LOG_WARN("Test module %s setup function failed", mod->name);
                     /** Invoke the test run hook here */
-                    if (RCU_GET_RUN_LEVEL(machine) == RCU_RUN_LEVEL_MOD) {
-                        if (machine->run_hook != NULL) {
+                    if (RCU_GET_RUN_LEVEL(engine) == RCU_RUN_LEVEL_MOD) {
+                        if (engine->run_hook != NULL) {
                             run_event = RCU_TEST_RUN_FINISHED;
-                            machine->run_hook(&run_event);
+                            engine->run_hook(&run_event);
                         }
                     }
                     return RCU_E_NG;
@@ -260,7 +260,7 @@ int rcu_run_test_mod_impl(rcu_test_machine *machine, rcu_module *mod) {
 
     RCU_FOR_EACH_ENTRY(&mod->func_list, cursor3) {
         func = (rcu_test *) cursor3;
-        rcu_run_test_func_impl(machine, func);
+        rcu_run_test_func_impl(engine, func);
         /** If the function's init or destroy function failed, override the test
          *  status to failed even if the test actually succeeded.
          */
@@ -276,7 +276,7 @@ int rcu_run_test_mod_impl(rcu_test_machine *machine, rcu_module *mod) {
         }
     }
     if (mod->destroy != NULL) {
-        RCU_SET_RUN_CTX(machine, RCU_RUN_CTX_MOD_DESTROY);
+        RCU_SET_RUN_CTX(engine, RCU_RUN_CTX_MOD_DESTROY);
         RCU_TRY
                 {
                     mod->destroy(NULL);
@@ -286,10 +286,10 @@ int rcu_run_test_mod_impl(rcu_test_machine *machine, rcu_module *mod) {
                 {
                     RCU_LOG_WARN("Test module teardown function failed : %s", mod->name);
                     /** Invoke test run hook before we return */
-                    if (RCU_GET_RUN_LEVEL(machine) == RCU_RUN_LEVEL_MOD) {
-                        if (machine->run_hook != NULL) {
+                    if (RCU_GET_RUN_LEVEL(engine) == RCU_RUN_LEVEL_MOD) {
+                        if (engine->run_hook != NULL) {
                             run_event = RCU_TEST_RUN_FINISHED;
-                            machine->run_hook(&run_event);
+                            engine->run_hook(&run_event);
                         }
                     }
                 }
@@ -303,10 +303,10 @@ int rcu_run_test_mod_impl(rcu_test_machine *machine, rcu_module *mod) {
      * completed successfully.
      */
 
-    if (RCU_GET_RUN_LEVEL(machine) == RCU_RUN_LEVEL_MOD) {
-        if (machine->run_hook != NULL) {
+    if (RCU_GET_RUN_LEVEL(engine) == RCU_RUN_LEVEL_MOD) {
+        if (engine->run_hook != NULL) {
             run_event = RCU_TEST_RUN_FINISHED;
-            machine->run_hook(&run_event);
+            engine->run_hook(&run_event);
         }
     }
 
@@ -318,8 +318,8 @@ int rcu_run_test_mod_impl(rcu_test_machine *machine, rcu_module *mod) {
     }
 
     /* Increment the total number of failed test */
-    RCU_INCR_BY(machine->nr_failed_test, mod->nr_failed_test)
-    RCU_INCR_BY(machine->nr_succ_test, mod->nr_succ_test)
+    RCU_INCR_BY(engine->nr_failed_test, mod->nr_failed_test)
+    RCU_INCR_BY(engine->nr_succ_test, mod->nr_succ_test)
 
     return RCU_E_OK;
 }

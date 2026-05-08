@@ -16,11 +16,11 @@
 
 #include "rcunit.h"
 
-extern int rcu_gen_html_report(rcu_test_machine *machine);
+extern int rcu_gen_html_report(rcu_test_engine *engine);
 
-extern int rcu_gen_plaintext_report(rcu_test_machine *machine);
+extern int rcu_gen_plaintext_report(rcu_test_engine *engine);
 
-extern int rcu_gen_xml_report(rcu_test_machine *machine);
+extern int rcu_gen_xml_report(rcu_test_engine *engine);
 
 const char *rcu_get_stat_str(int stat) {
     switch (stat) {
@@ -37,9 +37,9 @@ const char *rcu_get_stat_str(int stat) {
 
 /* This function prepares the test report statistics. No report generators 
  * should modify the statistics */
-void rcu_prepare_report(rcu_test_machine *machine) {
+void rcu_prepare_report(rcu_test_engine *engine) {
 
-    RCU_FOR_EACH_ENTRY_WITH_CURSOR_INDEX(&machine->reg_list, reg_cursor, reg_no) {
+    RCU_FOR_EACH_ENTRY_WITH_CURSOR_INDEX(&engine->reg_list, reg_cursor, reg_no) {
         rcu_registry *reg = (rcu_registry *) reg_cursor;
 
         RCU_FOR_EACH_ENTRY_WITH_CURSOR_INDEX(&reg->mod_list, mod_cursor, mod_no) {
@@ -67,19 +67,19 @@ void rcu_prepare_report(rcu_test_machine *machine) {
             RCU_INCR_BY(reg->nr_failed_test, mod->nr_failed_test);
         }
         if (reg->nr_succ_mod > 0) {
-            RCU_INCR(machine->nr_succ_reg);
+            RCU_INCR(engine->nr_succ_reg);
         } else if (reg->nr_failed_mod > 0) {
-            RCU_INCR(machine->nr_failed_reg);
+            RCU_INCR(engine->nr_failed_reg);
         } else {
             RCU_LOG_WARN("Registry with unknown test result : %s", reg->name);
         }
-        RCU_INCR_BY(machine->nr_succ_test, reg->nr_succ_test);
-        RCU_INCR_BY(machine->nr_failed_test, reg->nr_failed_test);
+        RCU_INCR_BY(engine->nr_succ_test, reg->nr_succ_test);
+        RCU_INCR_BY(engine->nr_failed_test, reg->nr_failed_test);
     }
 }
 
-void rcu_gen_test_run_report(rcu_test_machine *machine) {
-    rcu_gen_plaintext_report(machine);
+void rcu_gen_test_run_report(rcu_test_engine *engine) {
+    rcu_gen_plaintext_report(engine);
 }
 
 

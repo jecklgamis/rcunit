@@ -37,15 +37,15 @@ int rcu_get_timestamp(char *ts_buff, int ts_buff_len) {
     return RCU_E_OK;
 }
 
-void rcu_dump_test_dbase_impl(rcu_test_machine *machine) {
-    if (machine != NULL) {
-        if (!rcu_is_mach_initialized(machine)) {
+void rcu_dump_test_dbase_impl(rcu_test_engine *engine) {
+    if (engine != NULL) {
+        if (!rcu_is_mach_initialized(engine)) {
             RCU_SET_ERCD(RCU_E_MACHNOINIT);
             RCU_LOG_WARN("%s", RCU_GET_ERR_MSG());
         }
         RCU_LOG_INFO("+- Test Entity Database");
 
-        RCU_FOR_EACH_ENTRY_WITH_CURSOR(&machine->reg_list, cursor1) {
+        RCU_FOR_EACH_ENTRY_WITH_CURSOR(&engine->reg_list, cursor1) {
             rcu_registry *reg = NULL;
             reg = (rcu_registry *) cursor1;
             rcu_dump_test_reg(reg);
@@ -55,14 +55,14 @@ void rcu_dump_test_dbase_impl(rcu_test_machine *machine) {
 
 RCU_API void rcu_dump_test_dbase() {
     rcu_init();
-    rcu_dump_test_dbase_impl(&the_test_machine);
+    rcu_dump_test_dbase_impl(&the_test_engine);
 }
 
 rcu_module *rcu_srch_mod_by_name_global(const char *mod_name, rcu_registry **which_reg) {
-    rcu_test_machine *machine = &the_test_machine;
+    rcu_test_engine *engine = &the_test_engine;
 
     *which_reg = NULL;
-    RCU_FOR_EACH_ENTRY_WITH_CURSOR(&machine->reg_list, reg_cursor) {
+    RCU_FOR_EACH_ENTRY_WITH_CURSOR(&engine->reg_list, reg_cursor) {
         rcu_registry *reg = (rcu_registry *) reg_cursor;
         RCU_FOR_EACH_ENTRY_WITH_CURSOR(&reg->mod_list, mod_cursor) {
             rcu_module *mod = (rcu_module *) mod_cursor;
@@ -77,12 +77,12 @@ rcu_module *rcu_srch_mod_by_name_global(const char *mod_name, rcu_registry **whi
 
 rcu_test *rcu_srch_test_func_entry_global(rcu_generic_function entry,
                                           rcu_module **which_mod, rcu_registry **which_reg) {
-    rcu_test_machine *machine = &the_test_machine;
+    rcu_test_engine *engine = &the_test_engine;
 
     *which_reg = NULL;
     *which_mod = NULL;
 
-    RCU_FOR_EACH_ENTRY_WITH_CURSOR(&machine->reg_list, reg_cursor) {
+    RCU_FOR_EACH_ENTRY_WITH_CURSOR(&engine->reg_list, reg_cursor) {
         rcu_registry *reg = (rcu_registry *) reg_cursor;
 
         RCU_FOR_EACH_ENTRY_WITH_CURSOR(&reg->mod_list, mod_cursor) {
@@ -100,7 +100,7 @@ rcu_test *rcu_srch_test_func_entry_global(rcu_generic_function entry,
 
 rcu_test *rcu_srch_test_func_by_name_global(const char *name,
                                             rcu_module **which_mod, rcu_registry **which_reg) {
-    rcu_test_machine *machine = &the_test_machine;
+    rcu_test_engine *engine = &the_test_engine;
 
     *which_reg = NULL;
     *which_mod = NULL;
@@ -110,7 +110,7 @@ rcu_test *rcu_srch_test_func_by_name_global(const char *name,
         return NULL;
     }
 
-    RCU_FOR_EACH_ENTRY_WITH_CURSOR(&machine->reg_list, cursor1) {
+    RCU_FOR_EACH_ENTRY_WITH_CURSOR(&engine->reg_list, cursor1) {
         rcu_registry *reg = (rcu_registry *) cursor1;
 
         RCU_FOR_EACH_ENTRY_WITH_CURSOR(&reg->mod_list, cursor2) {
@@ -128,11 +128,11 @@ rcu_test *rcu_srch_test_func_by_name_global(const char *name,
 
 int rcu_srch_mod_by_ref_global(rcu_module *srch_mod,
                                rcu_registry **which_reg) {
-    rcu_test_machine *machine = &the_test_machine;;
+    rcu_test_engine *engine = &the_test_engine;;
 
     *which_reg = NULL;
 
-    RCU_FOR_EACH_ENTRY_WITH_CURSOR(&machine->reg_list, reg_cursor) {
+    RCU_FOR_EACH_ENTRY_WITH_CURSOR(&engine->reg_list, reg_cursor) {
         rcu_registry *reg = (rcu_registry *) reg_cursor;
         RCU_FOR_EACH_ENTRY_WITH_CURSOR(&reg->mod_list, mod_cursor) {
             rcu_module *mod = (rcu_module *) mod_cursor;
@@ -146,10 +146,10 @@ int rcu_srch_mod_by_ref_global(rcu_module *srch_mod,
 
 int rcu_get_nr_tests() {
     int nr_tests = 0;
-    rcu_test_machine *machine = &the_test_machine;
+    rcu_test_engine *engine = &the_test_engine;
 
     rcu_init();
-    RCU_FOR_EACH_ENTRY_WITH_CURSOR(&machine->reg_list, reg_cursor) {
+    RCU_FOR_EACH_ENTRY_WITH_CURSOR(&engine->reg_list, reg_cursor) {
         rcu_registry *reg = (rcu_registry *) reg_cursor;
 
         RCU_FOR_EACH_ENTRY_WITH_CURSOR(&reg->mod_list, mod_cursor) {
@@ -164,10 +164,10 @@ int rcu_get_nr_tests() {
 
 int rcu_get_nr_mods() {
     int nr_mods = 0;
-    rcu_test_machine *machine = &the_test_machine;
+    rcu_test_engine *engine = &the_test_engine;
 
     rcu_init();
-    RCU_FOR_EACH_ENTRY_WITH_CURSOR(&machine->reg_list, reg_cursor) {
+    RCU_FOR_EACH_ENTRY_WITH_CURSOR(&engine->reg_list, reg_cursor) {
         rcu_registry *reg = (rcu_registry *) reg_cursor;
         RCU_FOR_EACH_ENTRY_WITH_CURSOR(&reg->mod_list, mod_cursor) {
             nr_mods++;
@@ -178,10 +178,10 @@ int rcu_get_nr_mods() {
 
 int rcu_get_nr_regs() {
     int nr_regs = 0;
-    rcu_test_machine *machine = &the_test_machine;
+    rcu_test_engine *engine = &the_test_engine;
 
     rcu_init();
-    RCU_FOR_EACH_ENTRY_WITH_CURSOR(&machine->reg_list, reg_cursor) {
+    RCU_FOR_EACH_ENTRY_WITH_CURSOR(&engine->reg_list, reg_cursor) {
         rcu_registry *reg = (rcu_registry *) reg_cursor;
         nr_regs++;
     }

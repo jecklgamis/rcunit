@@ -168,7 +168,7 @@ extern RCU_API int rcu_add_test_mod_tbl(rcu_registry *reg, rcu_module_entry *mod
 extern RCU_API int rcu_run_test_mod(rcu_module *module);
 
 extern RCU_API void rcu_dump_test_reg(rcu_registry *reg);
-extern int rcu_destroy_test_mach(rcu_test_machine *machine);
+extern int rcu_destroy_test_mach(rcu_test_engine *engine);
 
 
 #endif /* RCUNIT_API_H */

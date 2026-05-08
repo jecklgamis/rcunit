@@ -8,7 +8,7 @@ librcunit_a_SOURCES = \
     rcunit_function.c \
     rcunit_module.c \
     rcunit_registry.c \
-    rcunit_machine.c \
+    rcunit_engine.c \
     rcunit_exception.c \
     rcunit_list.c \
     rcunit_random.c \

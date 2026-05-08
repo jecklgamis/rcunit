@@ -18,11 +18,11 @@
 
 extern rcu_module *rcu_srch_mod_by_name_global(const char *mod_name, rcu_registry **which_reg);
 
-rcu_registry *rcu_srch_reg_by_name(rcu_test_machine *machine, const char *reg_name);
+rcu_registry *rcu_srch_reg_by_name(rcu_test_engine *engine, const char *reg_name);
 
 int rcu_mod_exists(rcu_registry *reg, rcu_module *srch_mod);
 
-int rcu_reg_exists(rcu_test_machine *machine, rcu_registry *reg);
+int rcu_reg_exists(rcu_test_engine *engine, rcu_registry *reg);
 
 rcu_registry *rcu_cre_test_reg(const char *name);
 
@@ -34,7 +34,7 @@ RCU_API rcu_registry *rcu_get_reg(const char *name) {
         return NULL;
     }
     rcu_init();
-    reg = rcu_srch_reg_by_name(&the_test_machine, name);
+    reg = rcu_srch_reg_by_name(&the_test_engine, name);
     if (reg == NULL) {
         reg = rcu_cre_test_reg(name);
         rcu_add_test_reg(reg);
@@ -44,7 +44,7 @@ RCU_API rcu_registry *rcu_get_reg(const char *name) {
 
 RCU_API rcu_registry *rcu_get_default_reg() {
     rcu_init();
-    return &the_test_machine.def_reg;
+    return &the_test_engine.def_reg;
 }
 
 rcu_registry *rcu_alloc_reg(int nr_reg) {
@@ -87,7 +87,7 @@ int rcu_init_reg(rcu_registry *reg, const char *name) {
 
 rcu_registry *rcu_cre_test_reg(const char *name) {
     rcu_registry *reg = NULL;
-    rcu_test_machine *machine = &the_test_machine;
+    rcu_test_engine *engine = &the_test_engine;
     rcu_init();
     if (!(reg = rcu_alloc_reg(1))) {
         RCU_SET_ERCD(RCU_E_NOMEM);
@@ -112,7 +112,7 @@ rcu_registry *rcu_cre_test_reg(const char *name) {
 RCU_API int rcu_destroy_test_reg(rcu_registry *reg) {
     rcu_list *cursor = NULL;
     rcu_module *mod = NULL;
-    rcu_test_machine *machine = &the_test_machine;
+    rcu_test_engine *engine = &the_test_engine;
 
     rcu_init();
     if (reg == NULL) {
@@ -145,9 +145,9 @@ RCU_API int rcu_add_test_mod(rcu_module *mod) {
 RCU_API int rcu_add_mod_to_reg(rcu_registry *reg, rcu_module *mod) {
     rcu_registry *which_reg = NULL;
     rcu_module *srch_mod = NULL;
-    rcu_test_machine *machine = NULL;
+    rcu_test_engine *engine = NULL;
     rcu_init();
-    machine = &the_test_machine;
+    engine = &the_test_engine;
     if (mod == NULL) {
         RCU_SET_ERCD(RCU_E_INVMOD);
         RCU_LOG_WARN("%s (null)", RCU_GET_ERR_MSG());
@@ -202,11 +202,11 @@ RCU_API int rcu_add_test_mod_tbl(rcu_registry *reg, rcu_module_entry *mod_tbl) {
     rcu_module *mod = NULL;
     int mod_index;
     int ercd;
-    rcu_test_machine *machine = NULL;
+    rcu_test_engine *engine = NULL;
 
     rcu_init();
     RCU_LOG_DEBUG("Adding test module table");
-    machine = &the_test_machine;
+    engine = &the_test_engine;
     if (mod_tbl == NULL) {
         RCU_SET_ERCD(RCU_E_INVMODTABLE);
         RCU_LOG_WARN("%s (null)", RCU_GET_ERR_MSG());
@@ -299,43 +299,43 @@ RCU_API void rcu_dump_test_reg(rcu_registry *reg) {
 }
 
 RCU_API int rcu_run_test_reg_unsupported(rcu_registry *reg) {
-    rcu_test_machine *machine = NULL;
+    rcu_test_engine *engine = NULL;
     char ts_buff[RCU_TSTAMP_BUFF_SIZE];
     rcu_init();
-    machine = &the_test_machine;
+    engine = &the_test_engine;
     rcu_get_timestamp(ts_buff, RCU_TSTAMP_BUFF_SIZE);
     RCU_LOG_INFO("Test run started %s", ts_buff);
-    rcu_restart_mach(machine);
-    RCU_SET_RUN_LEVEL(machine, RCU_RUN_LEVEL_REG);
-    reg = (reg == NULL) ? &machine->def_reg : reg;
+    rcu_restart_mach(engine);
+    RCU_SET_RUN_LEVEL(engine, RCU_RUN_LEVEL_REG);
+    reg = (reg == NULL) ? &engine->def_reg : reg;
 
-    if (rcu_reg_exists(machine, reg) == 0) {
+    if (rcu_reg_exists(engine, reg) == 0) {
         RCU_SET_ERCD(RCU_E_UNKNOWNREG);
         RCU_LOG_WARN("%s (%s)", RCU_GET_ERR_MSG(), reg->name);
         return RCU_E_NG;
     }
-    RCU_SET_CURR_REG(machine, reg);
-    if ((rcu_run_test_reg_impl(machine, reg)) == RCU_E_NG) {
+    RCU_SET_CURR_REG(engine, reg);
+    if ((rcu_run_test_reg_impl(engine, reg)) == RCU_E_NG) {
         return RCU_E_NG;
     }
     rcu_get_timestamp(ts_buff, RCU_TSTAMP_BUFF_SIZE);
     RCU_LOG_INFO("Test run finished %s", ts_buff);
-    rcu_stop_mach(machine);
-    rcu_gen_test_run_report(machine);
+    rcu_stop_mach(engine);
+    rcu_gen_test_run_report(engine);
     return RCU_E_OK;
 }
 
 RCU_API int rcu_run_test_reg_by_name(const char *name) {
     rcu_registry *reg = NULL;
-    rcu_test_machine *machine = NULL;
+    rcu_test_engine *engine = NULL;
 
     rcu_init();
-    machine = &the_test_machine;
+    engine = &the_test_engine;
 
     if (name == NULL) {
         reg = rcu_get_default_reg();;
     } else {
-        reg = rcu_srch_reg_by_name(machine, name);
+        reg = rcu_srch_reg_by_name(engine, name);
     }
 
     if (reg == NULL) {
@@ -346,12 +346,12 @@ RCU_API int rcu_run_test_reg_by_name(const char *name) {
     return (rcu_run_test_reg_unsupported(reg));
 }
 
-int rcu_reg_exists(rcu_test_machine *machine, rcu_registry *reg) {
+int rcu_reg_exists(rcu_test_engine *engine, rcu_registry *reg) {
     rcu_registry *srch_reg = NULL;
     rcu_list *cursor = NULL;
-    if (machine != NULL && reg != NULL) {
+    if (engine != NULL && reg != NULL) {
 
-        RCU_FOR_EACH_ENTRY(&machine->reg_list, cursor) {
+        RCU_FOR_EACH_ENTRY(&engine->reg_list, cursor) {
             srch_reg = (rcu_registry *) cursor;
             if (srch_reg == reg) {
                 return 1;
@@ -361,22 +361,22 @@ int rcu_reg_exists(rcu_test_machine *machine, rcu_registry *reg) {
     return 0;
 }
 
-int rcu_run_test_reg_impl(rcu_test_machine *machine, rcu_registry *reg) {
+int rcu_run_test_reg_impl(rcu_test_engine *engine, rcu_registry *reg) {
     rcu_list *cursor2, *cursor3;
     rcu_module *mod;
     int run_event;
     rcu_test *func;
 
-    reg = (reg == NULL) ? &machine->def_reg : reg;
-    if (RCU_GET_RUN_LEVEL(machine) == RCU_RUN_LEVEL_REG) {
-        if (machine->run_hook != NULL) {
+    reg = (reg == NULL) ? &engine->def_reg : reg;
+    if (RCU_GET_RUN_LEVEL(engine) == RCU_RUN_LEVEL_REG) {
+        if (engine->run_hook != NULL) {
             run_event = RCU_TEST_RUN_STARTED;
-            machine->run_hook(&run_event);
+            engine->run_hook(&run_event);
         }
-        machine->nr_failed_reg = 0;
-        machine->nr_succ_reg = 0;
-        machine->nr_failed_test = 0;
-        machine->nr_succ_test = 0;
+        engine->nr_failed_reg = 0;
+        engine->nr_succ_reg = 0;
+        engine->nr_failed_test = 0;
+        engine->nr_succ_test = 0;
         reg->nr_failed_mod = 0;
         reg->nr_succ_mod = 0;
     }
@@ -384,8 +384,8 @@ int rcu_run_test_reg_impl(rcu_test_machine *machine, rcu_registry *reg) {
 
     RCU_FOR_EACH_ENTRY(&reg->mod_list, cursor2) {
         mod = (rcu_module *) cursor2;
-        RCU_SET_CURR_MOD(machine, mod);
-        rcu_run_test_mod_impl(machine, mod);
+        RCU_SET_CURR_MOD(engine, mod);
+        rcu_run_test_mod_impl(engine, mod);
         /*
          * If the module's init or destroy function failed, override the
          * module's status to failed, even if all its tests completed
@@ -410,16 +410,16 @@ int rcu_run_test_reg_impl(rcu_test_machine *machine, rcu_registry *reg) {
             }
         }
     }
-    if (RCU_GET_RUN_LEVEL(machine) == RCU_RUN_LEVEL_REG) {
-        if (machine->run_hook != NULL) {
+    if (RCU_GET_RUN_LEVEL(engine) == RCU_RUN_LEVEL_REG) {
+        if (engine->run_hook != NULL) {
             run_event = RCU_TEST_RUN_FINISHED;
-            machine->run_hook(&run_event);
+            engine->run_hook(&run_event);
         }
     }
     if (reg->nr_failed_mod > 0) {
-        RCU_INCR(machine->nr_failed_reg);
+        RCU_INCR(engine->nr_failed_reg);
     } else {
-        RCU_INCR(machine->nr_succ_reg);
+        RCU_INCR(engine->nr_succ_reg);
     }
     return RCU_E_OK;
 }

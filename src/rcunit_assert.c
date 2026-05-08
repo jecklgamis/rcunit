@@ -21,7 +21,7 @@ static char g_temp_buff[RCU_TEMP_BUFF_SIZE];
 
 void rcu_assert_impl(int cond, const char *filename, const char *func_name,
                      int line_no, const char *format, ...) {
-    rcu_test_machine *machine = NULL;
+    rcu_test_engine *engine = NULL;
     rcu_test *func = NULL;
     rcu_module *mod = NULL;
     int run_ctx;
@@ -34,11 +34,11 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
     va_end(ap);
 
     rcu_init();
-    machine = &the_test_machine;
+    engine = &the_test_engine;
 
-    func = RCU_GET_CURR_FUNC(machine);
-    mod = RCU_GET_CURR_MOD(machine);
-    run_ctx = RCU_GET_RUN_CTX(machine);
+    func = RCU_GET_CURR_FUNC(engine);
+    mod = RCU_GET_CURR_MOD(engine);
+    run_ctx = RCU_GET_RUN_CTX(engine);
 
     switch (run_ctx) {
         case RCU_RUN_CTX_MOD_INIT:
@@ -52,7 +52,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
                     RCU_SET_DESTROY_FAILED(mod);
                 }
                 rcu_add_fail_rec_to_mod(mod, assert_msg_buff, filename, line_no, RCU_TRUE);
-                RCU_SET_RUN_CTX(machine, RCU_RUN_CTX_UNKNOWN);
+                RCU_SET_RUN_CTX(engine, RCU_RUN_CTX_UNKNOWN);
                 RCU_THROW(RCU_GET_EXCP(RCU_EXCP_ABORTMODRUN));
             }
             break;
@@ -67,7 +67,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
                     RCU_SET_DESTROY_FAILED(func);
                 }
                 rcu_add_fail_rec_to_func(func, assert_msg_buff, filename, line_no);
-                RCU_SET_RUN_CTX(machine, RCU_RUN_CTX_UNKNOWN);
+                RCU_SET_RUN_CTX(engine, RCU_RUN_CTX_UNKNOWN);
                 RCU_THROW(RCU_GET_EXCP(RCU_EXCP_ASSERTIONFAILURE));
             }
             break;
@@ -82,7 +82,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
                 RCU_INCR(func->nr_fail_assert);
                 RCU_SET_RUN_STAT(func, RCU_RUN_STAT_TEST_FAILED);
                 rcu_add_fail_rec_to_func(func, assert_msg_buff, filename, line_no);
-                RCU_SET_RUN_CTX(machine, RCU_RUN_CTX_UNKNOWN);
+                RCU_SET_RUN_CTX(engine, RCU_RUN_CTX_UNKNOWN);
                 RCU_THROW(RCU_GET_EXCP(RCU_EXCP_ASSERTIONFAILURE));
             } else {
                 RCU_INCR(func->nr_succ_assert);
@@ -92,7 +92,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
             if (!cond) {
                 RCU_LOG_ERROR("Assert failed in non-test function %s (%s:%d)",
                               func_name, filename, line_no);
-                rcu_add_fail_rec_impl(&machine->ae.assert_list, assert_msg_buff, filename, func_name, line_no);
+                rcu_add_fail_rec_impl(&engine->ae.assert_list, assert_msg_buff, filename, func_name, line_no);
             }
     }
 
@@ -100,44 +100,44 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
 
 RCU_API int rcu_have_asserts() {
     rcu_init();
-    rcu_test_machine *machine = &the_test_machine;
-    return (!rcu_is_list_empty(&machine->ae.assert_list));
+    rcu_test_engine *engine = &the_test_engine;
+    return (!rcu_is_list_empty(&engine->ae.assert_list));
 }
 
 RCU_API void rcu_dump_asserts() {
     rcu_list *cursor = NULL;
-    rcu_test_machine *machine = NULL;
+    rcu_test_engine *engine = NULL;
     rcu_failure_record *fail_rec = NULL;
     rcu_init();
-    machine = &the_test_machine;
+    engine = &the_test_engine;
     if (!rcu_have_asserts()) {
         RCU_LOG_WARN("No assertions to dump found");
     }
     RCU_LOG_WARN("[ NON TEST RUN ASSERTIONS DUMP START]");
 
-    RCU_FOR_EACH_ENTRY(&machine->ae.assert_list, cursor) {
+    RCU_FOR_EACH_ENTRY(&engine->ae.assert_list, cursor) {
         fail_rec = (rcu_failure_record *) cursor;
         RCU_LOG_WARN("%s", fail_rec->info);
     }
     RCU_LOG_WARN("[ NON TEST RUN ASSERTIONS DUMP END]");
 }
 
-int rcu_restart_assert_engine(rcu_test_machine *machine) {
-    memset(&machine->ae, 0x00, sizeof(rcu_assertion_engine));
+int rcu_restart_assert_engine(rcu_test_engine *engine) {
+    memset(&engine->ae, 0x00, sizeof(rcu_assertion_engine));
     RCU_LOG_DEBUG("Assertion engine restarted");
     return RCU_E_OK;
 }
 
-int rcu_stop_assert_engine(rcu_test_machine *machine) {
+int rcu_stop_assert_engine(rcu_test_engine *engine) {
     RCU_LOG_DEBUG("Assertion engine stopped");
     return RCU_E_OK;
 }
 
 RCU_API int rcu_set_assert_hook(rcu_generic_function assert_hook) {
-    rcu_test_machine *machine = &the_test_machine;
+    rcu_test_engine *engine = &the_test_engine;
     rcu_init();
     if (assert_hook != NULL) {
-        machine->ae.assert_hook = assert_hook;
+        engine->ae.assert_hook = assert_hook;
         RCU_LOG_DEBUG("Assertion hook set");
     }
     return RCU_E_OK;
@@ -171,7 +171,7 @@ rcu_failure_record *rcu_cre_fail_rec(const char *info, const char *filename, con
 int rcu_add_fail_rec_impl(rcu_list *fail_rec_list, const char *info, const char *filename, const char *func_name,
                           int line_no) {
     rcu_failure_record *fail_rec = NULL;
-    rcu_test_machine *machine = NULL;
+    rcu_test_engine *engine = NULL;
 
     if (fail_rec_list == NULL) {
         return RCU_E_NG;
@@ -183,10 +183,10 @@ int rcu_add_fail_rec_impl(rcu_list *fail_rec_list, const char *info, const char 
         return RCU_E_NG;
     }
     rcu_insert_list(fail_rec_list, &fail_rec->link);
-    machine = &the_test_machine;
-    if (machine->run_ctx == RCU_RUN_CTX_UNKNOWN) {
-        if (machine->ae.assert_hook != NULL) {
-            machine->ae.assert_hook(fail_rec);
+    engine = &the_test_engine;
+    if (engine->run_ctx == RCU_RUN_CTX_UNKNOWN) {
+        if (engine->ae.assert_hook != NULL) {
+            engine->ae.assert_hook(fail_rec);
         }
     }
     return RCU_E_OK;
@@ -211,7 +211,7 @@ int rcu_del_all_fail_rec_impl(rcu_list *fail_rec_list) {
     return RCU_E_OK;
 }
 
-int rcu_del_all_fail_rec(rcu_test_machine *machine) {
+int rcu_del_all_fail_rec(rcu_test_engine *engine) {
     rcu_list *cursor1 = NULL;
     rcu_list *cursor2 = NULL;
     rcu_list *cursor3 = NULL;
@@ -221,12 +221,12 @@ int rcu_del_all_fail_rec(rcu_test_machine *machine) {
     rcu_registry *reg = NULL;
 
     RCU_LOG_DEBUG("Destroying all failure records from test runs");
-    if (machine == NULL) {
+    if (engine == NULL) {
         RCU_LOG_WARN("%s (null)", RCU_GET_ERR_MSG_OF(RCU_E_INVMACH));
         return RCU_E_NG;
     }
 
-    RCU_FOR_EACH_ENTRY(&machine->reg_list, cursor1) {
+    RCU_FOR_EACH_ENTRY(&engine->reg_list, cursor1) {
         reg = (rcu_registry *) cursor1;
 
         RCU_FOR_EACH_ENTRY(&reg->mod_list, cursor2) {
@@ -240,6 +240,6 @@ int rcu_del_all_fail_rec(rcu_test_machine *machine) {
         }
     }
     RCU_LOG_DEBUG("Destroying all failure records from non-test runs");
-    rcu_del_all_fail_rec_impl(&machine->ae.assert_list);
+    rcu_del_all_fail_rec_impl(&engine->ae.assert_list);
     return RCU_E_OK;
 }

@@ -23,8 +23,8 @@
 /* Tag to indicate a function parameter is nullable */
 #define RCU_NULLABLE
 
-/* Test machine name */
-#define RCU_DEFAULT_MACHINE_NAME  "default-machine"
+/* Test engine name */
+#define RCU_DEFAULT_MACHINE_NAME  "default-engine"
 
 /* Default test registry name  */
 #define RCU_DEFAULT_REGISTRY_NAME "default-reg"
@@ -185,36 +185,36 @@ typedef struct {
 } rcu_test;
 
 /*  Sets the currently executing test function */
-#define RCU_SET_CURR_FUNC(machine, func) \
-    (machine)->ae.curr_func = func;
+#define RCU_SET_CURR_FUNC(engine, func) \
+    (engine)->ae.curr_func = func;
 
 /* Sets the currently executing test module */
-#define RCU_SET_CURR_MOD(machine, mod) \
-    (machine)->ae.curr_mod = mod;
+#define RCU_SET_CURR_MOD(engine, mod) \
+    (engine)->ae.curr_mod = mod;
 
 /* Sets the currently executing test registry */
-#define RCU_SET_CURR_REG(machine, reg)   \
-    (machine)->ae.curr_reg = reg;
+#define RCU_SET_CURR_REG(engine, reg)   \
+    (engine)->ae.curr_reg = reg;
 
 /* Gets the currently executing test function */
-#define RCU_GET_CURR_FUNC(machine)  \
-    (machine->ae.curr_func)
+#define RCU_GET_CURR_FUNC(engine)  \
+    (engine->ae.curr_func)
 
 /* Gets the currently executing test module */
-#define RCU_GET_CURR_MOD(machine)  \
-    (machine->ae.curr_mod)
+#define RCU_GET_CURR_MOD(engine)  \
+    (engine->ae.curr_mod)
 
 /* Gets the currently executing test registry  */
-#define RCU_GET_CURR_REG(machine)  \
-    (machine->ae.curr_reg)
+#define RCU_GET_CURR_REG(engine)  \
+    (engine->ae.curr_reg)
 
-/* Gets the currently executing test machine */
-#define RCU_THE_TEST_MACHINE (&the_test_machine)
+/* Gets the currently executing test engine */
+#define RCU_THE_TEST_MACHINE (&the_test_engine)
 
 /* Test run levels (i.e. when a test module is run through its reference or
  *  name, it is said to run in test module level)
  */
-/* Test machine run level */
+/* Test engine run level */
 #define RCU_RUN_LEVEL_MACH   0
 
 /* Test registry run level */
@@ -224,12 +224,12 @@ typedef struct {
 #define RCU_RUN_LEVEL_MOD    2
 
 /* Sets the run level */
-#define RCU_SET_RUN_LEVEL(machine, level) \
-    (machine)->run_level = level;
+#define RCU_SET_RUN_LEVEL(engine, level) \
+    (engine)->run_level = level;
 
 /* Gets the run level */
-#define RCU_GET_RUN_LEVEL(machine) \
-    ((machine)->run_level)
+#define RCU_GET_RUN_LEVEL(engine) \
+    ((engine)->run_level)
 
 /* Assertion engine runtime data structure */
 typedef struct rcu_assertion_engine {
@@ -268,11 +268,11 @@ typedef struct rcu_assertion_engine {
 /* Test module destroy run context */
 #define RCU_RUN_CTX_MOD_DESTROY     5
 
-/** Set test machine run context */
-#define RCU_SET_RUN_CTX(machine, ctx)   (machine)->run_ctx = (ctx);
+/** Set test engine run context */
+#define RCU_SET_RUN_CTX(engine, ctx)   (engine)->run_ctx = (ctx);
 
-/*  Get test machine run context */
-#define RCU_GET_RUN_CTX(machine)   ((machine)->run_ctx)
+/*  Get test engine run context */
+#define RCU_GET_RUN_CTX(engine)   ((engine)->run_ctx)
 
 /* HTML log file name */
 #define RCU_LOG_FILENAME_HTML  "rcunit_log.html"
@@ -280,7 +280,7 @@ typedef struct rcu_assertion_engine {
 /* Plain text log file name */
 #define RCU_LOG_FILENAME_PLAINTEXT  "rcunit_log.txt"
 
-/* Test machine runtime data structure */
+/* Test engine runtime data structure */
 typedef struct {
     rcu_module def_mod;
     rcu_registry def_reg;
@@ -297,15 +297,15 @@ typedef struct {
     int nr_failed_test;
     int nr_succ_test;
     int terminate_on_first_failure;
-} rcu_test_machine;
+} rcu_test_engine;
 
 void rcu_assert_impl(int cond, const char *filename, const char *func_name, int line, const char *format, ...);
 
 int rcu_get_timestamp(char *ts_buff, const int ts_buff_len);
 
-int rcu_is_mach_initialized(rcu_test_machine *machine);
+int rcu_is_mach_initialized(rcu_test_engine *engine);
 
-int rcu_del_all_fail_rec(rcu_test_machine *machine);
+int rcu_del_all_fail_rec(rcu_test_engine *engine);
 
 int rcu_del_all_fail_rec_from_func(rcu_test *func);
 
@@ -333,23 +333,23 @@ rcu_module *rcu_cre_test_mod(const char *name, rcu_generic_function init,
 /* External variable declarations (used internally) */
 extern const char *g_error_msg_tbl[];
 extern int g_ercd;
-extern rcu_test_machine the_test_machine;
+extern rcu_test_engine the_test_engine;
 
 extern int rcu_add_fail_rec_to_mod(rcu_module *mod, const char *info, const char *filepath, const int line_no,
                                    int fatal);
 
-extern int rcu_run_test_reg_impl(rcu_test_machine *machine, rcu_registry *reg);
+extern int rcu_run_test_reg_impl(rcu_test_engine *engine, rcu_registry *reg);
 
 extern int rcu_add_fail_rec_to_func(rcu_test *func, const char *info, const char *filepath, const int line_no);
 
 extern int rcu_add_test_func(rcu_module *mod, rcu_generic_function entry, rcu_generic_function init,
                              rcu_generic_function destroy, const char *name);
 
-extern int rcu_run_tests_impl(rcu_test_machine *machine);
+extern int rcu_run_tests_impl(rcu_test_engine *engine);
 
-extern int rcu_stop_mach(rcu_test_machine *machine);
+extern int rcu_stop_mach(rcu_test_engine *engine);
 
-extern void rcu_gen_test_run_report(rcu_test_machine *machine);
+extern void rcu_gen_test_run_report(rcu_test_engine *engine);
 
 extern int rcu_get_nr_tests();
 
@@ -362,7 +362,7 @@ extern int rcu_has_mem_leak();
 extern int rcu_add_fail_rec_impl(rcu_list *fail_rec_list, const char *info, const char *filename,
                                  const char *func_name, int line_no);
 
-extern int rcu_reg_exists(rcu_test_machine *machine, rcu_registry *reg);
+extern int rcu_reg_exists(rcu_test_engine *engine, rcu_registry *reg);
 
 extern void rcu_init_exception();
 
@@ -372,15 +372,15 @@ extern int rcu_init_mod(rcu_module *mod, rcu_generic_function init, rcu_generic_
 
 extern int rcu_add_test_reg(rcu_registry *reg);
 
-extern int rcu_restart_mach(rcu_test_machine *machine);
+extern int rcu_restart_mach(rcu_test_engine *engine);
 
-extern int rcu_run_test_mod_impl(rcu_test_machine *machine, rcu_module *mod);
+extern int rcu_run_test_mod_impl(rcu_test_engine *engine, rcu_module *mod);
 
 extern void rcu_destroy_exception();
 
-extern int rcu_destroy_test_dbase(rcu_test_machine *machine);
+extern int rcu_destroy_test_dbase(rcu_test_engine *engine);
 
-extern int rcu_stop_assert_engine(rcu_test_machine *machine);
+extern int rcu_stop_assert_engine(rcu_test_engine *engine);
 
 extern int rcu_del_all_fail_rec_impl(rcu_list *fail_rec_list);
 
@@ -390,7 +390,7 @@ extern int rcu_free_test_func(rcu_test *func);
 
 extern void rcu_reset_all_run_stat();
 
-int rcu_run_test_func_impl(rcu_test_machine *machine, rcu_test *func);
+int rcu_run_test_func_impl(rcu_test_engine *engine, rcu_test *func);
 
 #endif /* RCUNIT_H */
 
