@@ -6,8 +6,8 @@
 
 rcunit is a small framework for testing C programs. It uses non-local jumps to
 emulate exceptions and handles program-terminating signals (e.g. SIGSEGV,
-SIGILL) during test runs. rcunit supports test fixtures either per test or per
-test module, and is free to use under the
+SIGILL) during test runs. rcunit supports test fixtures per test module, and is
+free to use under the
 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 ### Test Suite
