@@ -1,32 +1,21 @@
-# RCUNIT User Guide
+# rcunit User Guide
 
 **Jerrico Gamis** <jecklgamis@gmail.com>
 
 ## Introduction
 
-RCUNIT is a small framework for testing C programs. It uses non-local jumps to
-emulate exceptions and handles program-terminating signals (e.g. SIGILL) during
-test runs. rcunit allows creation of test fixtures, either per test or per test
-group. rcunit is free, you can use it under the terms of the
-[Apache License](https://www.apache.org/licenses/LICENSE-2.0).
-
-### Introduction to Test Design Methods
-
-rcunit is essentially a black box testing tool. Black box testing, also called
-functional or behavioral testing, is a test method designed to test the
-functional requirements of a system. This type of testing does not require
-knowledge of the internal structure of the system under test.
-
-White box testing, also called structural testing, is used for testing different
-execution paths. This type of testing can find implementation problems of the
-functional requirements.
+rcunit is a small framework for testing C programs. It uses non-local jumps to
+emulate exceptions and handles program-terminating signals (e.g. SIGSEGV,
+SIGILL) during test runs. rcunit supports test fixtures either per test or per
+test module, and is free to use under the
+[Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 ### Test Suite
 
 A test suite or test group is a collection of tests that share the same test
 fixture. In rcunit, this is implemented using modules.
 
-### Test Phase
+### Test Phases
 
 An xUnit test is typically divided into four phases:
 
@@ -42,20 +31,24 @@ An xUnit test is typically divided into four phases:
 ### Installing rcunit
 
 ```sh
-git clone git@github.com/jecklgamis/rcunit.git
+git clone https://github.com/jecklgamis/rcunit.git
 cd rcunit
 ./autogen.sh
+./configure
 make
 sudo make install
 ```
 
 This builds and installs the static library (`librcunit.a`) in `/usr/local/lib`
-and the headers in `/usr/local/include`.
+and the headers in `/usr/local/include`. To change the install prefix:
+
+```sh
+./configure --prefix=/some/dir
+```
 
 ### Writing a Simple Test
 
 ```c
-#include <stdio.h>
 #include "rcunit.h"
 
 RCU_TEST(test_func) {
@@ -76,29 +69,27 @@ assertion failure records the failure, aborts the test, and marks it as failed.
 ```c
 RCU_TEST(test_func) {
     unsigned char data = 128;
-    RCU_ASSERT_BIT_SET(data, 7); /* Asserts that bit 7 is set */
+    RCU_ASSERT_BIT_SET(data, 7);
 }
 ```
 
-### Using Test Module
+### Using Test Modules
 
-A module (also known as a test suite or test group) groups one or more related
-tests. The macro RCU_ADD_TEST can be used to group test cases into module
-
-A test always belongs to a module. `RCU_ADD_TEST` adds to a named module,
-creating it if needed:
+A module groups one or more related tests. `RCU_ADD_TEST` adds a test to a
+named module, creating the module if it does not already exist:
 
 ```c
 RCU_ADD_TEST("some-module", test_func);
 ```
 
-### Writing Test Module With Setup and Teardown
+### Writing a Test Module With Fixtures
 
-A module can have setup and teardown functions that run before and after all
-tests within that module.
+A module can have per-test and per-suite fixture functions.
+`RCU_SET_MODULE_FIXTURES` sets functions that run before and after each test.
+`RCU_SET_MODULE_FIXTURES_ALL` sets functions that run once before and after all
+tests in the module.
 
 ```c
-#include <stdio.h>
 #include "rcunit.h"
 
 RCU_TEST(test_func) {
@@ -118,8 +109,8 @@ RCU_FIXTURE(teardown_all) {
 
 int main(int argc, char *argv[]) {
     RCU_SET_MODULE_FIXTURES("some-module", setup, teardown);
-    RCU_ADD_TEST("some-module", test_func);
     RCU_SET_MODULE_FIXTURES_ALL("some-module", setup_all, teardown_all);
+    RCU_ADD_TEST("some-module", test_func);
     return rcu_run_tests();
 }
 ```
@@ -129,7 +120,6 @@ int main(int argc, char *argv[]) {
 Test run hooks are callbacks invoked before and after the full test run.
 
 ```c
-#include <stdio.h>
 #include "rcunit.h"
 
 RCU_RUN_HOOK(run_hook) {
@@ -149,34 +139,32 @@ int main(int argc, char *argv[]) {
 
 ### Test Reports
 
-`rcunit` generates a test run report in plain text format: `rcunit_test_run_report.txt`.
+rcunit generates a plain-text test run report: `rcunit_test_run_report.txt`.
 
 ---
 
-## rcunit APIs
+## API Reference
 
-### API
+### Macros
 
 ```c
-RCU_ADD_TEST("module", func)                       
-RCU_SET_MODULE_FIXTURES(module, setup, teardown)    
-RCU_SET_MODULE_FIXTURES_ALL(module, setup, teardown) 
+RCU_TEST(name)                                       /* define a test function */
+RCU_FIXTURE(name)                                    /* define a fixture function */
+RCU_RUN_HOOK(name)                                   /* define a run hook function */
+
+RCU_ADD_TEST(module, func)                           /* add test to a named module */
+RCU_SET_MODULE_FIXTURES(module, setup, teardown)     /* per-test fixtures */
+RCU_SET_MODULE_FIXTURES_ALL(module, setup, teardown) /* per-suite fixtures */
 ```
 
+### Functions
+
 ```c
-int rcu_init();                                    
-int rcu_destroy();                                 
+int rcu_init();
+int rcu_destroy();
 int rcu_run_tests();
 void rcu_dump_test_registry();
 int rcu_set_run_hook(rcu_generic_function hook);
-```
-
-### Helper Macros
-
-```c
-RCU_TEST(name) { ... }          /* define a test function */
-RCU_FIXTURE(name) { ... }       /* define a setup or teardown function */
-RCU_RUN_HOOK(name) { ... }      /* define a run hook function */
 ```
 
 ### Assertion Macros
@@ -198,31 +186,25 @@ RCU_FAIL(msg)
 
 ---
 
-## rcunit Internals
+## Internals
 
 ### Exception Handling
 
-rcunit uses non-local jumps (`setjmp`/`longjmp`) to simulate exceptions. This
-mechanism is used when running tests and test fixtures.
+rcunit uses non-local jumps (`setjmp`/`longjmp`) to simulate exceptions when
+running tests and fixtures.
 
 ### Signal Handling
 
-rcunit catches signals thrown during a test run, allowing subsequent tests to
-continue executing instead of terminating the process.
+rcunit installs signal handlers for SIGSEGV, SIGILL, SIGFPE, and SIGBUS during
+test execution. When a signal fires, rcunit records the failure and continues
+with the next test rather than terminating the process.
 
 ```c
-#include <stdio.h>
 #include "rcunit.h"
 
-typedef struct {
-    unsigned char *data;
-    size_t size;
-} buffer_t;
-
 RCU_TEST(my_test) {
-    buffer_t *buff = NULL;
-    RCU_ASSERT_NULL(buff);
-    fprintf(stdout, "buffer data address = %p", buff->data); /* triggers SIGSEGV */
+    int *p = NULL;
+    *p = 1; /* triggers SIGSEGV — rcunit catches it and marks test failed */
 }
 
 int main(int argc, char *argv[]) {
@@ -235,7 +217,7 @@ Example output:
 
 ```
 [INFO]  Test run started Sun Feb 10 20:22:32 2013
-[ERROR] Caught illegal instruction in 0x100001650
+[ERROR] Caught segmentation violation in my_test
 [INFO]  Test run report generated : rcunit_test_run_report.txt
 [INFO]  Test run finished Sun Feb 10 20:22:32 2013
 [INFO]  Test Run Results: Passed : 0  Failed : 1
@@ -244,13 +226,14 @@ Example output:
 
 ### Logging
 
-rcunit includes built-in logging support via `RCU_LOG_INFO`, `RCU_LOG_WARN`,
-`RCU_LOG_ERROR`, and `RCU_LOG_DEBUG` (enabled with `-DRCU_DEBUG`).
+rcunit includes built-in logging via `RCU_LOG_INFO`, `RCU_LOG_WARN`,
+`RCU_LOG_ERROR`, and `RCU_LOG_DEBUG`. Debug logging is enabled by compiling
+with `-DRCU_DEBUG`.
 
-### Testing
+### Self-Tests
 
 rcunit uses its own framework to test itself. The test suite lives in the
-`tests/` directory.
+`tests/` directory and can be run with `make check`.
 
 ---
 
