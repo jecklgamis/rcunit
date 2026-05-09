@@ -169,20 +169,71 @@ int rcu_set_run_hook(rcu_generic_function hook);
 
 ### Assertion Macros
 
-```c
-RCU_ASSERT(cond)
-RCU_ASSERT_TRUE(cond)
-RCU_ASSERT_FALSE(cond)
-RCU_ASSERT_NULL(ptr)
-RCU_ASSERT_NOT_NULL(ptr)
-RCU_ASSERT_EQUAL(expected, actual)
-RCU_ASSERT_EQUAL_STRING(expected, actual)
-RCU_ASSERT_SAME_BYTE_ARRAY(array1, array2, size)
-RCU_ASSERT_NOT_SAME_BYTE_ARRAY(array1, array2, size)
-RCU_ASSERT_BIT_SET(data, bit_pos)
-RCU_ASSERT_BIT_NOT_SET(data, bit_pos)
-RCU_FAIL(msg)
-```
+#### General
+
+| Macro | Description |
+|-------|-------------|
+| `RCU_ASSERT(cond)` | Fails if `cond` is false |
+| `RCU_ASSERT_TRUE(cond)` | Fails if `cond` is not true |
+| `RCU_ASSERT_FALSE(cond)` | Fails if `cond` is not false |
+| `RCU_FAIL(msg)` | Unconditionally fails with message |
+
+#### Pointers
+
+| Macro | Description |
+|-------|-------------|
+| `RCU_ASSERT_NULL(ptr)` | Fails if `ptr` is not null |
+| `RCU_ASSERT_NOT_NULL(ptr)` | Fails if `ptr` is null |
+| `RCU_ASSERT_EQUAL_PTRS(expected, actual)` | Fails if pointers are not equal |
+| `RCU_ASSERT_NOT_EQUAL_PTRS(expected, actual)` | Fails if pointers are equal |
+
+#### Integers
+
+| Macro | Description |
+|-------|-------------|
+| `RCU_ASSERT_EQUAL(expected, actual)` | Fails if values are not equal |
+| `RCU_ASSERT_NOT_EQUAL(expected, actual)` | Fails if values are equal |
+| `RCU_ASSERT_GREATER_THAN(a, b)` | Fails if `a <= b` |
+| `RCU_ASSERT_LESS_THAN(a, b)` | Fails if `a >= b` |
+| `RCU_ASSERT_GREATER_EQUAL(a, b)` | Fails if `a < b` |
+| `RCU_ASSERT_LESS_EQUAL(a, b)` | Fails if `a > b` |
+| `RCU_ASSERT_IN_RANGE(val, min, max)` | Fails if `val` is not in `[min, max]` |
+
+#### Floating Point
+
+| Macro | Description |
+|-------|-------------|
+| `RCU_ASSERT_EQUAL_FLOATS(expected, actual)` | Fails if values are not exactly equal |
+| `RCU_ASSERT_NOT_EQUAL_FLOATS(expected, actual)` | Fails if values are exactly equal |
+| `RCU_ASSERT_NEAR(expected, actual, delta)` | Fails if `|expected - actual| > delta` |
+
+#### Strings
+
+| Macro | Description |
+|-------|-------------|
+| `RCU_ASSERT_EQUAL_STRING(expected, actual)` | Fails if strings are not equal |
+| `RCU_ASSERT_NOT_EQUAL_STRING(expected, actual)` | Fails if strings are equal |
+| `RCU_ASSERT_STRING_CONTAINS(haystack, needle)` | Fails if `haystack` does not contain `needle` |
+| `RCU_ASSERT_STRING_EMPTY(str)` | Fails if string is not empty |
+| `RCU_ASSERT_STRING_NOT_EMPTY(str)` | Fails if string is empty |
+
+#### Byte Arrays
+
+| Macro | Description |
+|-------|-------------|
+| `RCU_ASSERT_SAME_BYTE_ARRAY(a, b, size)` | Fails if byte arrays differ |
+| `RCU_ASSERT_NOT_SAME_BYTE_ARRAY(a, b, size)` | Fails if byte arrays are equal |
+| `RCU_ASSERT_ZERO_MEMORY(ptr, size)` | Fails if any byte in the region is non-zero |
+| `RCU_ASSERT_ARRAY_EQUAL(expected, actual, n)` | Fails if integer arrays differ element-wise |
+
+#### Bits
+
+| Macro | Description |
+|-------|-------------|
+| `RCU_ASSERT_BIT_SET(data, bit_pos)` | Fails if bit at `bit_pos` is not set |
+| `RCU_ASSERT_BIT_NOT_SET(data, bit_pos)` | Fails if bit at `bit_pos` is set |
+| `RCU_ASSERT_BITS_SET(data, mask)` | Fails if any bit in `mask` is not set |
+| `RCU_ASSERT_BITS_NOT_SET(data, mask)` | Fails if any bit in `mask` is set |
 
 ---
 
