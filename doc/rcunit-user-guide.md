@@ -174,9 +174,7 @@ int rcu_set_run_hook(rcu_generic_function hook);
 ### Helper Macros
 
 ```c
-
-RCU_ADD_TEST_F("module", func, setup, teardown)     /* register a test with fixtures */
-RCU_TEST(name) { ... }                            /* define a test function */
+RCU_TEST(name) { ... }          /* define a test function */
 RCU_FIXTURE(name) { ... }       /* define a setup or teardown function */
 RCU_RUN_HOOK(name) { ... }      /* define a run hook function */
 ```

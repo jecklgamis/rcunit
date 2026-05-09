@@ -36,17 +36,17 @@ int rcu_init_reg(struct rcu_registry *reg, const char *name) {
     return RCU_E_OK;
 }
 
-RCU_API struct rcu_registry *rcu_get_default_reg() {
+struct rcu_registry *rcu_get_default_reg() {
     rcu_init();
     return &the_test_engine.def_reg;
 }
 
-RCU_API int rcu_add_test_module(struct rcu_module *module) {
+int rcu_add_test_module(struct rcu_module *module) {
     rcu_init();
     return rcu_add_module_to_reg(rcu_get_default_reg(), module);
 }
 
-RCU_API int rcu_add_module_to_reg(struct rcu_registry *reg, struct rcu_module *module) {
+int rcu_add_module_to_reg(struct rcu_registry *reg, struct rcu_module *module) {
     rcu_init();
     if (!module) {
         RCU_SET_ERROR_CODE(RCU_E_INVMOD);
@@ -80,7 +80,7 @@ struct rcu_module *rcu_search_module_by_name(struct rcu_registry *reg, const cha
     return NULL;
 }
 
-RCU_API void rcu_dump_test_reg(struct rcu_registry *reg) {
+void rcu_dump_test_reg(struct rcu_registry *reg) {
     struct rcu_list *cursor1 = NULL;
     struct rcu_list *cursor2 = NULL;
     struct rcu_test *func = NULL;

@@ -58,7 +58,7 @@ RCU_API int rcu_has_mem_leak();
 
 #define RCU_ADD_TEST(module, func) \
     do { \
-        rcu_add_test_func(rcu_get_module(module), func, NULL, NULL, #func); \
+        rcu_add_test_func(rcu_get_module(module), func, #func); \
     } while(0);
 
 #define RCU_SET_MODULE_FIXTURES(module, setup, teardown) \

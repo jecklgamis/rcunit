@@ -118,7 +118,7 @@ struct rcu_module *rcu_create_test_module(const char *name, rcu_generic_function
     return module;
 }
 
-RCU_API int rcu_destroy_test_module(struct rcu_module *module) {
+int rcu_destroy_test_module(struct rcu_module *module) {
     struct rcu_list *cursor;
     struct rcu_test *func;
     struct rcu_test_engine *engine;
@@ -168,7 +168,7 @@ struct rcu_test *rcu_search_test_func_by_name(struct rcu_module *module,
     return NULL;
 }
 
-RCU_API int rcu_run_test_module(struct rcu_module *module) {
+int rcu_run_test_module(struct rcu_module *module) {
     struct rcu_test_engine *engine = NULL;
     char ts_buff[RCU_TSTAMP_BUFF_SIZE];
 
@@ -189,7 +189,7 @@ RCU_API int rcu_run_test_module(struct rcu_module *module) {
     return RCU_E_OK;
 }
 
-RCU_API int rcu_run_test_module_by_name(const char *name) {
+int rcu_run_test_module_by_name(const char *name) {
     struct rcu_module *module = NULL;
 
     rcu_init();

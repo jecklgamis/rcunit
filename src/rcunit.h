@@ -277,7 +277,7 @@ int rcu_del_all_fail_rec_from_func(struct rcu_test *func);
 int rcu_del_all_fail_rec_from_module(struct rcu_module *module);
 int rcu_add_fail_rec_to_module(struct rcu_module *module, const char *info, const char *filepath, const int line_no, int fatal);
 int rcu_add_fail_rec_to_func(struct rcu_test *func, const char *info, const char *filepath, const int line_no);
-int rcu_add_test_func(struct rcu_module *module, rcu_generic_function entry, rcu_generic_function init, rcu_generic_function destroy, const char *name);
+int rcu_add_test_func(struct rcu_module *module, rcu_generic_function entry, const char *name);
 int rcu_add_fail_rec_impl(struct rcu_list *fail_rec_list, const char *info, const char *filename, const char *func_name, int line_no);
 int rcu_del_all_fail_rec_impl(struct rcu_list *fail_rec_list);
 int rcu_free_test_func(struct rcu_test *func);
