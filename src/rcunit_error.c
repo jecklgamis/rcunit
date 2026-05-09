@@ -47,12 +47,12 @@ const char *g_error_msg_tbl[] = {
         /* RCU_E_INVFUNCENTRY  */, "Invalid function entry point"
 };
 
-RCU_API int rcu_get_err() {
+int rcu_get_err() {
     rcu_init();
     return g_ercd;
 }
 
-RCU_API const char *rcu_get_err_msg(int ercd) {
+const char *rcu_get_err_msg(int ercd) {
     rcu_init();
     if (ercd >= RCU_E_OK && ercd <= RCU_E_INVFUNCENTRY) {
         return (g_error_msg_tbl[ercd]);

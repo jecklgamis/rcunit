@@ -38,7 +38,7 @@ void rcu_native_free(void *addr) {
 /*
  *  Internal memory allocation wrapper
  */
-RCU_API void *rcu_malloc(size_t size) {
+void *rcu_malloc(size_t size) {
     void *addr = NULL;
     size_t aligned_size = size;
     rcu_init();
@@ -70,7 +70,7 @@ RCU_API void *rcu_malloc(size_t size) {
 /*
  * Internal memory deallocation wrapper
  */
-RCU_API void rcu_free(void *addr) {
+void rcu_free(void *addr) {
     if (addr) {
 #if RCU_ENABLE_MTRACE
         RCU_TRACE_FREE_INTERNAL(addr);

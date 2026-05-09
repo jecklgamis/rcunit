@@ -38,9 +38,9 @@ struct rcu_thread {
     int running;
 };
 
-RCU_API struct rcu_thread *rcu_get_thread(const char *name, rcu_thread_routine run, void *arg);
+struct rcu_thread *rcu_get_thread(const char *name, rcu_thread_routine run, void *arg);
 
-RCU_API void rcu_join_thread(struct rcu_thread *thread);
+void rcu_join_thread(struct rcu_thread *thread);
 
 #endif /* RCUNIT_THREAD_H **/
 

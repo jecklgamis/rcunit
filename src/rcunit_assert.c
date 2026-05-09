@@ -98,13 +98,13 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
 
 }
 
-RCU_API int rcu_have_asserts() {
+int rcu_have_asserts() {
     rcu_init();
     struct rcu_test_engine *engine = &the_test_engine;
     return (!rcu_is_list_empty(&engine->ae.assert_list));
 }
 
-RCU_API void rcu_dump_asserts() {
+void rcu_dump_asserts() {
     struct rcu_list *cursor = NULL;
     struct rcu_test_engine *engine = NULL;
     struct rcu_failure_record *fail_rec = NULL;
@@ -133,7 +133,7 @@ int rcu_stop_assert_engine(struct rcu_test_engine *engine) {
     return RCU_E_OK;
 }
 
-RCU_API int rcu_set_assert_hook(rcu_generic_function assert_hook) {
+int rcu_set_assert_hook(rcu_generic_function assert_hook) {
     struct rcu_test_engine *engine = &the_test_engine;
     rcu_init();
     if (assert_hook) {

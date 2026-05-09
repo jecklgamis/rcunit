@@ -18,12 +18,12 @@
 
 extern struct rcu_module *rcu_search_module_by_name(struct rcu_registry *reg, const char *mod_name);
 
-RCU_API struct rcu_module *rcu_get_default_module() {
+struct rcu_module *rcu_get_default_module() {
     rcu_init();
     return &the_test_engine.def_module;
 }
 
-RCU_API struct rcu_module *rcu_get_module(const char *name) {
+struct rcu_module *rcu_get_module(const char *name) {
     struct rcu_module *module;
     rcu_init();
     if (name) {
@@ -37,14 +37,14 @@ RCU_API struct rcu_module *rcu_get_module(const char *name) {
     return NULL;
 }
 
-RCU_API void rcu_set_module_fixture(struct rcu_module *module, rcu_generic_function setup,
+void rcu_set_module_fixture(struct rcu_module *module, rcu_generic_function setup,
                              rcu_generic_function teardown) {
     rcu_init();
     module->init = setup;
     module->destroy = teardown;
 }
 
-RCU_API void rcu_set_module_fixture_all(struct rcu_module *module, rcu_generic_function setup,
+void rcu_set_module_fixture_all(struct rcu_module *module, rcu_generic_function setup,
     rcu_generic_function teardown) {
     rcu_init();
     module->init_all = setup;

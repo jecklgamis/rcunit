@@ -22,9 +22,9 @@
 #include <stdlib.h>
 #include "rcunit_types.h"
 
-extern RCU_API void *rcu_malloc(size_t size);
+extern void *rcu_malloc(size_t size);
 
-extern RCU_API void rcu_free(void *addr);
+extern void rcu_free(void *addr);
 
 void *rcu_native_malloc(size_t size);
 

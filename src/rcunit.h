@@ -17,9 +17,6 @@
 #ifndef RCUNIT_H
 #define RCUNIT_H
 
-/* Tag to indicate an API function */
-#define RCU_API
-
 /* Tag to indicate a function parameter is nullable */
 #define RCU_NULLABLE
 
@@ -63,7 +60,6 @@
 /* Destroy handler failed status */
 #define RCU_RUN_STAT_DESTROY_FAILED   8
 
-
 #define RCU_SET_INIT_FAILED(func_or_module) \
     (func_or_module)->init_failed = (RCU_TRUE);
 
@@ -73,7 +69,6 @@
 /* Returns true if the test was not performed */
 #define RCU_IS_NOT_TESTED(func_or_module) \
     ((func_or_module)->run_stat == RCU_RUN_STAT_NOTTESTED)
-
 
 /* Returns true if the init function failed */
 #define RCU_IS_INIT_FAILED(func_or_module) \
@@ -191,7 +186,6 @@ struct rcu_test {
 /* Test module run level */
 #define RCU_RUN_LEVEL_MODULE    2
 
-
 /* Assertion engine runtime data structure */
 struct rcu_assertion_engine {
     struct rcu_registry *current_reg;
@@ -270,81 +264,60 @@ extern int g_ercd;
 extern struct rcu_test_engine the_test_engine;
 
 /* Internal function declarations */
-int rcu_get_timestamp(char *ts_buff, const int ts_buff_len);
-int rcu_is_engine_initialized(struct rcu_test_engine *engine);
+int rcu_add_fail_rec_impl(struct rcu_list *fail_rec_list, const char *info, const char *filename, const char *func_name, int line_no);
+int rcu_add_fail_rec_to_func(struct rcu_test *func, const char *info, const char *filepath, const int line_no);
+int rcu_add_fail_rec_to_module(struct rcu_module *module, const char *info, const char *filepath, const int line_no, int fatal);
+int rcu_add_module_to_reg(struct rcu_registry *reg, struct rcu_module *module);
+int rcu_add_test(rcu_generic_function test);
+int rcu_add_test_func(struct rcu_module *module, rcu_generic_function entry, const char *name);
+int rcu_add_test_module(struct rcu_module *module);
+int rcu_add_test_to_module(struct rcu_module *module, rcu_generic_function test);
+struct rcu_module *rcu_create_test_module(const char *name, rcu_generic_function init, rcu_generic_function destroy);
 int rcu_del_all_fail_rec(struct rcu_test_engine *engine);
 int rcu_del_all_fail_rec_from_func(struct rcu_test *func);
 int rcu_del_all_fail_rec_from_module(struct rcu_module *module);
-int rcu_add_fail_rec_to_module(struct rcu_module *module, const char *info, const char *filepath, const int line_no, int fatal);
-int rcu_add_fail_rec_to_func(struct rcu_test *func, const char *info, const char *filepath, const int line_no);
-int rcu_add_test_func(struct rcu_module *module, rcu_generic_function entry, const char *name);
-int rcu_add_fail_rec_impl(struct rcu_list *fail_rec_list, const char *info, const char *filename, const char *func_name, int line_no);
 int rcu_del_all_fail_rec_impl(struct rcu_list *fail_rec_list);
-int rcu_free_test_func(struct rcu_test *func);
-int rcu_init_reg(struct rcu_registry *reg, const char *name);
-int rcu_init_module(struct rcu_module *module, rcu_generic_function init, rcu_generic_function destroy, const char *name);
-int rcu_run_tests_impl(struct rcu_test_engine *engine);
-int rcu_run_test_reg_impl(struct rcu_test_engine *engine, struct rcu_registry *reg);
-int rcu_run_test_module_impl(struct rcu_test_engine *engine, struct rcu_module *module);
-int rcu_run_test_func_impl(struct rcu_test_engine *engine, struct rcu_test *func);
-int rcu_restart_engine(struct rcu_test_engine *engine);
-int rcu_stop_engine(struct rcu_test_engine *engine);
-int rcu_stop_assert_engine(struct rcu_test_engine *engine);
 int rcu_destroy_test_dbase(struct rcu_test_engine *engine);
-void rcu_gen_test_run_report(struct rcu_test_engine *engine);
-void rcu_init_exception();
-void rcu_destroy_exception();
-
-extern  int rcu_get_err();
-
-extern  int rcu_has_mem_leak();
-
-extern  int rcu_have_asserts();
-
-extern  int rcu_init();
-
-extern  int rcu_run_test_engine();
-
-extern  int rcu_run_test_module_by_name(const char *name);
-
-extern  int rcu_run_tests();
-
-extern  int rcu_set_assert_hook(rcu_generic_function assert_hook);
-
-extern  int rcu_set_run_hook(rcu_generic_function run_hook);
-
-extern  struct rcu_exception *rcu_lookup_excp_by_id(rcu_exception_id id);
-
-extern  struct rcu_module *rcu_get_default_module();
-
-extern  struct rcu_module *rcu_get_module(const char *name);
-
-extern  struct rcu_thread *rcu_get_thread(const char *name, rcu_thread_routine routine, void *arg);
-
-extern  void *rcu_malloc(size_t size);
-
-extern  void rcu_destroy_threads();
-
-extern  void rcu_dump_asserts();
-
-extern  void rcu_dump_test_registry();
-
-extern  void rcu_free(void *addr);
-
-extern  void rcu_init_threads();
-
-extern  int rcu_run_test_module(struct rcu_module *module);
-
-extern  void rcu_dump_test_reg(struct rcu_registry *reg);
 extern int rcu_destroy_test_engine(struct rcu_test_engine *engine);
-
-int rcu_add_test(rcu_generic_function test);
-
-int rcu_add_test_to_module(struct rcu_module *module, rcu_generic_function test);
-
-int rcu_add_module_to_reg(struct rcu_registry *reg, struct rcu_module *module);
-
-
+int rcu_destroy_test_module(struct rcu_module *module);
+void rcu_destroy_exception();
+void rcu_destroy_threads();
+void rcu_dump_asserts();
+void rcu_dump_test_reg(struct rcu_registry *reg);
+void rcu_dump_test_registry();
+void rcu_free(void *addr);
+int rcu_free_test_func(struct rcu_test *func);
+void rcu_gen_test_run_report(struct rcu_test_engine *engine);
+int rcu_get_err();
+struct rcu_registry *rcu_get_default_reg();
+struct rcu_module *rcu_get_default_module();
+struct rcu_module *rcu_get_module(const char *name);
+int rcu_get_nr_mods();
+int rcu_get_nr_tests();
+struct rcu_thread *rcu_get_thread(const char *name, rcu_thread_routine routine, void *arg);
+int rcu_get_timestamp(char *ts_buff, const int ts_buff_len);
+int rcu_has_mem_leak();
+int rcu_have_asserts();
+int rcu_init();
+void rcu_init_exception();
+int rcu_init_module(struct rcu_module *module, rcu_generic_function init, rcu_generic_function destroy, const char *name);
+int rcu_init_reg(struct rcu_registry *reg, const char *name);
+void rcu_init_threads();
+int rcu_is_engine_initialized(struct rcu_test_engine *engine);
+struct rcu_exception *rcu_lookup_excp_by_id(rcu_exception_id id);
+void *rcu_malloc(size_t size);
+int rcu_restart_engine(struct rcu_test_engine *engine);
+int rcu_run_test_engine();
+int rcu_run_test_func_impl(struct rcu_test_engine *engine, struct rcu_test *func);
+int rcu_run_test_module(struct rcu_module *module);
+int rcu_run_test_module_by_name(const char *name);
+int rcu_run_test_module_impl(struct rcu_test_engine *engine, struct rcu_module *module);
+int rcu_run_test_reg_impl(struct rcu_test_engine *engine, struct rcu_registry *reg);
+int rcu_run_tests();
+int rcu_run_tests_impl(struct rcu_test_engine *engine);
+int rcu_set_assert_hook(rcu_generic_function assert_hook);
+int rcu_set_run_hook(rcu_generic_function run_hook);
+int rcu_stop_assert_engine(struct rcu_test_engine *engine);
+int rcu_stop_engine(struct rcu_test_engine *engine);
 
 #endif /* RCUNIT_H */
-

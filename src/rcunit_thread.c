@@ -19,14 +19,14 @@
 struct rcu_list g_rcu_thread_list;
 static int g_rcu_threads_initialized;
 
-RCU_API void rcu_init_threads() {
+void rcu_init_threads() {
     if (!g_rcu_threads_initialized) {
         rcu_init_list(&g_rcu_thread_list);
         g_rcu_threads_initialized = 1;
     }
 }
 
-RCU_API void rcu_destroy_threads() {
+void rcu_destroy_threads() {
     if (g_rcu_threads_initialized) {
         g_rcu_threads_initialized = 0;
     }
@@ -58,7 +58,7 @@ struct rcu_thread *rcu_search_thread_by_name(const char *name) {
     return NULL;
 }
 
-RCU_API struct rcu_thread *rcu_get_thread(const char *name, rcu_thread_routine routine, void *arg) {
+struct rcu_thread *rcu_get_thread(const char *name, rcu_thread_routine routine, void *arg) {
     struct rcu_thread *thread = NULL;
     rcu_init_threads();
     if (!name) {

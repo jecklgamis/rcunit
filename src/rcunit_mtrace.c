@@ -261,7 +261,7 @@ int rcu_uncache_ptr(void *ptr, struct rcu_pointer_cache *ptr_cache) {
 /**
  *  Memory allocation trace implementation
  */
-RCU_API int rcu_trace_alloc_impl(void *ptr, size_t size,
+int rcu_trace_alloc_impl(void *ptr, size_t size,
                                  const char *filename, const char *function, const int line,
                                  struct rcu_pointer_cache *ptr_cache) {
     rcu_ensure_mtrace_init();
@@ -276,7 +276,7 @@ RCU_API int rcu_trace_alloc_impl(void *ptr, size_t size,
 /**
  *  Memory deallocation trace implementation
  */
-RCU_API int rcu_trace_free_impl(void *ptr, const char *filename, const char *function,
+int rcu_trace_free_impl(void *ptr, const char *filename, const char *function,
                                 const int line, struct rcu_pointer_cache *ptr_cache) {
     struct rcu_pointer_info *ptr_info = NULL;
     rcu_ensure_mtrace_init();
@@ -285,7 +285,7 @@ RCU_API int rcu_trace_free_impl(void *ptr, const char *filename, const char *fun
     return RCU_E_OK;
 }
 
-RCU_API int rcu_check_mem_leak_impl(const char *filename, const char *function,
+int rcu_check_mem_leak_impl(const char *filename, const char *function,
                                     const int line, struct rcu_pointer_cache *ptr_cache) {
     struct rcu_list *cursor;
     struct rcu_pointer_table *ptr_tbl;
@@ -317,7 +317,7 @@ RCU_API int rcu_check_mem_leak_impl(const char *filename, const char *function,
     return RCU_E_OK;
 }
 
-RCU_API int rcu_has_mem_leak() {
+int rcu_has_mem_leak() {
     int nr_leaks = 0;
     size_t leak_size = 0;
     rcu_get_mtrace_results(rcu_get_rcunit_ptr_cache(), &nr_leaks, &leak_size);

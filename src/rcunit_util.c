@@ -47,7 +47,7 @@ void rcu_dump_test_registry_impl(struct rcu_test_engine *engine) {
     }
 }
 
-RCU_API void rcu_dump_test_registry() {
+void rcu_dump_test_registry() {
     rcu_init();
     rcu_dump_test_registry_impl(&the_test_engine);
 }

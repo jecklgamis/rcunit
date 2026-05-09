@@ -40,7 +40,7 @@ struct rcu_exception g_rcu_excp_tbl[] = {
         RCU_DEFINE_EXCEPTION(RCU_EXCP_ID_UNKNOWN, "Unknown")
 };
 
-RCU_API struct rcu_exception *rcu_lookup_excp_by_id(rcu_exception_id id) {
+struct rcu_exception *rcu_lookup_excp_by_id(rcu_exception_id id) {
     struct rcu_exception *excp = &g_rcu_excp_tbl[RCU_EXCP_ID_UNKNOWN];
     if (id > RCU_EXCP_ID_START && id < RCU_EXCP_ID_END) {
         excp = &g_rcu_excp_tbl[id];
