@@ -53,7 +53,7 @@ TMK_TEST(rcu_test_assert_single_evaluation) {
     TMK_ASSERT_EQUAL(1, nr_invocations);
 
     nr_invocations = 0;
-    RCU_ASSERT_EQUAL_STRING("string", return_string());
+    RCU_ASSERT_EQUAL_STR("string", return_string());
     TMK_ASSERT_EQUAL(1, nr_invocations);
 
     nr_invocations = 0;
@@ -106,14 +106,14 @@ RCU_TEST(rcu_byte_assertion_tests){
     actual[2] = 0xc0;
     actual[3] = 0xde;
     
-    RCU_ASSERT_SAME_BYTE_ARRAY(expected, actual, 4);
-    
+    RCU_ASSERT_EQUAL_MEM(expected, actual, 4);
+
     actual[0] = 0xde;
     actual[1] = 0xad;
     actual[2] = 0xbe;
     actual[3] = 0xef;
 
-    RCU_ASSERT_NOT_SAME_BYTE_ARRAY(expected, actual, 4);
+    RCU_ASSERT_NOT_EQUAL_MEM(expected, actual, 4);
 }
 
 TMK_TEST(rcu_test_byte_assertions) {
@@ -122,8 +122,8 @@ TMK_TEST(rcu_test_byte_assertions) {
 }
 
 RCU_TEST(rcu_float_assertion_tests) {
-    RCU_ASSERT_EQUAL_FLOATS(1.00001, 1.00001);
-    RCU_ASSERT_NOT_EQUAL_FLOATS(1.00001, 1.00000);
+    RCU_ASSERT_EQUAL_FLOAT(1.00001, 1.00001);
+    RCU_ASSERT_NOT_EQUAL_FLOAT(1.00001, 1.00000);
 }
 
 TMK_TEST(rcu_test_float_assertions) {
@@ -134,7 +134,7 @@ TMK_TEST(rcu_test_float_assertions) {
 RCU_TEST(rcu_pointer_assertion_tests) {
     int x;
     int *y = &x;
-    RCU_ASSERT_EQUAL_PTRS(&x, y);
+    RCU_ASSERT_EQUAL_PTR(&x, y);
 }
 
 TMK_TEST(rcu_test_pointer_assertions) {

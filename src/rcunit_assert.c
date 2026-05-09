@@ -205,8 +205,8 @@ int rcu_del_all_fail_rec_impl(struct rcu_list *fail_rec_list) {
         fail_rec = (struct rcu_failure_record *) cursor;
         rcu_free(fail_rec->info);
         RCU_SAVE_CURSOR(cursor)
-            rcu_remove_list(cursor);
-            rcu_free(fail_rec);
+        rcu_remove_list(cursor);
+        rcu_free(fail_rec);
         RCU_RESTORE_CURSOR(cursor)
     }
     return RCU_E_OK;
