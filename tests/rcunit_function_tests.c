@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,49 +26,43 @@ TMK_TEST(rcu_test_add_test) {
     TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
 }
 
-TMK_TEST(rcu_test_add_test_fxt) {
-    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_fxt(test, setup, teardown));
-    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_fxt(test, setup, teardown));
+TMK_TEST(rcu_test_add_test_to_module) {
+    struct rcu_module *module = rcu_get_module("module");
+    TMK_ASSERT_NOT_NULL(module);
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_to_module(module, test));
+    TMK_ASSERT_EQUAL(2, rcu_get_nr_mods());
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
+}
+
+TMK_TEST(rcu_test_add_test_fixture_to_module) {
+    RCU_ADD_TEST("module",test);
+    rcu_set_module_fixture(rcu_get_module("module"), setup, teardown);
+    TMK_ASSERT_EQUAL(2, rcu_get_nr_mods());
+    TMK_ASSERT_EQUAL(1, rcu_get_nr_tests());
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
+}
+
+TMK_TEST(rcu_test_add_test_to_default_module) {
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_to_module(rcu_get_default_module(), test));
+    TMK_ASSERT_EQUAL(1, rcu_get_nr_tests());
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
+}
+
+TMK_TEST(rcu_test_add_test_fixture_to_default_module) {
+    rcu_add_test_to_module(rcu_get_default_module(), test);
+    rcu_set_module_fixture(rcu_get_default_module(), setup, teardown);
+    TMK_ASSERT_EQUAL(1, rcu_get_nr_tests());
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
+}
+
+TMK_TEST(rcu_test_add_null_test) {
+    TMK_ASSERT_EQUAL(RCU_E_NG, rcu_add_test(NULL));
+    TMK_ASSERT_EQUAL(0, rcu_get_nr_tests());
+}
+
+TMK_TEST(rcu_test_add_duplicate_test) {
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test(test));
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test(test));
     TMK_ASSERT_EQUAL(2, rcu_get_nr_tests());
-    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
 }
 
-TMK_TEST(rcu_test_add_test_to_mod) {
-    rcu_module *mod = rcu_get_mod("mod");
-    TMK_ASSERT_NOT_NULL(mod);
-    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_to_mod(mod, test));
-    TMK_ASSERT_EQUAL(2, rcu_get_nr_mods());
-    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
-}
-
-TMK_TEST(rcu_test_add_test_fxt_to_mod) {
-    rcu_module *mod = rcu_get_mod("mod");
-    TMK_ASSERT_NOT_NULL(mod);
-    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_fxt_to_mod(mod, test, setup, teardown));
-    TMK_ASSERT_EQUAL(2, rcu_get_nr_mods());
-    TMK_ASSERT_EQUAL(1, rcu_get_nr_tests());
-    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
-}
-
-TMK_TEST(rcu_test_add_test_to_default_mod) {
-    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_to_mod(rcu_get_default_mod(), test));
-    TMK_ASSERT_EQUAL(1, rcu_get_nr_tests());
-    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
-}
-
-TMK_TEST(rcu_test_add_test_fxt_to_default_mod) {
-    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_fxt_to_mod(rcu_get_default_mod(), test, setup, teardown));
-    TMK_ASSERT_EQUAL(1, rcu_get_nr_tests());
-    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
-}
-
-RCU_DEF_FUNC_TBL(test_func_tbl)
-RCU_INC_TEST(test)
-RCU_DEF_FUNC_TBL_END
-
-TMK_TEST(rcu_test_add_test_func_tbl) {
-   TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_func_tbl(rcu_get_default_mod(), 
-           test_func_tbl));
-   TMK_ASSERT_EQUAL(1, rcu_get_nr_tests());
-   TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
-}

@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: rcunit
+Description: Unit testing framework for C programs
+Version: 2.0.0-rc1
+Libs: -L${libdir} -lrcunit
+Cflags: -I${includedir}

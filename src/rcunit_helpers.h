@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -49,17 +49,6 @@
 #define RCU_DECR_BY(__value__, __dec__) \
     __value__ -=__dec__;
 
-/* Resets a counter */
-#define RCU_RESET(__value__) \
-    __value__ = 0;
-
-/* Traverses a test function table */
-#define RCU_FOR_EACH_FUNC_ENTRY(func_tbl, cursor, index) \
-    for(index = 0, cursor = func_tbl; cursor->name != NULL; cursor++, index++)
-
-/* Traverses a test module table */
-#define RCU_FOR_EACH_MOD_ENTRY(mod_tbl, cursor, index) \
-    for(index = 0,cursor = mod_tbl; cursor->name != NULL; cursor++, index++)
 
 /* Declares a log handler implementation */
 #define RCU_DEC_LOG_HANDLER_IMPL(log_impl, param) \
@@ -70,7 +59,11 @@
     extern void out_impl(void *param);
 
 #define RCU_LOG_TRACE(fmt, ...) fprintf(stdout, "[TRACE] " fmt "\n", ##__VA_ARGS__)
+#ifdef RCU_DEBUG
 #define RCU_LOG_DEBUG(fmt, ...) fprintf(stdout, "[DEBUG] " fmt "\n", ##__VA_ARGS__)
+#else
+#define RCU_LOG_DEBUG(fmt, ...) ((void)0)
+#endif
 #define RCU_LOG_INFO(fmt, ...)  fprintf(stdout, "[INFO]  " fmt "\n", ##__VA_ARGS__)
 #define RCU_LOG_WARN(fmt, ...)  fprintf(stdout, "[WARN]  " fmt "\n", ##__VA_ARGS__)
 #define RCU_LOG_ERROR(fmt, ...) fprintf(stderr, "[ERROR] " fmt "\n", ##__VA_ARGS__)
@@ -79,23 +72,15 @@
 #define RCU_DEC_TEST_FUNC(func, param) \
     extern void func(void* param);
 
-/* Declares a test function table */
-#define RCU_DEC_TEST_FUNC_TBL(func_tbl) \
-    extern rcu_test_function_entry func_tbl[];
-
 /* Declares a test module */
-#define RCU_DEC_TEST_MOD(mod) \
-    extern rcu_module mod;
-
-/* Declares a test module table */
-#define RCU_DEC_TEST_MOD_TBL(mod) \
-    extern rcu_module_entry mod[];
+#define RCU_DEC_TEST_MODULE(module) \
+    extern struct rcu_module module;
 
 #define RCU_RET_IF_NULL(ptr) \
-    if ((ptr) == NULL) return;
+    if (!(ptr)) return;
 
 #define RCU_RET_VALUE_IF_NULL(ptr, value) \
-    if ((ptr) == NULL) return value;
+    if (!(ptr)) return value;
 
 #endif /* RCUNIT_HELPERS_H */
 

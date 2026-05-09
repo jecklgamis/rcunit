@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,7 @@
 
 #define RCU_DEBUG_EXCEPTION 0
 
-/*  The RCUNIT Exception Facility
+/*  The rcunit Exception Facility
  *  This is a simple implementation of an exception mechanism. The mechanism
  *  relies on the non-local jump routines ,setjmp and longjmp, and is
  *  primarily used for aborting test function execution (i.e. triggered by
@@ -55,25 +55,25 @@ typedef enum rcu_exception_id_tag {
 } rcu_exception_id;
 
 /* Exception runtime data structure */
-typedef struct rcu_exception {
+struct rcu_exception {
     rcu_exception_id id;
     const char *name;
-} rcu_exception;
+};
 
 /* Exception frame runtime data structure */
-typedef struct rcu_exception_frame {
-    rcu_exception *excp; /* exception */
-    sigjmp_buf *env; /* native exception context */
-    struct rcu_exception_frame *outer; /* outer exception frame */
-    struct sigaction segv_act_old; /* SIGSEGV action to be restored */
-    struct sigaction ill_act_old; /* SIGILL action to be restored */
-    struct sigaction fpe_act_old; /* SIGFPE action to be restored */
-    struct sigaction bus_act_old; /* SIGBUGS action to be restored */
-} rcu_exception_frame;
+struct rcu_exception_frame {
+    struct rcu_exception *excp;
+    sigjmp_buf *env;
+    struct rcu_exception_frame *outer;
+    struct sigaction segv_act_old;
+    struct sigaction ill_act_old;
+    struct sigaction fpe_act_old;
+    struct sigaction bus_act_old;
+};
 
-typedef struct rcu_exception_context {
-    rcu_exception_frame *excp_root;
-} rcu_exception_context;
+struct rcu_exception_context {
+    struct rcu_exception_frame *excp_root;
+};
 
 #define RCU_EXCEPTION_TYPE_GET() (__ret_code)
 
@@ -95,7 +95,7 @@ typedef struct rcu_exception_context {
     {                                         \
         int __retcode;                        \
         sigjmp_buf __env;                     \
-        rcu_exception_frame __frame;          \
+        struct rcu_exception_frame __frame;          \
         __frame.outer = g_curr_excp_frame;    \
         __frame.excp = NULL;              \
     g_curr_excp_frame = &__frame;         \
@@ -112,7 +112,7 @@ typedef struct rcu_exception_context {
         g_curr_excp_frame = __frame.outer;    \
         rcu_sig_restore(&__frame); \
         if (__retcode != RCU_EXCEPTION_TYPE_NONE ) {            \
-            rcu_exception *__caught_excp = __frame.excp;       \
+            struct rcu_exception *__caught_excp = __frame.excp;       \
             int __ret_code = __retcode;                     \
 
 /* Terminates RCU_CATCH */
@@ -136,18 +136,18 @@ void rcu_init_excp();
 
 void rcu_destroy_excp();
 
-rcu_exception *rcu_lookup_excp_by_id(rcu_exception_id id);
+struct rcu_exception *rcu_lookup_excp_by_id(rcu_exception_id id);
 
 /** External variable declarations */
-extern rcu_exception_frame *g_curr_excp_frame;
+extern struct rcu_exception_frame *g_curr_excp_frame;
 
 /** Exception signal handlers */
 extern void rcu_sig_handler(int signo);
 
 extern void rcu_sig_catch(void);
 
-extern void rcu_sig_restore(rcu_exception_frame *pf);
+extern void rcu_sig_restore(struct rcu_exception_frame *pf);
 
-extern void rcu_sig_save(rcu_exception_frame *pf);
+extern void rcu_sig_save(struct rcu_exception_frame *pf);
 
 #endif /* RCUNIT_EXCEPTION_H */

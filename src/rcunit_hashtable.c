@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,15 +18,15 @@
 
 extern rcu_memcell *rcu_alloc_mem_cell(size_t nr_mem_cell);
 
-rcu_hashtable *rcu_cre_hash_tbl(int nr_bucket) {
-    rcu_hashtable *tbl;
+struct rcu_hashtable *rcu_create_hash_tbl(int nr_bucket) {
+    struct rcu_hashtable *tbl;
     int tbl_size;
     if (nr_bucket == 0) {
         return NULL;
     }
     tbl_size = RCU_SIZEOF_HASHTABLE(nr_bucket);
-    tbl = (rcu_hashtable *) rcu_alloc_mem_cell(tbl_size);
-    if (tbl == NULL) {
+    tbl = (struct rcu_hashtable *) rcu_alloc_mem_cell(tbl_size);
+    if (!tbl) {
         return NULL;
     }
     return NULL;

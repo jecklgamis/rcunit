@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,7 @@
 #include "rcunit.h"
 
 /*
- * The native memory allocator used by RCUNIT
+ * The native memory allocator used by rcunit
  */
 static int nr_native_allocs = 0;
 
@@ -27,10 +27,10 @@ void *rcu_native_malloc(size_t size) {
 }
 
 /*
- *  The native memory deallocator used by RCUNIT
+ *  The native memory deallocator used by rcunit
  */
 void rcu_native_free(void *addr) {
-    if (addr != NULL) {
+    if (addr) {
         free(addr);
     }
 }
@@ -38,7 +38,7 @@ void rcu_native_free(void *addr) {
 /*
  *  Internal memory allocation wrapper
  */
-RCU_API void *rcu_malloc(size_t size) {
+void *rcu_malloc(size_t size) {
     void *addr = NULL;
     size_t aligned_size = size;
     rcu_init();
@@ -59,7 +59,7 @@ RCU_API void *rcu_malloc(size_t size) {
     aligned_size = RCU_ALIGN_N(RCU_DEFAULT_MALLOC_ALIGNMENT, size);
 #endif
     addr = (void *) rcu_native_malloc(aligned_size);
-    if (addr != NULL) {
+    if (addr) {
 #if RCU_ENABLE_MTRACE
         RCU_TRACE_ALLOC_INTERNAL(addr, aligned_size);
 #endif
@@ -70,8 +70,8 @@ RCU_API void *rcu_malloc(size_t size) {
 /*
  * Internal memory deallocation wrapper
  */
-RCU_API void rcu_free(void *addr) {
-    if (addr != NULL) {
+void rcu_free(void *addr) {
+    if (addr) {
 #if RCU_ENABLE_MTRACE
         RCU_TRACE_FREE_INTERNAL(addr);
 #endif
@@ -95,7 +95,7 @@ rcu_memcell *rcu_alloc_mem_cell(size_t nr_mem_cell) {
  *   Memory cell deallocation wrapper
  */
 void rcu_free_mem_cell(rcu_memcell **cell) {
-    if (cell == NULL || *cell == NULL) {
+    if (!cell || !*cell) {
         return;
     }
     rcu_free(*cell);

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,54 +16,43 @@
 
 #include "rcunit.h"
 
-/* The test machine */
-rcu_test_machine the_test_machine;
+struct rcu_test_engine the_test_engine;
 
+extern struct rcu_test *rcu_search_test_func_by_name(struct rcu_module *module, const char *name);
 
-extern rcu_test *rcu_srch_test_func_by_name(rcu_module *mod, const char *name);
+extern struct rcu_test *rcu_search_test_func_entry(struct rcu_module *module, rcu_generic_function entry);
 
-extern rcu_test *rcu_srch_test_func_entry(rcu_module *mod, rcu_generic_function entry);
+extern int rcu_init_test_engine(struct rcu_test_engine *engine);
 
-extern int rcu_init_test_mach(rcu_test_machine *machine);
-
-int rcu_init_log();
-
-int rcu_destroy_log();
-
-RCU_API int rcu_run_test_mach() {
-    rcu_test_machine *machine = &the_test_machine;
+int rcu_run_test_engine() {
+    struct rcu_test_engine *engine = &the_test_engine;
     char ts_buff[RCU_TSTAMP_BUFF_SIZE];
     rcu_init();
     rcu_get_timestamp(ts_buff, RCU_TSTAMP_BUFF_SIZE);
     RCU_LOG_INFO("Test run started %s", ts_buff);
-    RCU_SET_RUN_LEVEL(machine, RCU_RUN_LEVEL_MACH);
-    rcu_run_tests_impl(machine);
+    engine->run_level = RCU_RUN_LEVEL_ENGINE;
+    rcu_run_tests_impl(engine);
     rcu_get_timestamp(ts_buff, RCU_TSTAMP_BUFF_SIZE);
-    rcu_stop_mach(machine);
-    rcu_gen_test_run_report(machine);
+    rcu_stop_engine(engine);
+    rcu_gen_test_run_report(engine);
     RCU_LOG_INFO("Test run finished %s", ts_buff);
-    RCU_LOG_INFO("Test Run Results: Passed : %d  Failed : %d", machine->nr_succ_test, machine->nr_failed_test);
-    if (machine->nr_failed_reg == 0 && rcu_get_nr_tests() > 0) {
+    RCU_LOG_INFO("Test Run Results: Passed : %d  Failed : %d", engine->nr_succ_test, engine->nr_failed_test);
+    if (engine->nr_failed_reg == 0 && rcu_get_nr_tests() > 0) {
         RCU_LOG_INFO("Test successful!");
     } else {
         RCU_LOG_INFO("Test failed!");
     }
     rcu_destroy();
-    return machine->nr_failed_reg > 0 ? RCU_E_NG : RCU_E_OK;
+    return engine->nr_failed_reg > 0 ? RCU_E_NG : RCU_E_OK;
 }
 
-RCU_API int rcu_run_tests() {
-    return rcu_run_test_mach();
+int rcu_run_tests() {
+    return rcu_run_test_engine();
 }
 
-void rcu_print_rcunit_info() {
-    RCU_LOG_DEBUG("[ RCUNIT INFORMATION ]");
-    RCU_LOG_DEBUG("RCUNIT version is %s (Built last %s %s)", RCU_VERSION_STRING, __DATE__, __TIME__);
-#ifdef RCU_DEBUG
-    RCU_LOG_DEBUG("RCUNIT is running in debug mode");
-#else
-    RCU_LOG_DEBUG("RCUNIT is not running in debug mode");
-#endif
+static void rcu_print_rcunit_info() {
+    RCU_LOG_DEBUG("[ rcunit INFORMATION ]");
+    RCU_LOG_DEBUG("rcunit version is %s (Built last %s %s)", RCU_VERSION_STRING, __DATE__, __TIME__);
 
 #if RCU_ENABLE_MTRACE
     RCU_LOG_DEBUG("Memory leak checking is enabled");
@@ -83,26 +72,24 @@ void rcu_print_rcunit_info() {
     RCU_LOG_DEBUG("sizeof(rcu_long_long) is %zu bytes", sizeof(rcu_long_long));
     RCU_LOG_DEBUG("sizeof(rcu_long_double) is %zu bytes", sizeof(rcu_long_double));
     RCU_LOG_DEBUG("sizeof(void*) is %zu bytes", sizeof(void *));
-    RCU_LOG_DEBUG("[ RCUNIT INFORMATION END ]");
+    RCU_LOG_DEBUG("[ rcunit INFORMATION END ]");
 }
 
-RCU_API int rcu_init() {
-    rcu_test_machine *machine = &the_test_machine;
-    if (!rcu_is_mach_initialized(machine)) {
-        rcu_init_log();
-        RCU_LOG_DEBUG("Initializing RCUNIT");
+int rcu_init() {
+    struct rcu_test_engine *engine = &the_test_engine;
+    if (!rcu_is_engine_initialized(engine)) {
+        RCU_LOG_DEBUG("Initializing rcunit");
         rcu_print_rcunit_info();
-        rcu_init_test_mach(machine);
+        rcu_init_test_engine(engine);
     }
     return RCU_E_OK;
 }
 
-RCU_API int rcu_destroy() {
-    rcu_test_machine *machine = &the_test_machine;
-    RCU_LOG_DEBUG("Destroying RCUNIT");
-    if (rcu_is_mach_initialized(machine)) {
-        rcu_destroy_test_mach(machine);
-        rcu_destroy_log();
+int rcu_destroy() {
+    struct rcu_test_engine *engine = &the_test_engine;
+    RCU_LOG_DEBUG("Destroying rcunit");
+    if (rcu_is_engine_initialized(engine)) {
+        rcu_destroy_test_engine(engine);
     }
     return RCU_E_OK;
 }
@@ -113,20 +100,11 @@ int rcu_exit_hook(void *param) {
     return RCU_E_OK;
 }
 
-RCU_API int rcu_set_run_hook(rcu_generic_function run_hook) {
-    rcu_test_machine *machine = &the_test_machine;
+int rcu_set_run_hook(rcu_generic_function run_hook) {
+    struct rcu_test_engine *engine = &the_test_engine;
     rcu_init();
-    machine->run_hook = run_hook;
+    engine->run_hook = run_hook;
     RCU_LOG_DEBUG("Test run hook set");
     return RCU_E_OK;
 }
-
-int rcu_destroy_log() {
-    return RCU_E_OK;
-}
-
-int rcu_init_log() {
-    return RCU_E_OK;
-}
-
 

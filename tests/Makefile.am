@@ -6,13 +6,13 @@ rcunit_test_SOURCES = example_test.c testmoko.c testmoko_exception.c
 
 noinst_HEADERS = \
     rcunit_test.h \
-    rcunit_test_assertions.c \
-    rcunit_test_exceptions.c \
-    rcunit_test_framework.c \
-    rcunit_test_function.c \
-    rcunit_test_module.c \
-    rcunit_test_mtrace.c \
-    rcunit_test_registry.c \
+    rcunit_assertion_tests.c \
+    rcunit_exception_tests.c \
+    rcunit_framework_tests.c \
+    rcunit_function_tests.c \
+    rcunit_module_tests.c \
+    rcunit_mtrace_tests.c \
+    rcunit_registry_tests.c \
     testmoko.h \
     testmoko_exception.h
     

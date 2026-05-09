@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-#include <stdio.h>
-#include "rcunit.h"
+#include "rcunit_test.h"
 
-/* A buffer */
-typedef struct {
-    unsigned char *data;
-    size_t size;
-} buffer_t;
+static int invoked = 0;
 
-RCU_TEST(my_test) {
-    buffer_t *buff = NULL;
-    RCU_ASSERT_NULL(buff);
-    fprintf(stdout, "buffer data address = %p, size = %lu\n", buff->data, buff->size);
+RCU_RUN_HOOK(run_hook) {
+    int run_event;
+    run_event = RCU_GET_RUN_EVENT_TYPE(param);
+    if (run_event == RCU_TEST_RUN_STARTED) {
+        invoked++;
+    } else if (run_event == RCU_TEST_RUN_FINISHED) {
+        invoked++;
+    }
 }
 
-int main(int argc, char *argv[]) {
-    rcu_add_test(my_test);
-    return rcu_run_tests();
+TMK_TEST(rcu_test_run_hooks) {
+    rcu_set_run_hook(run_hook);
+    rcu_run_tests();
+    TMK_ASSERT_EQUAL(2, invoked);
 }
