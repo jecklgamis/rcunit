@@ -134,14 +134,13 @@ int rcu_dump_ptr_tble(struct rcu_pointer_table *ptr_tbl, const char *info) {
 int rcu_dump_ptr_cache(struct rcu_pointer_cache *ptr_cache) {
     struct rcu_list *cursor = NULL;
     struct rcu_pointer_table *ptr_tbl = NULL;
-    char tbl_name[16];
+    char tbl_name[32];
 
     RCU_LOG_INFO("[MTRACE POINTER CACHE DUMP]");
 
     RCU_FOR_EACH_ENTRY(&ptr_cache->ptr_tbl_list, cursor) {
         ptr_tbl = (struct rcu_pointer_table *) cursor;
-        memset(tbl_name, 0, 16);
-        sprintf(tbl_name, "%p", ptr_tbl);
+        snprintf(tbl_name, sizeof(tbl_name), "%p", ptr_tbl);
         rcu_dump_ptr_tble(ptr_tbl, tbl_name);
     }
     RCU_LOG_INFO("[MTRACE POINTER CACHE DUMP END]");

@@ -136,7 +136,7 @@ struct rcu_failure_record {
 /* Test function runtime data structure */
 struct rcu_test {
     struct rcu_list link;
-    char name[RCU_TEST_FUNCTION_NAME_LENGTH];
+    char name[RCU_TEST_FUNCTION_NAME_LENGTH + 1];
     rcu_generic_function entry;
     int run_stat;
     int init_failed;

@@ -51,15 +51,10 @@ int rcu_add_test_func(struct rcu_module *module, rcu_generic_function entry, con
         return RCU_E_NG;
     }
     rcu_init_list(&func->link);
-    char test_name[RCU_TEST_FUNCTION_NAME_LENGTH];
     if (!name) {
-        memset(test_name, 0, RCU_TEST_FUNCTION_NAME_LENGTH);
-        sprintf(test_name, "%p", entry);
-        strncpy(func->name, test_name, strlen(test_name));
+        snprintf(func->name, sizeof(func->name), "%p", entry);
     } else {
-        name_len = strlen(name) > RCU_TEST_FUNCTION_NAME_LENGTH ?
-                   RCU_TEST_FUNCTION_NAME_LENGTH : strlen(name);
-        strncpy(func->name, name, name_len);
+        snprintf(func->name, sizeof(func->name), "%s", name);
     }
     func->entry = entry;
     func->module = module;

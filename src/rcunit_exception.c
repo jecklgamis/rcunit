@@ -60,6 +60,9 @@ void rcu_destroy_exception() {
 }
 
 void rcu_sig_handler(int signo) {
+    if (!g_curr_excp_frame) {
+        return;
+    }
     switch (signo) {
         case SIGSEGV:
             g_curr_excp_frame->excp = rcu_lookup_excp_by_id(RCU_EXCP_SIGSEGV);

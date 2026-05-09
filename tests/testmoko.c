@@ -29,7 +29,7 @@ void tmk_log_impl(const char *filename, const int line_no, const char *format, .
     va_list ap;
     memset(local_log_buff, 0, TMK_LOG_BUFF_SIZE);
     va_start(ap, format);
-    vsprintf(local_log_buff, format, ap);
+    vsnprintf(local_log_buff, TMK_LOG_BUFF_SIZE, format, ap);
     va_end(ap);
     fprintf(stdout, "[TEST] %s\n", local_log_buff);
 }
@@ -39,7 +39,7 @@ void tmk_assert_impl(int cond, const char *filename, const char *func_name,
     va_list ap;
     memset(&assert_msg_buff[0], 0, TMK_LOG_BUFF_SIZE);
     va_start(ap, format);
-    vsprintf(assert_msg_buff, format, ap);
+    vsnprintf(assert_msg_buff, TMK_LOG_BUFF_SIZE, format, ap);
     va_end(ap);
     if (!cond) {
         TMK_LOG("Assertion failure in %s(%s:%d) : %s ", func_name,
