@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,7 @@
 
 #define RCU_DEBUG_EXCEPTION 0
 
-/*  The RCUNIT Exception Facility
+/*  The rcunit Exception Facility
  *  This is a simple implementation of an exception mechanism. The mechanism
  *  relies on the non-local jump routines ,setjmp and longjmp, and is
  *  primarily used for aborting test function execution (i.e. triggered by

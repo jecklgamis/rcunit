@@ -20,8 +20,6 @@ librcunit_a_SOURCES = \
     rcunit_report.c \
     rcunit_report_html.c \
     rcunit_report_plaintext.c \
-    rcunit_report_xml.c \
-    rcunit_report_json.c \
     rcunit_util.c \
     rcunit_thread.c
 

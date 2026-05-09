@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,8 +36,8 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
     rcu_init();
     engine = &the_test_engine;
 
-    func = RCU_GET_CURR_FUNC(engine);
-    module = RCU_GET_CURR_MODULE(engine);
+    func = RCU_GET_CURRENT_FUNC(engine);
+    module = RCU_GET_CURRENT_MODULE(engine);
     run_ctx = RCU_GET_RUN_CTX(engine);
 
     switch (run_ctx) {
@@ -80,7 +80,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
                 RCU_LOG_ERROR("Assert failed in %s (%s:%d) : %s", func_name,
                               filename, line_no, assert_msg_buff);
                 RCU_INCR(func->nr_fail_assert);
-                RCU_SET_RUN_STAT(func, RCU_RUN_STAT_TEST_FAILED);
+                func->run_stat = RCU_RUN_STAT_TEST_FAILED;
                 rcu_add_fail_rec_to_func(func, assert_msg_buff, filename, line_no);
                 RCU_SET_RUN_CTX(engine, RCU_RUN_CTX_UNKNOWN);
                 RCU_THROW(RCU_GET_EXCP(RCU_EXCP_ASSERTIONFAILURE));
@@ -123,7 +123,7 @@ RCU_API void rcu_dump_asserts() {
 }
 
 int rcu_restart_assert_engine(struct rcu_test_engine *engine) {
-    memset(&engine->ae, 0x00, sizeof(struct rcu_assertion_engine));
+    memset(&engine->ae, 0, sizeof(struct rcu_assertion_engine));
     RCU_LOG_DEBUG("Assertion engine restarted");
     return RCU_E_OK;
 }

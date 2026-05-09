@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -62,7 +62,7 @@ int retcode;
     fprintf(stdout,"sample_test_codes_6 : invoked!\n");
     /** Initialize the framework */
     if (rcu_init() == RCU_E_NG){
-        fprintf(stdout,"Unable to initialize RCUNIT framework\n");
+        fprintf(stdout,"Unable to initialize rcunit framework\n");
         return(-1);
     }
     RCU_TRY {

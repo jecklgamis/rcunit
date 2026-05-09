@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,6 +43,12 @@ RCU_API void rcu_set_module_fixture(struct rcu_module *module, rcu_generic_funct
     module->destroy = teardown;
 }
 
+RCU_API void rcu_set_module_fixture_all(struct rcu_module *module, rcu_generic_function setup,
+    rcu_generic_function teardown) {
+    module->init_all = setup;
+    module->destroy_all = teardown;
+}
+
 struct rcu_module *rcu_alloc_test_module(unsigned int nr_module) {
     struct rcu_module *module = NULL;
 
@@ -51,7 +57,7 @@ struct rcu_module *rcu_alloc_test_module(unsigned int nr_module) {
     }
     module = (struct rcu_module *) rcu_malloc(sizeof(struct rcu_module) * nr_module);
     if (module) {
-        memset(module, 0x00, sizeof(struct rcu_module));
+        memset(module, 0, sizeof(struct rcu_module));
     }
     return module;
 }
@@ -75,7 +81,7 @@ int rcu_init_module(struct rcu_module *module, rcu_generic_function init, rcu_ge
         RCU_LOG_WARN("%s (null)", RCU_GET_ERR_MSG_OF(RCU_E_INVMODNAME));
         return RCU_E_NG;
     }
-    memset(module, 0x00, sizeof(struct rcu_module));
+    memset(module, 0, sizeof(struct rcu_module));
     rcu_init_list(&module->link);
     rcu_init_list(&module->func_list);
     module->init = init;
@@ -92,12 +98,12 @@ struct rcu_module *rcu_create_test_module(const char *name, rcu_generic_function
     struct rcu_test_engine *engine = &the_test_engine;
     rcu_init();
     if ((!(module = rcu_alloc_test_module(1)))) {
-        RCU_SET_ERCD(RCU_E_NOMEM);
+        RCU_SET_ERROR_CODE(RCU_E_NOMEM);
         RCU_LOG_WARN("%s", RCU_GET_ERR_MSG());
         return NULL;
     }
     if (name && !strcmp(name, RCU_DEFAULT_MODULE_NAME)) {
-        RCU_SET_ERCD(RCU_E_INVMODNAME);
+        RCU_SET_ERROR_CODE(RCU_E_INVMODNAME);
         RCU_LOG_WARN("%s (%s is reserved)", RCU_GET_ERR_MSG(), RCU_DEFAULT_MODULE_NAME);
         rcu_free_test_module(module);
         return NULL;
@@ -117,7 +123,7 @@ RCU_API int rcu_destroy_test_module(struct rcu_module *module) {
     rcu_init();
     engine = &the_test_engine;
     if (!module) {
-        RCU_SET_ERCD(RCU_E_INVMOD);
+        RCU_SET_ERROR_CODE(RCU_E_INVMOD);
         RCU_LOG_WARN("%s (null)", RCU_GET_ERR_MSG());
         return RCU_E_NG;
     }
@@ -130,9 +136,7 @@ RCU_API int rcu_destroy_test_module(struct rcu_module *module) {
             rcu_free_test_func(func);
         RCU_RESTORE_CURSOR(cursor)
     }
-    /* Unlink this test module */
     rcu_remove_list(&module->link);
-    /* Do not deallocate default test module! */
     if (strcmp(module->name, RCU_DEFAULT_MODULE_NAME)) {
         RCU_LOG_DEBUG("Test module destroyed : %s", module->name);
         rcu_free_test_module(module);
@@ -159,7 +163,7 @@ struct rcu_test *rcu_search_test_func_by_name(struct rcu_module *module,
             return (func);
         }
     }
-    return (NULL);
+    return NULL;
 }
 
 RCU_API int rcu_run_test_module(struct rcu_module *module) {
@@ -174,7 +178,7 @@ RCU_API int rcu_run_test_module(struct rcu_module *module) {
     RCU_LOG_INFO("Test run started %s", ts_buff);
     rcu_restart_engine(engine);
     engine->run_level = RCU_RUN_LEVEL_MODULE;
-    RCU_SET_CURR_MODULE(engine, module);
+    RCU_SET_CURRENT_MODULE(engine, module);
     rcu_run_test_module_impl(engine, module);
     rcu_get_timestamp(ts_buff, RCU_TSTAMP_BUFF_SIZE);
     RCU_LOG_INFO("Test run finished %s", ts_buff);
@@ -193,7 +197,7 @@ RCU_API int rcu_run_test_module_by_name(const char *name) {
         module = rcu_search_module_by_name(&the_test_engine.def_reg, name);
     }
     if (!module) {
-        RCU_SET_ERCD(RCU_E_INVMOD);
+        RCU_SET_ERROR_CODE(RCU_E_INVMOD);
         RCU_LOG_WARN("%s (%s)", RCU_GET_ERR_MSG(), name);
         return RCU_E_NG;
     }
@@ -231,13 +235,13 @@ int rcu_run_test_module_impl(struct rcu_test_engine *engine, struct rcu_module *
         module->nr_failed_test = 0;
         module->nr_succ_test = 0;
     }
-    reg = RCU_GET_CURR_REG(engine);
+    reg = RCU_GET_CURRENT_REG(engine);
     RCU_LOG_DEBUG("Running tests from  module : %s", module->name);
-    if (module->init) {
+    if (module->init_all) {
         RCU_TRY
                 {
                     RCU_SET_RUN_CTX(engine, RCU_RUN_CTX_MODULE_INIT);
-                    module->init(NULL);
+                    module->init_all(NULL);
                 }
 
             RCU_CATCH(e)
@@ -262,21 +266,22 @@ int rcu_run_test_module_impl(struct rcu_test_engine *engine, struct rcu_module *
          *  status to failed even if the test actually succeeded.
          */
         if (RCU_IS_INIT_FAILED(func) || RCU_IS_DESTROY_FAILED(func)) {
-            RCU_SET_RUN_STAT(func, RCU_RUN_STAT_TEST_FAILED);
+            func->run_stat = RCU_RUN_STAT_TEST_FAILED;
             RCU_INCR(module->nr_failed_test);
         } else {
-            if (RCU_IS_TEST_FAILED(func)) {
+            if (func->run_stat == RCU_RUN_STAT_TEST_FAILED) {
                 RCU_INCR(module->nr_failed_test);
             } else {
                 RCU_INCR(module->nr_succ_test);
             }
         }
     }
-    if (module->destroy) {
+
+    if (module->destroy_all) {
         RCU_SET_RUN_CTX(engine, RCU_RUN_CTX_MODULE_DESTROY);
         RCU_TRY
                 {
-                    module->destroy(NULL);
+                    module->destroy_all(NULL);
                 }
 
             RCU_CATCH(e)
@@ -309,9 +314,9 @@ int rcu_run_test_module_impl(struct rcu_test_engine *engine, struct rcu_module *
 
     /* the module will be marked failed if at least a test failed */
     if (module->nr_failed_test == 0) {
-        RCU_SET_RUN_STAT(module, RCU_RUN_STAT_TEST_SUCC);
+        module->run_stat = RCU_RUN_STAT_TEST_SUCC;
     } else {
-        RCU_SET_RUN_STAT(module, RCU_RUN_STAT_TEST_FAILED);
+        module->run_stat = RCU_RUN_STAT_TEST_FAILED;
     }
 
     /* Increment the total number of failed test */

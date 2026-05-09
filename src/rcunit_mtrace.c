@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -140,7 +140,7 @@ int rcu_dump_ptr_cache(struct rcu_pointer_cache *ptr_cache) {
 
     RCU_FOR_EACH_ENTRY(&ptr_cache->ptr_tbl_list, cursor) {
         ptr_tbl = (struct rcu_pointer_table *) cursor;
-        memset(tbl_name, 0x00, 16);
+        memset(tbl_name, 0, 16);
         sprintf(tbl_name, "%p", ptr_tbl);
         rcu_dump_ptr_tble(ptr_tbl, tbl_name);
     }

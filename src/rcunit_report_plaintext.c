@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,8 +31,8 @@ int rcu_gen_plaintext_report(struct rcu_test_engine *engine) {
     char ts_buff[RCU_TSTAMP_BUFF_SIZE];
     rcu_get_timestamp(ts_buff, RCU_TSTAMP_BUFF_SIZE);
     FILE *fp = NULL;
-    const char *title = "RCUNIT Test Run Report";
-    const char *sub_title = "http://github.com/jecklgamis/rcunit";
+    const char *title = "rcunit Test Run Report";
+    const char *sub_title = "https://github.com/jecklgamis/rcunit";
 
     RCU_LOG_DEBUG("Generating test run report : %s", RCU_TEST_RUN_REPORT_FILENAME_PLAINTEXT);
     if ((!(fp = fopen(RCU_TEST_RUN_REPORT_FILENAME_PLAINTEXT, "wt")))) {
@@ -66,7 +66,7 @@ int rcu_gen_plaintext_report(struct rcu_test_engine *engine) {
                     func->name,
                     rcu_get_stat_str(func->run_stat));
             if (func->nr_succ_assert == 0 && func->nr_fail_assert == 0
-                && RCU_IS_TEST_SUCCEDED(func)) {
+                && func->run_stat == RCU_RUN_STAT_TEST_SUCC) {
                 rcu_indent(fp, 12);
                 fprintf(fp, "[failure = No assertions executed!]\n");
             }
@@ -90,7 +90,7 @@ int rcu_gen_plaintext_report(struct rcu_test_engine *engine) {
 
     rcu_get_timestamp(ts_buff, RCU_TSTAMP_BUFF_SIZE);
     fprintf(fp, "\n%s%s\n", RCU_LINE_MARKER_1, RCU_LINE_MARKER_1);
-    fprintf(fp, "Generated last %s by RCUNIT version %s.\n\n", ts_buff, RCU_VERSION_STRING);
+    fprintf(fp, "Generated last %s by rcunit version %s.\n\n", ts_buff, RCU_VERSION_STRING);
 
     if (fp) {
         fclose(fp);

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,13 +38,11 @@ const char *g_error_msg_tbl[] = {
         /* RCU_E_MODNOINIT     */, "Module not initialized"
         /* RCU_E_INVMOD        */, "Invalid module"
         /* RCU_E_INVMODNAME    */, "Invalid module name"
-        /* RCU_E_INVMODTABLE   */, "Invalid module table"
         /* RCU_E_UNKNOWNMOD    */, "Unknown module"
         /* RCU_E_MODEXISTS     */, "Module exists"
         /* RCU_E_FUNCNOINIT    */, "Function not initialized"
         /* RCU_E_INVFUNCNAME   */, "Invalid function name"
         /* RCU_E_INVFUNC       */, "Invalid function"
-        /* RCU_E_INVFUNCTABLE  */, "Invalid function table"
         /* RCU_E_FUNCEXISTS    */, "Function exists"
         /* RCU_E_INVFUNCENTRY  */, "Invalid function entry point"
 };

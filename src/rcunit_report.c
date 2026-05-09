@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,8 +19,6 @@
 extern int rcu_gen_html_report(struct rcu_test_engine *engine);
 
 extern int rcu_gen_plaintext_report(struct rcu_test_engine *engine);
-
-extern int rcu_gen_xml_report(struct rcu_test_engine *engine);
 
 const char *rcu_get_stat_str(int stat) {
     switch (stat) {
@@ -45,18 +43,18 @@ void rcu_prepare_report(struct rcu_test_engine *engine) {
 
         RCU_FOR_EACH_ENTRY_WITH_CURSOR_INDEX(&module->func_list, func_cursor, func_no) {
             struct rcu_test *func = (struct rcu_test *) func_cursor;
-            if (RCU_IS_TEST_SUCCEDED(func)) {
+            if (func->run_stat == RCU_RUN_STAT_TEST_SUCC) {
                 RCU_INCR(module->nr_succ_test);
-            } else if (RCU_IS_TEST_FAILED(func)) {
+            } else if (func->run_stat == RCU_RUN_STAT_TEST_FAILED) {
                 RCU_INCR(module->nr_failed_test);
             } else {
                 RCU_LOG_WARN("Test with unknown test result : %s", func->name);
             }
         }
-        if (RCU_IS_TEST_SUCCEDED(module)) {
+        if (module->run_stat == RCU_RUN_STAT_TEST_SUCC) {
             RCU_INCR(reg->nr_succ_module);
         }
-        if (RCU_IS_TEST_FAILED(module)) {
+        if (module->run_stat == RCU_RUN_STAT_TEST_FAILED) {
             RCU_INCR(reg->nr_failed_module);
         }
         RCU_INCR_BY(reg->nr_succ_test, module->nr_succ_test);

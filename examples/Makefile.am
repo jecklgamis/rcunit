@@ -2,7 +2,6 @@
 
 noinst_PROGRAMS = rcunit_example_app_simple \
                   rcunit_example_app_module \
-                  rcunit_example_app_function_table \
                   rcunit_example_app_exception \
                   rcunit_example_app_signal \
                   rcunit_example_app_run_hook \
@@ -10,7 +9,6 @@ noinst_PROGRAMS = rcunit_example_app_simple \
 
 rcunit_example_app_simple_SOURCES = rcunit_example_app_simple.c
 rcunit_example_app_module_SOURCES = rcunit_example_app_module.c
-rcunit_example_app_function_table_SOURCES = rcunit_example_app_function_table.c
 rcunit_example_app_exception_SOURCES = rcunit_example_app_exception.c
 rcunit_example_app_signal_SOURCES = rcunit_example_app_signal.c
 rcunit_example_app_run_hook_SOURCES = rcunit_example_app_run_hook.c

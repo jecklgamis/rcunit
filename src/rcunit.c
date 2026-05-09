@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,9 +16,7 @@
 
 #include "rcunit.h"
 
-/* The test engine */
 struct rcu_test_engine the_test_engine;
-
 
 extern struct rcu_test *rcu_search_test_func_by_name(struct rcu_module *module, const char *name);
 
@@ -54,13 +52,8 @@ RCU_API int rcu_run_tests() {
 }
 
 void rcu_print_rcunit_info() {
-    RCU_LOG_DEBUG("[ RCUNIT INFORMATION ]");
-    RCU_LOG_DEBUG("RCUNIT version is %s (Built last %s %s)", RCU_VERSION_STRING, __DATE__, __TIME__);
-#ifdef RCU_DEBUG
-    RCU_LOG_DEBUG("RCUNIT is running in debug mode");
-#else
-    RCU_LOG_DEBUG("RCUNIT is not running in debug mode");
-#endif
+    RCU_LOG_DEBUG("[ rcunit INFORMATION ]");
+    RCU_LOG_DEBUG("rcunit version is %s (Built last %s %s)", RCU_VERSION_STRING, __DATE__, __TIME__);
 
 #if RCU_ENABLE_MTRACE
     RCU_LOG_DEBUG("Memory leak checking is enabled");
@@ -80,13 +73,13 @@ void rcu_print_rcunit_info() {
     RCU_LOG_DEBUG("sizeof(rcu_long_long) is %zu bytes", sizeof(rcu_long_long));
     RCU_LOG_DEBUG("sizeof(rcu_long_double) is %zu bytes", sizeof(rcu_long_double));
     RCU_LOG_DEBUG("sizeof(void*) is %zu bytes", sizeof(void *));
-    RCU_LOG_DEBUG("[ RCUNIT INFORMATION END ]");
+    RCU_LOG_DEBUG("[ rcunit INFORMATION END ]");
 }
 
 RCU_API int rcu_init() {
     struct rcu_test_engine *engine = &the_test_engine;
     if (!rcu_is_engine_initialized(engine)) {
-        RCU_LOG_DEBUG("Initializing RCUNIT");
+        RCU_LOG_DEBUG("Initializing rcunit");
         rcu_print_rcunit_info();
         rcu_init_test_engine(engine);
     }
@@ -95,7 +88,7 @@ RCU_API int rcu_init() {
 
 RCU_API int rcu_destroy() {
     struct rcu_test_engine *engine = &the_test_engine;
-    RCU_LOG_DEBUG("Destroying RCUNIT");
+    RCU_LOG_DEBUG("Destroying rcunit");
     if (rcu_is_engine_initialized(engine)) {
         rcu_destroy_test_engine(engine);
     }

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,7 @@
 int rcu_init_test_engine(struct rcu_test_engine *engine) {
     if (engine) {
         RCU_LOG_DEBUG("Initializing test engine");
-        memset(engine, 0x00, sizeof(struct rcu_test_engine));
+        memset(engine, 0, sizeof(struct rcu_test_engine));
         rcu_init_list(&engine->ae.assert_list);
         engine->name = RCU_DEFAULT_ENGINE_NAME;
         engine->init_done = 1;
@@ -91,7 +91,7 @@ int rcu_run_tests_impl(struct rcu_test_engine *engine) {
             engine->run_hook(&run_event);
         }
         RCU_LOG_DEBUG("Running test engine : %s", engine->name);
-        RCU_SET_CURR_REG(engine, &engine->def_reg);
+        RCU_SET_CURRENT_REG(engine, &engine->def_reg);
         rcu_run_test_reg_impl(engine, &engine->def_reg);
         if (engine->run_hook) {
             run_event = RCU_TEST_RUN_FINISHED;

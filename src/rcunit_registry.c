@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -49,7 +49,7 @@ RCU_API int rcu_add_test_module(struct rcu_module *module) {
 RCU_API int rcu_add_module_to_reg(struct rcu_registry *reg, struct rcu_module *module) {
     rcu_init();
     if (!module) {
-        RCU_SET_ERCD(RCU_E_INVMOD);
+        RCU_SET_ERROR_CODE(RCU_E_INVMOD);
         RCU_LOG_WARN("%s (null)", RCU_GET_ERR_MSG());
         return RCU_E_NG;
     }
@@ -59,45 +59,6 @@ RCU_API int rcu_add_module_to_reg(struct rcu_registry *reg, struct rcu_module *m
     RCU_INCR(reg->nr_module);
     rcu_init_list(&module->fail_rec_list);
     RCU_LOG_DEBUG("%s added to %s", module->name, reg->name);
-    return RCU_E_OK;
-}
-
-RCU_API int rcu_add_test_module_tbl(struct rcu_registry *reg, struct rcu_module_entry *mod_tbl) {
-    struct rcu_module_entry *cursor = NULL;
-    struct rcu_module *module = NULL;
-    int mod_index;
-    int ercd;
-
-    rcu_init();
-    RCU_LOG_DEBUG("Adding test module table");
-    if (!mod_tbl) {
-        RCU_SET_ERCD(RCU_E_INVMODTABLE);
-        RCU_LOG_WARN("%s (null)", RCU_GET_ERR_MSG());
-        return RCU_E_NG;
-    }
-
-    RCU_FOR_EACH_MODULE_ENTRY(mod_tbl, cursor, mod_index) {
-        if (!cursor->func_tbl) {
-            RCU_LOG_WARN("Invalid test function table (index = %d)", mod_index);
-            continue;
-        }
-        module = rcu_create_test_module(cursor->name, cursor->init, cursor->destroy);
-        if (!module) {
-            RCU_LOG_WARN("Unable to create test module. (index = %d)", mod_index);
-            continue;
-        }
-        ercd = rcu_add_module_to_reg(reg, module);
-        if (ercd == RCU_E_NG) {
-            RCU_LOG_WARN("Unable to add test module. (index = %d)", mod_index);
-            rcu_destroy_test_module(module);
-            continue;
-        }
-        ercd = rcu_add_test_func_tbl(module, cursor->func_tbl);
-        if (ercd == RCU_E_NG) {
-            RCU_LOG_WARN("Unable to add test function table. (index = %d)", mod_index);
-        }
-    }
-    RCU_LOG_DEBUG("Test module table added");
     return RCU_E_OK;
 }
 
@@ -146,7 +107,7 @@ int rcu_run_test_reg_impl(struct rcu_test_engine *engine, struct rcu_registry *r
     struct rcu_test *func;
 
     reg = (!reg) ? &engine->def_reg : reg;
-    if (engine->run_level == RCU_RUN_LEVEL_REG) {
+    if (engine->run_level == RCU_RUN_LEVEL_REGISTRY) {
         if (engine->run_hook) {
             run_event = RCU_TEST_RUN_STARTED;
             engine->run_hook(&run_event);
@@ -162,27 +123,26 @@ int rcu_run_test_reg_impl(struct rcu_test_engine *engine, struct rcu_registry *r
 
     RCU_FOR_EACH_ENTRY(&reg->mod_list, cursor2) {
         module = (struct rcu_module *) cursor2;
-        RCU_SET_CURR_MODULE(engine, module);
+        RCU_SET_CURRENT_MODULE(engine, module);
         rcu_run_test_module_impl(engine, module);
         if (RCU_IS_INIT_FAILED(module) || RCU_IS_DESTROY_FAILED(module)) {
-            RCU_SET_RUN_STAT(module, RCU_RUN_STAT_TEST_FAILED);
-
+            module->run_stat = RCU_RUN_STAT_TEST_FAILED;
             RCU_FOR_EACH_ENTRY(&module->func_list, cursor3) {
                 func = (struct rcu_test *) cursor3;
-                RCU_SET_RUN_STAT(func, RCU_RUN_STAT_TEST_FAILED);
-                RCU_RESET(func->nr_fail_assert);
-                RCU_RESET(func->nr_succ_assert);
+                func->run_stat = RCU_RUN_STAT_TEST_FAILED;
+                func->nr_fail_assert = 0;
+                func->nr_succ_assert = 0;
                 rcu_del_all_fail_rec_from_func(func);
             }
         } else {
-            if (RCU_IS_TEST_FAILED(module)) {
+            if (module->run_stat == RCU_RUN_STAT_TEST_FAILED) {
                 RCU_INCR(reg->nr_failed_module);
             } else {
                 RCU_INCR(reg->nr_succ_module);
             }
         }
     }
-    if (engine->run_level == RCU_RUN_LEVEL_REG) {
+    if (engine->run_level == RCU_RUN_LEVEL_REGISTRY) {
         if (engine->run_hook) {
             run_event = RCU_TEST_RUN_FINISHED;
             engine->run_hook(&run_event);

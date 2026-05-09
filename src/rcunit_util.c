@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,18 +28,18 @@ int rcu_get_timestamp(char *ts_buff, int ts_buff_len) {
         RCU_LOG_WARN("Null timestamp buffer or insufficient buffer length");
         return RCU_E_NG;
     }
-    memset(ts_buff, 0x00, ts_buff_len);
+    memset(ts_buff, 0, ts_buff_len);
     time(&t);
     sprintf(ts_buff, "%s", ctime(&t));
     len = strlen(ts_buff);
-    memset(&ts_buff[len - 1], 0x00, 1);
+    memset(&ts_buff[len - 1], 0, 1);
     return RCU_E_OK;
 }
 
-void rcu_dump_test_dbase_impl(struct rcu_test_engine *engine) {
+void rcu_dump_test_registry_impl(struct rcu_test_engine *engine) {
     if (engine) {
         if (!rcu_is_engine_initialized(engine)) {
-            RCU_SET_ERCD(RCU_E_ENGNOINIT);
+            RCU_SET_ERROR_CODE(RCU_E_ENGNOINIT);
             RCU_LOG_WARN("%s", RCU_GET_ERR_MSG());
         }
         RCU_LOG_INFO("+- Test Entity Database");
@@ -47,9 +47,9 @@ void rcu_dump_test_dbase_impl(struct rcu_test_engine *engine) {
     }
 }
 
-RCU_API void rcu_dump_test_dbase() {
+RCU_API void rcu_dump_test_registry() {
     rcu_init();
-    rcu_dump_test_dbase_impl(&the_test_engine);
+    rcu_dump_test_registry_impl(&the_test_engine);
 }
 
 int rcu_get_nr_tests() {

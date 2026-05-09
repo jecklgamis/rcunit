@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,13 +24,13 @@
 #define RCU_NULLABLE
 
 /* Test engine name */
-#define RCU_DEFAULT_ENGINE_NAME  "default-engine"
+#define RCU_DEFAULT_ENGINE_NAME  "default"
 
 /* Default test registry name  */
-#define RCU_DEFAULT_REGISTRY_NAME "default-reg"
+#define RCU_DEFAULT_REGISTRY_NAME "default"
 
 /* Default test module name  */
-#define RCU_DEFAULT_MODULE_NAME   "default-module"
+#define RCU_DEFAULT_MODULE_NAME   "default"
 
 /* Timestamp buffer size */
 #define RCU_TSTAMP_BUFF_SIZE 32
@@ -63,9 +63,6 @@
 /* Destroy handler failed status */
 #define RCU_RUN_STAT_DESTROY_FAILED   8
 
-/* Sets explicit run status */
-#define RCU_SET_RUN_STAT(func_or_module, stat) \
-    (func_or_module)->run_stat = (stat);
 
 #define RCU_SET_INIT_FAILED(func_or_module) \
     (func_or_module)->init_failed = (RCU_TRUE);
@@ -77,13 +74,6 @@
 #define RCU_IS_NOT_TESTED(func_or_module) \
     ((func_or_module)->run_stat == RCU_RUN_STAT_NOTTESTED)
 
-/* Returns true if the test run succeeded */
-#define RCU_IS_TEST_SUCCEDED(func_or_module) \
-    ((func_or_module)->run_stat == RCU_RUN_STAT_TEST_SUCC)
-
-/* Returns true if the test run failed */
-#define RCU_IS_TEST_FAILED(func_or_module) \
-    ((func_or_module)->run_stat == RCU_RUN_STAT_TEST_FAILED)
 
 /* Returns true if the init function failed */
 #define RCU_IS_INIT_FAILED(func_or_module) \
@@ -108,32 +98,9 @@
 #define RCU_HAS_NO_ASSERTS(func) \
     ((func)->nr_succ_assert == 0 && (func)->nr_fail_assert == 0 && !RCU_ABORTED((func)))
 
-/* WARNING:
- *  1. Do not change the order of the fields of the RCU_TEST_FUNCTION_ENTRY
- *     and RCU_TEST_MODULE_ENTRY structures. Some macros rely on the order
- *     of these fields.
- *  2. Do not move the position of the "link" fields.
- */
-
 #define RCU_TEST_FUNCTION_NAME_LENGTH 255
 #define RCU_TEST_MODULE_NAME_LENGTH 255
 #define RCU_TEST_REGISTRY_NAME_LENGTH 255
-
-/* Test function table entry */
-struct rcu_test_function_entry {
-    const char *name;
-    rcu_generic_function entry;
-    rcu_generic_function init;
-    rcu_generic_function destroy;
-};
-
-/* Test module table entry */
-struct rcu_module_entry {
-    const char *name;
-    rcu_generic_function init;
-    rcu_generic_function destroy;
-    struct rcu_test_function_entry *func_tbl;
-};
 
 /* Test registry runtime data structure */
 struct rcu_registry {
@@ -150,8 +117,10 @@ struct rcu_registry {
 /* Test module runtime data structure */
 struct rcu_module {
     struct rcu_list link;
-    rcu_generic_function init;
-    rcu_generic_function destroy;
+    rcu_generic_function init;      /* Executed before each test */
+    rcu_generic_function destroy;   /* Executed after each test */
+    rcu_generic_function init_all;  /* Executed before all tests */
+    rcu_generic_function destroy_all; /* Executed all tests */
     struct rcu_list func_list;
     char name[RCU_TEST_MODULE_NAME_LENGTH + 1];
     int nr_test;
@@ -174,39 +143,38 @@ struct rcu_test {
     struct rcu_list link;
     char name[RCU_TEST_FUNCTION_NAME_LENGTH];
     rcu_generic_function entry;
-    rcu_generic_function init;
-    rcu_generic_function destroy;
     int run_stat;
     int init_failed;
     int destroy_failed;
     int nr_fail_assert;
     int nr_succ_assert;
     struct rcu_list fail_rec_list;
+    struct rcu_module *module;
 };
 
 /*  Sets the currently executing test function */
-#define RCU_SET_CURR_FUNC(engine, func) \
-    (engine)->ae.curr_func = func;
+#define RCU_SET_CURRENT_FUNC(engine, func) \
+    (engine)->ae.current_func = func;
 
 /* Sets the currently executing test module */
-#define RCU_SET_CURR_MODULE(engine, module) \
-    (engine)->ae.curr_module = module;
+#define RCU_SET_CURRENT_MODULE(engine, module) \
+    (engine)->ae.current_module = module;
 
 /* Sets the currently executing test registry */
-#define RCU_SET_CURR_REG(engine, reg)   \
-    (engine)->ae.curr_reg = reg;
+#define RCU_SET_CURRENT_REG(engine, reg)   \
+    (engine)->ae.current_reg = reg;
 
 /* Gets the currently executing test function */
-#define RCU_GET_CURR_FUNC(engine)  \
-    (engine->ae.curr_func)
+#define RCU_GET_CURRENT_FUNC(engine)  \
+    (engine->ae.current_func)
 
 /* Gets the currently executing test module */
-#define RCU_GET_CURR_MODULE(engine)  \
-    (engine->ae.curr_module)
+#define RCU_GET_CURRENT_MODULE(engine)  \
+    (engine->ae.current_module)
 
 /* Gets the currently executing test registry  */
-#define RCU_GET_CURR_REG(engine)  \
-    (engine->ae.curr_reg)
+#define RCU_GET_CURRENT_REG(engine)  \
+    (engine->ae.current_reg)
 
 /* Gets the currently executing test engine */
 #define RCU_THE_TEST_ENGINE (&the_test_engine)
@@ -218,7 +186,7 @@ struct rcu_test {
 #define RCU_RUN_LEVEL_ENGINE   0
 
 /* Test registry run level */
-#define RCU_RUN_LEVEL_REG    1
+#define RCU_RUN_LEVEL_REGISTRY    1
 
 /* Test module run level */
 #define RCU_RUN_LEVEL_MODULE    2
@@ -226,9 +194,9 @@ struct rcu_test {
 
 /* Assertion engine runtime data structure */
 struct rcu_assertion_engine {
-    struct rcu_registry *curr_reg;
-    struct rcu_module *curr_module;
-    struct rcu_test *curr_func;
+    struct rcu_registry *current_reg;
+    struct rcu_module *current_module;
+    struct rcu_test *current_func;
     struct rcu_list assert_list;
     rcu_generic_function assert_hook;
 };
@@ -309,7 +277,7 @@ void rcu_print_rcunit_info();
 struct rcu_module *rcu_create_test_module(const char *name, rcu_generic_function init,
                              rcu_generic_function destroy);
 
-/* Other RCUNIT header files */
+/* Other rcunit header files */
 #include "rcunit_helpers.h"
 #include "rcunit_error.h"
 #include "rcunit_assert.h"

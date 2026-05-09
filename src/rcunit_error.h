@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,7 @@
 #ifndef RCUNIT_ERROR_H
 #define RCUNIT_ERROR_H
 
-/* The RCUNIT error codes */
+/* The rcunit error codes */
 enum {
     RCU_E_OK = 0,
     RCU_E_NG,
@@ -38,19 +38,17 @@ enum {
     RCU_E_MODNOINIT,
     RCU_E_INVMOD,
     RCU_E_INVMODNAME,
-    RCU_E_INVMODTABLE,
     RCU_E_UNKNOWNMOD,
     RCU_E_MODEXISTS,
     RCU_E_FUNCNOINIT,
     RCU_E_INVFUNCNAME,
     RCU_E_INVFUNC,
-    RCU_E_INVFUNCTABLE,
     RCU_E_FUNCEXISTS,
     RCU_E_INVFUNCENTRY
 };
 
 /* Sets the error code of the last operation that failed */
-#define RCU_SET_ERCD(ercd) { g_ercd = ercd; }
+#define RCU_SET_ERROR_CODE(ercd) { g_ercd = ercd; }
 
 /* Retrieves the error string of the last error code */
 #define RCU_GET_ERR_MSG() \

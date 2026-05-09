@@ -1,27 +1,17 @@
 /*
- * The MIT License (MIT)
- *
- * RCUNIT - A unit testing framework for C
  * Copyright 2013 Jerrico Gamis <jecklgamis@gmail.com>
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #include "rcunit_test.h"
@@ -37,60 +27,55 @@ RCU_SETUP(setup) {
 RCU_TEARDOWN(teardown) {
 }
 
-#include "rcunit_test_framework.c"
-#include "rcunit_test_registry.c"
-#include "rcunit_test_module.c"
-#include "rcunit_test_function.c"
-#include "rcunit_test_assertions.c"
-#include "rcunit_test_mtrace.c"
-#include "rcunit_test_exceptions.c"
+#include "rcunit_framework_tests.c"
+#include "rcunit_registry_tests.c"
+#include "rcunit_module_tests.c"
+#include "rcunit_function_tests.c"
+#include "rcunit_assertion_tests.c"
+#include "rcunit_mtrace_tests.c"
+#include "rcunit_exception_tests.c"
 
 TMK_TEST_FUNCTION_TABLE_START(test_function_table)
 /* test registry */
-                TMK_INCLUDE_TEST(rcu_test_get_default_reg)
+    TMK_INCLUDE_TEST(rcu_test_get_default_reg)
 
 /* test module */
-                TMK_INCLUDE_TEST(rcu_test_get_module)
-                TMK_INCLUDE_TEST(rcu_test_get_default_module)
-                TMK_INCLUDE_TEST(rcu_test_get_default_module_by_name)
-                TMK_INCLUDE_TEST(rcu_test_create_default_module)
-                TMK_INCLUDE_TEST(rcu_test_module_fixture_invocation)
-                TMK_INCLUDE_TEST(rcu_test_create_multiple_mods)
-                TMK_INCLUDE_TEST(rcu_test_create_and_destroy_module)
-                TMK_INCLUDE_TEST(rcu_test_add_module_tbl)
-                TMK_INCLUDE_TEST(rcu_test_add_null_module_tbl)
-                TMK_INCLUDE_TEST(rcu_test_module_on_null_reg)
-                TMK_INCLUDE_TEST(rcu_test_run_module)
+    TMK_INCLUDE_TEST(rcu_test_get_module)
+    TMK_INCLUDE_TEST(rcu_test_get_default_module)
+    TMK_INCLUDE_TEST(rcu_test_get_default_module_by_name)
+    TMK_INCLUDE_TEST(rcu_test_create_default_module)
+    TMK_INCLUDE_TEST(rcu_test_module_fixture_invocation)
+    TMK_INCLUDE_TEST(rcu_test_create_multiple_mods)
+    TMK_INCLUDE_TEST(rcu_test_create_and_destroy_module)
+    TMK_INCLUDE_TEST(rcu_test_run_module)
 //TMK_INCLUDE_TEST(rcu_test_run_module_by_name)
 //TMK_INCLUDE_TEST(rcu_test_run_module_by_unknown_name)
 
 /* test function */
-                TMK_INCLUDE_TEST(rcu_test_add_test)
-                TMK_INCLUDE_TEST(rcu_test_add_test_fixture)
-                TMK_INCLUDE_TEST(rcu_test_add_test_to_module)
-                TMK_INCLUDE_TEST(rcu_test_add_test_fixture_to_module)
-                TMK_INCLUDE_TEST(rcu_test_add_test_to_default_module)
-                TMK_INCLUDE_TEST(rcu_test_add_test_func_tbl)
+    TMK_INCLUDE_TEST(rcu_test_add_test)
+    TMK_INCLUDE_TEST(rcu_test_add_test_to_module)
+    TMK_INCLUDE_TEST(rcu_test_add_test_to_default_module)
+    TMK_INCLUDE_TEST(rcu_test_add_test_fixture_to_module)
 
 /* run hooks */
-                TMK_INCLUDE_TEST(rcu_test_run_hooks)
+    TMK_INCLUDE_TEST(rcu_test_run_hooks)
 
 /* assertion macro tests */
-                TMK_INCLUDE_TEST(rcu_test_assert_single_evaluation)
-                TMK_INCLUDE_TEST(rcu_test_bit_assertions)
-                TMK_INCLUDE_TEST(rcu_test_byte_assertions)
-                TMK_INCLUDE_TEST(rcu_test_float_assertions)
-                TMK_INCLUDE_TEST(rcu_test_pointer_assertions)
+    TMK_INCLUDE_TEST(rcu_test_assert_single_evaluation)
+    TMK_INCLUDE_TEST(rcu_test_bit_assertions)
+    TMK_INCLUDE_TEST(rcu_test_byte_assertions)
+    TMK_INCLUDE_TEST(rcu_test_float_assertions)
+    TMK_INCLUDE_TEST(rcu_test_pointer_assertions)
 
 /* memory allocation tracing tests */
-                TMK_INCLUDE_TEST(rcu_test_mtrace)
+    TMK_INCLUDE_TEST(rcu_test_mtrace)
 
 /* exception tests */
-                TMK_INCLUDE_TEST(rcu_test_exception_handling)
-                TMK_INCLUDE_TEST(rcu_test_exception_catch_sigfpe)
-                TMK_INCLUDE_TEST(rcu_test_exception_catch_sigill)
-                TMK_INCLUDE_TEST(rcu_test_exception_catch_sigsev)
-                TMK_INCLUDE_TEST(rcu_test_exception_catch_sigbus)
+    TMK_INCLUDE_TEST(rcu_test_exception_handling)
+    TMK_INCLUDE_TEST(rcu_test_exception_catch_sigfpe)
+    TMK_INCLUDE_TEST(rcu_test_exception_catch_sigill)
+    TMK_INCLUDE_TEST(rcu_test_exception_catch_sigsev)
+    TMK_INCLUDE_TEST(rcu_test_exception_catch_sigbus)
 
 TMK_TEST_FUNCTION_TABLE_END
 

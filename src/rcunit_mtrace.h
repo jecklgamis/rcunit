@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,7 @@
 #ifndef RCUNIT_MTRACE_H
 #define RCUNIT_MTRACE_H
 
-/* The RCUNIT Memory Tracing Facility
+/* The rcunit Memory Tracing Facility
  *  This is a simple pointer caching mechanism. Fundamentally, allocated
  *  pointers are cached (recorded) and uncached on deallocations. Any left
  *  pointers in the cache are considered leaks. Thus if a user assumes that
@@ -96,7 +96,7 @@ extern struct rcu_pointer_cache g_ptr_cache_2;
 #define RCU_CHECK_MEMORY_LEAK \
     rcu_check_mem_leak_impl(__FILE__, __func__, __LINE__, &g_ptr_cache_2);
 
-/* These are used internally by RCUNIT */
+/* These are used internally by rcunit */
 
 /* Traces the allocation of the given pointer and size */
 #define RCU_TRACE_ALLOC_INTERNAL(ptr, size) \
