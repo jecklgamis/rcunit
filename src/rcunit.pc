@@ -5,6 +5,6 @@ includedir=${prefix}/include
 
 Name: rcunit
 Description: Unit testing framework for C programs
-Version: 2.0.0-rc1
+Version: 2.0.0-rcX
 Libs: -L${libdir} -lrcunit
 Cflags: -I${includedir}
