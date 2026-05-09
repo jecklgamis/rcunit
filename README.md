@@ -1,5 +1,7 @@
 # rcunit
 
+[![Build](https://github.com/jecklgamis/rcunit/actions/workflows/build.yaml/badge.svg)](https://github.com/jecklgamis/rcunit/actions/workflows/build.yaml)
+
 rcunit is a small framework for testing C programs. It uses non-local jumps to
 emulate exceptions and handles program-terminating signals (e.g. SIGSEGV,
 SIGILL) during test runs. rcunit supports test fixtures per test module, and is free to use under the
