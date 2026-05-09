@@ -49,8 +49,20 @@ TMK_TEST(rcu_test_add_test_to_default_module) {
 }
 
 TMK_TEST(rcu_test_add_test_fixture_to_default_module) {
+    rcu_add_test_to_module(rcu_get_default_module(), test);
     rcu_set_module_fixture(rcu_get_default_module(), setup, teardown);
     TMK_ASSERT_EQUAL(1, rcu_get_nr_tests());
     TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
+}
+
+TMK_TEST(rcu_test_add_null_test) {
+    TMK_ASSERT_EQUAL(RCU_E_NG, rcu_add_test(NULL));
+    TMK_ASSERT_EQUAL(0, rcu_get_nr_tests());
+}
+
+TMK_TEST(rcu_test_add_duplicate_test) {
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test(test));
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test(test));
+    TMK_ASSERT_EQUAL(2, rcu_get_nr_tests());
 }
 

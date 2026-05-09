@@ -16,8 +16,6 @@
 
 #include "rcunit.h"
 
-extern int rcu_gen_html_report(struct rcu_test_engine *engine);
-
 extern int rcu_gen_plaintext_report(struct rcu_test_engine *engine);
 
 const char *rcu_get_stat_str(int stat) {

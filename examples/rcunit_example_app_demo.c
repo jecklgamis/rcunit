@@ -41,11 +41,20 @@ RCU_FIXTURE(module_teardown_after_all) {
     puts("module_teardown_after_all");
 }
 
+RCU_RUN_HOOK(run_hook) {
+    int run_event = RCU_GET_RUN_EVENT_TYPE(param);
+    if (run_event == RCU_TEST_RUN_STARTED) {
+        puts("Test started");
+    } else if (run_event == RCU_TEST_RUN_FINISHED) {
+        puts("Test finished");
+    }
+}
 int main(int argc, char **argv) {
     RCU_ADD_TEST("default", test_func_1)
     RCU_ADD_TEST("default", test_func_2)
     RCU_SET_MODULE_FIXTURES("default", module_setup, module_teardown)
     RCU_SET_MODULE_FIXTURES_ALL("default", module_setup_before_all, module_teardown_after_all)
     rcu_dump_test_registry();
+    rcu_set_run_hook(run_hook);
     return rcu_run_tests();
 }

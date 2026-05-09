@@ -18,10 +18,7 @@
 #define RCUNIT_REPORT_H
 
 /* Run report file names */
-#define RCU_TEST_RUN_REPORT_FILENAME_HTML      "rcunit_test_run_report.html"
 #define RCU_TEST_RUN_REPORT_FILENAME_PLAINTEXT "rcunit_test_run_report.txt"
-#define RCU_TEST_RUN_REPORT_FILENAME_XML       "rcunit_test_run_report.xml"
-#define RCU_TEST_RUN_REPORT_FILENAME_JSON      "rcunit_test_run_report.json"
 
 #if 0
 /* Temporary report buffer size */

@@ -34,7 +34,7 @@ RCU_API int rcu_add_test_fixture(rcu_generic_function test, rcu_generic_function
 
 RCU_API int rcu_add_test_fixture_to_module(struct rcu_module *module, rcu_generic_function test,
                                     rcu_generic_function setup, rcu_generic_function teardown) {
-    return rcu_add_test_func(rcu_get_default_module(), test, setup, teardown, NULL);
+    return rcu_add_test_func(module, test, setup, teardown, NULL);
 }
 
 RCU_API int rcu_add_test_func(struct rcu_module *module, rcu_generic_function entry, rcu_generic_function init,

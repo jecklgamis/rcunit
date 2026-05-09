@@ -52,7 +52,7 @@ RCU_FIXTURE(mod_teardown) {
 
 /* Verify that the module's setup function is invoked */
 TMK_TEST(rcu_test_module_fixture_invocation) {
-    RCU_DEF_TEST_MODULE(module = rcu_get_module("m1"));
+    struct rcu_module *module = rcu_get_module("m1");
     TMK_ASSERT_NOT_NULL(module);
     TMK_ASSERT_EQUAL(2, rcu_get_nr_mods())
     rcu_set_module_fixture_all(module, mod_setup, mod_teardown);
@@ -68,7 +68,7 @@ TMK_TEST(rcu_test_create_multiple_mods) {
 }
 
 TMK_TEST(rcu_test_create_and_destroy_module) {
-    RCU_DEF_TEST_MODULE(m1)
+    struct rcu_module *m1;
     TMK_ASSERT_NOT_NULL(m1 = rcu_create_test_module("m1", NULL, NULL));
     TMK_ASSERT_EQUAL(RCU_E_OK, rcu_add_test_module(m1));
     TMK_ASSERT_EQUAL(2, rcu_get_nr_mods())
@@ -78,19 +78,19 @@ TMK_TEST(rcu_test_create_and_destroy_module) {
 }
 
 TMK_TEST(rcu_test_run_module) {
-    RCU_DEF_TEST_MODULE(m1)
+    struct rcu_module *m1;
     TMK_ASSERT_NOT_NULL(m1 = rcu_get_module("m1"));
     TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_test_module(m1));
 }
 
 TMK_TEST(rcu_test_run_module_by_name) {
-    RCU_DEF_TEST_MODULE(m1)
+    struct rcu_module *m1;
     TMK_ASSERT_NOT_NULL(m1 = rcu_get_module("m1"));
     TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_test_module_by_name("m1"));
 }
 
 TMK_TEST(rcu_test_run_module_by_unknown_name) {
-    RCU_DEF_TEST_MODULE(m1)
+    struct rcu_module *m1;
     TMK_ASSERT_NOT_NULL(m1 = rcu_get_module("m1"));
     TMK_ASSERT_EQUAL(RCU_E_NG, rcu_run_test_module_by_name("unknown_module_name"));
 }

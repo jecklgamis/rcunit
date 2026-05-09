@@ -1,10 +1,10 @@
-# rcunit User Guide
+# RCUNIT User Guide
 
 **Jerrico Gamis** <jecklgamis@gmail.com>
 
 ## Introduction
 
-rcunit is a small framework for testing C programs. It uses non-local jumps to
+RCUNIT is a small framework for testing C programs. It uses non-local jumps to
 emulate exceptions and handles program-terminating signals (e.g. SIGILL) during
 test runs. rcunit allows creation of test fixtures, either per test or per test
 group. rcunit is free, you can use it under the terms of the
@@ -20,13 +20,6 @@ knowledge of the internal structure of the system under test.
 White box testing, also called structural testing, is used for testing different
 execution paths. This type of testing can find implementation problems of the
 functional requirements.
-
-### Test Fixture
-
-A [test fixture](https://en.wikipedia.org/wiki/Test_fixture), also called test
-context, is a fixed state or environment in which tests are run. In an
-[xUnit](https://en.wikipedia.org/wiki/XUnit) framework, this is typically
-configured in a `setup` function and destroyed in a `teardown` function.
 
 ### Test Suite
 
@@ -75,31 +68,6 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-### Writing a Test With Setup and Teardown
-
-A test can have associated setup and teardown functions that run before and
-after the test, respectively.
-
-```c
-#include <stdio.h>
-#include "rcunit.h"
-
-RCU_TEST(test_func) {
-    RCU_ASSERT(1);
-}
-
-RCU_FIXTURE(setup) {
-}
-
-RCU_FIXTURE(teardown) {
-}
-
-int main(int argc, char *argv[]) {
-    RCU_SET_MODULE_FIXTURES("some-module", setup, teardown);
-    return rcu_run_tests();
-}
-```
-
 ### Using Assertion Macros
 
 Assertion macros assert specific conditions within a test or fixture. An
@@ -121,10 +89,10 @@ A test always belongs to a module. `RCU_ADD_TEST` adds to a named module,
 creating it if needed:
 
 ```c
-RCU_ADD_TEST(test_module, test_func);
+RCU_ADD_TEST("some-module", test_func);
 ```
 
-### Writing a Test Module With Setup and Teardown
+### Writing Test Module With Setup and Teardown
 
 A module can have setup and teardown functions that run before and after all
 tests within that module.
@@ -134,32 +102,27 @@ tests within that module.
 #include "rcunit.h"
 
 RCU_TEST(test_func) {
-    RCU_ASSERT(1);
 }
 
-RCU_FIXTURE(mod_setup) {
+RCU_FIXTURE(setup) {
 }
 
-RCU_FIXTURE(mod_teardown) {
+RCU_FIXTURE(teardown) {
+}
+
+RCU_FIXTURE(setup_all) {
+}
+
+RCU_FIXTURE(teardown_all) {
 }
 
 int main(int argc, char *argv[]) {
-    struct rcu_module *mod = rcu_get_module("module");
-    rcu_set_module_fixture(mod, mod_setup, mod_teardown);
-    rcu_add_test_to_module(mod, test_func);
+    RCU_SET_MODULE_FIXTURES("some-module", setup, teardown);
+    RCU_ADD_TEST("some-module", test_func);
+    RCU_SET_MODULE_FIXTURES_ALL("some-module", setup_all, teardown_all);
     return rcu_run_tests();
 }
 ```
-
-#### Setup and Teardown Execution Sequence
-
-When both a module and a test have fixture functions, the execution order is:
-
-1. Run module setup
-2. Run test setup
-3. Run test
-4. Run test teardown
-5. Run module teardown
 
 ### Writing a Test Run Hook
 
@@ -170,7 +133,7 @@ Test run hooks are callbacks invoked before and after the full test run.
 #include "rcunit.h"
 
 RCU_RUN_HOOK(run_hook) {
-    int run_event = RCU_GET_RUN_EVT_TYPE(param);
+    int run_event = RCU_GET_RUN_EVENT_TYPE(param);
     if (run_event == RCU_TEST_RUN_STARTED) {
         puts("Test started");
     } else if (run_event == RCU_TEST_RUN_FINISHED) {
@@ -186,32 +149,23 @@ int main(int argc, char *argv[]) {
 
 ### Test Reports
 
-rcunit generates a test run report in plain text format: `rcunit_test_run_report.txt`.
+`rcunit` generates a test run report in plain text format: `rcunit_test_run_report.txt`.
 
 ---
 
 ## rcunit APIs
 
-### API Functions
+### API
 
 ```c
-/* Test function APIs */
-int rcu_add_test(rcu_generic_function test);
-int rcu_add_test_to_module(struct rcu_module *module, rcu_generic_function test);
-int rcu_add_test_fixture(rcu_generic_function test, rcu_generic_function setup,
-        rcu_generic_function teardown);
-int rcu_add_test_fixture_to_module(struct rcu_module *module, rcu_generic_function test,
-        rcu_generic_function setup, rcu_generic_function teardown);
+RCU_ADD_TEST("module", func)                       
+RCU_SET_MODULE_FIXTURES(module, setup, teardown)    
+RCU_SET_MODULE_FIXTURES_ALL(module, setup, teardown) 
+```
 
-/* Test module APIs */
-struct rcu_module *rcu_get_module(const char *name);
-struct rcu_module *rcu_get_default_module();
-void rcu_set_module_fixture(struct rcu_module *module, rcu_generic_function setup,
-        rcu_generic_function teardown);
-
-/* Main APIs */
-int rcu_init();
-int rcu_destroy();
+```c
+int rcu_init();                                    
+int rcu_destroy();                                 
 int rcu_run_tests();
 void rcu_dump_test_registry();
 int rcu_set_run_hook(rcu_generic_function hook);
@@ -220,7 +174,7 @@ int rcu_set_run_hook(rcu_generic_function hook);
 ### Helper Macros
 
 ```c
-RCU_ADD_TEST("module", func)                        /* register a test in a named module */
+
 RCU_ADD_TEST_F("module", func, setup, teardown)     /* register a test with fixtures */
 RCU_TEST(name) { ... }                            /* define a test function */
 RCU_FIXTURE(name) { ... }       /* define a setup or teardown function */

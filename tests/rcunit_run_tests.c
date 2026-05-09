@@ -1,254 +1,91 @@
 /*
-#if 0
-f0 - has no assertion statements
-f1 - has no assertion failures
-f2 - with non-fatal assertion failures
-f3 - with fatal assertion failures
-f4 - init failed (with non-fatal or fatal with assertion failures)
-f5 - destroy failed (with non-fatal and fatal assertion failures)
-f6-f15 - has no assertion failures
-#endif
+ * Copyright 2013 Jerrico Gamis <jecklgamis@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-#if 0
-m0 : no assertions
-     no init
-     no destroy
-m1:
-    test functions - OK
-    init           - OK
-    destroy        - OK
-m2:
-    test functions - NG
-        -> with non-fatal assertion failures
-        -> with fatal assertion failures
-    init           - OK
-    destroy        - OK
-m3:
-    test functions - OK
-    init           - NG (with non-fatal or fatal assertion failures)
-    destroy        - OK
+#include "rcunit_test.h"
 
-m4:
-    test functions - OK
-    init           - OK
-    destroy        - NG (with non-fatal or fatal assertion failures)
-
-m5: test functions - OK
-    init           - OK
-    destroy        - OK
-    registered as disabled
-
-*/
-
-//f0
-RCU_DEF_TEST_FUNC(user_f0,param){
-}
-
-RCU_DEF_INIT_FUNC(user_f0_init,param){
-}
-
-RCU_DEF_DESTROY_FUNC(user_f0_destroy,param){
-}
-
-//f1
-RCU_DEF_TEST_FUNC(user_f1,param){
+RCU_TEST(passing_func) {
     RCU_ASSERT(RCU_TRUE);
 }
 
-RCU_DEF_INIT_FUNC(user_f1_init,param){
+RCU_TEST(empty_func) {
+    /* no assertions */
 }
 
-RCU_DEF_DESTROY_FUNC(user_f1_destroy,param){
+RCU_TEST(non_fatal_failing_func) {
+    RCU_FAIL("intentional failure");
 }
 
-//f2
-RCU_DEF_TEST_FUNC(user_f2,param){
-    RCU_FAIL("user_f2");
+RCU_TEST(assert_false_func) {
+    RCU_ASSERT(RCU_FALSE);
 }
 
-RCU_DEF_INIT_FUNC(user_f2_init,param){
+static int fixture_call_order[3];
+static int fixture_call_idx = 0;
+
+RCU_FIXTURE(ordered_setup) {
+    fixture_call_order[fixture_call_idx++] = 1;
 }
 
-RCU_DEF_DESTROY_FUNC(user_f2_destroy,param){
-}
-//f3
-RCU_DEF_TEST_FUNC(user_f3,param){
-    RCU_FAIL_FATAL("user_f3");
-}
-
-RCU_DEF_INIT_FUNC(user_f3_init,param){
-}
-
-RCU_DEF_DESTROY_FUNC(user_f3_destroy,param){
-}
-
-//f4
-RCU_DEF_TEST_FUNC(user_f4,param){
+RCU_TEST(ordered_func) {
+    fixture_call_order[fixture_call_idx++] = 2;
     RCU_ASSERT(RCU_TRUE);
 }
 
-RCU_DEF_INIT_FUNC(user_f4_init,param){
-    RCU_FAIL("user_f4_init");
+RCU_FIXTURE(ordered_teardown) {
+    fixture_call_order[fixture_call_idx++] = 3;
 }
 
-RCU_DEF_DESTROY_FUNC(user_f4_destroy,param){
+RCU_FIXTURE(failing_init) {
+    RCU_FAIL("intentional module init failure");
 }
 
-//f5
-RCU_DEF_TEST_FUNC(user_f5,param){
-    RCU_ASSERT(RCU_TRUE);
+TMK_TEST(rcu_test_passing_run) {
+    rcu_add_test(passing_func);
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
 }
 
-RCU_DEF_INIT_FUNC(user_f5_init,param){
+TMK_TEST(rcu_test_no_assertions_fails) {
+    rcu_add_test(empty_func);
+    TMK_ASSERT_EQUAL(RCU_E_NG, rcu_run_tests());
 }
 
-RCU_DEF_DESTROY_FUNC(user_f5_destroy,param){
-    RCU_FAIL("user_f5_destroy");
+TMK_TEST(rcu_test_non_fatal_failure) {
+    rcu_add_test(non_fatal_failing_func);
+    TMK_ASSERT_EQUAL(RCU_E_NG, rcu_run_tests());
 }
 
-RCU_DEF_TEST_FUNC(user_f100,param){RCU_ASSERT(RCU_TRUE);}
-RCU_DEF_TEST_FUNC(user_f101,param){RCU_ASSERT(RCU_TRUE);}
-RCU_DEF_TEST_FUNC(user_f102,param){RCU_ASSERT(RCU_TRUE);}
-RCU_DEF_TEST_FUNC(user_f103,param){RCU_ASSERT(RCU_TRUE);}
-RCU_DEF_TEST_FUNC(user_f104,param){RCU_ASSERT(RCU_TRUE);}
-RCU_DEF_TEST_FUNC(user_f105,param){RCU_ASSERT(RCU_TRUE);}
-RCU_DEF_TEST_FUNC(user_f106,param){RCU_ASSERT(RCU_TRUE);}
-RCU_DEF_TEST_FUNC(user_f107,param){RCU_ASSERT(RCU_TRUE);}
-RCU_DEF_TEST_FUNC(user_f108,param){RCU_ASSERT(RCU_TRUE);}
-RCU_DEF_TEST_FUNC(user_f109,param){RCU_ASSERT(RCU_TRUE);}
-RCU_DEF_TEST_FUNC(user_f110,param){RCU_ASSERT(RCU_TRUE);}
-RCU_DEF_TEST_FUNC(user_f111,param){RCU_ASSERT(RCU_TRUE);}
-RCU_DEF_TEST_FUNC(user_f112,param){RCU_ASSERT(RCU_TRUE);}
-RCU_DEF_TEST_FUNC(user_f113,param){RCU_ASSERT(RCU_TRUE);}
-RCU_DEF_TEST_FUNC(user_f114,param){RCU_ASSERT(RCU_TRUE);}
-RCU_DEF_TEST_FUNC(user_f115,param){RCU_ASSERT(RCU_TRUE);}
-
-RCU_DEF_TEST_FUNC(user_f200,param){RCU_ASSERT(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f201,param){RCU_ASSERT(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f202,param){RCU_ASSERT(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f203,param){RCU_ASSERT(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f204,param){RCU_ASSERT(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f205,param){RCU_ASSERT(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f206,param){RCU_ASSERT(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f207,param){RCU_ASSERT(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f208,param){RCU_ASSERT(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f209,param){RCU_ASSERT(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f210,param){RCU_ASSERT(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f211,param){RCU_ASSERT(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f212,param){RCU_ASSERT(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f213,param){RCU_ASSERT(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f214,param){RCU_ASSERT(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f215,param){RCU_ASSERT(RCU_FALSE);}
-
-RCU_DEF_TEST_FUNC(user_f300,param){RCU_ASSERT_FATAL(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f301,param){RCU_ASSERT_FATAL(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f302,param){RCU_ASSERT_FATAL(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f303,param){RCU_ASSERT_FATAL(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f304,param){RCU_ASSERT_FATAL(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f305,param){RCU_ASSERT_FATAL(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f306,param){RCU_ASSERT_FATAL(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f307,param){RCU_ASSERT_FATAL(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f308,param){RCU_ASSERT_FATAL(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f309,param){RCU_ASSERT_FATAL(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f310,param){RCU_ASSERT_FATAL(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f311,param){RCU_ASSERT_FATAL(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f312,param){RCU_ASSERT_FATAL(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f313,param){RCU_ASSERT_FATAL(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f314,param){RCU_ASSERT_FATAL(RCU_FALSE);}
-RCU_DEF_TEST_FUNC(user_f315,param){RCU_ASSERT_FATAL(RCU_FALSE);}
-
-RCU_DEF_INIT_FUNC(user_m1_init,param){
+TMK_TEST(rcu_test_assert_false_fails) {
+    rcu_add_test(assert_false_func);
+    TMK_ASSERT_EQUAL(RCU_E_NG, rcu_run_tests());
 }
 
-RCU_DEF_INIT_FUNC(user_m1_destroy,param){
+TMK_TEST(rcu_test_fixture_invocation_order) {
+    fixture_call_idx = 0;
+    struct rcu_module *mod = rcu_get_module("ordered_mod");
+    rcu_set_module_fixture(mod, ordered_setup, ordered_teardown);
+    rcu_add_test_to_module(mod, ordered_func);
+    TMK_ASSERT_EQUAL(RCU_E_OK, rcu_run_tests());
+    TMK_ASSERT_EQUAL(1, fixture_call_order[0]);
+    TMK_ASSERT_EQUAL(2, fixture_call_order[1]);
+    TMK_ASSERT_EQUAL(3, fixture_call_order[2]);
 }
 
-RCU_DEF_INIT_FUNC(user_m2_init,param){
+TMK_TEST(rcu_test_module_init_failure) {
+    struct rcu_module *mod = rcu_get_module("failing_init_mod");
+    rcu_set_module_fixture(mod, failing_init, NULL);
+    rcu_add_test_to_module(mod, passing_func);
+    TMK_ASSERT_EQUAL(RCU_E_NG, rcu_run_tests());
 }
-
-RCU_DEF_INIT_FUNC(user_m2_destroy,param){
-}
-
-RCU_DEF_INIT_FUNC(user_m3_init,param){
-    RCU_FAIL("user_m3_init");
-}
-
-RCU_DEF_INIT_FUNC(user_m3_destroy,param){
-}
-
-RCU_DEF_INIT_FUNC(user_m4_init,param){
-}
-
-RCU_DEF_INIT_FUNC(user_m4_destroy,param){
-    RCU_FAIL("user_m4_destroy");
-}
-
-RCU_DEF_INIT_FUNC(user_m5_init,param){
-}
-
-RCU_DEF_INIT_FUNC(user_m5_destroy,param){
-}
-
-//Test entity tables
-RCU_DEF_FUNC_TBL(user_ftbl0)
-RCU_DEF_FUNC_TBL_END
-
-//This contains successful test functions
-RCU_DEF_FUNC_TBL(user_ftbl1)
-    RCU_INC_FUNC_AUTONAME(user_f100,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f101,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f102,RCU_NULL,RCU_NULL,RCU_TRUE)
-RCU_DEF_FUNC_TBL_END
-
-//This contains failed test functions (all types)
-RCU_DEF_FUNC_TBL(user_ftbl2)
-    RCU_INC_FUNC_AUTONAME(user_f0,user_f0_init,user_f0_destroy,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f1,user_f1_init,user_f1_destroy,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f2,user_f2_init,user_f2_destroy,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f3,user_f3_init,user_f3_destroy,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f4,user_f4_init,user_f4_destroy,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f5,user_f5_init,user_f5_destroy,RCU_TRUE)
-RCU_DEF_FUNC_TBL_END
-
-RCU_DEF_FUNC_TBL(user_ftbl3)
-    RCU_INC_FUNC_AUTONAME(user_f103,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f104,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f105,RCU_NULL,RCU_NULL,RCU_TRUE)
-RCU_DEF_FUNC_TBL_END
-
-RCU_DEF_FUNC_TBL(user_ftbl4)
-    RCU_INC_FUNC_AUTONAME(user_f106,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f107,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f108,RCU_NULL,RCU_NULL,RCU_TRUE)
-RCU_DEF_FUNC_TBL_END
-
-RCU_DEF_FUNC_TBL(user_ftbl5)
-    RCU_INC_FUNC_AUTONAME(user_f109,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f110,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f111,RCU_NULL,RCU_NULL,RCU_TRUE)
-RCU_DEF_FUNC_TBL_END
-
-//This is for the default test module
-RCU_DEF_FUNC_TBL(user_ftbl6)
-    RCU_INC_FUNC_AUTONAME(user_f112,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f113,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f114,RCU_NULL,RCU_NULL,RCU_FALSE)
-    RCU_INC_FUNC_AUTONAME(user_f200,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f201,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f202,RCU_NULL,RCU_NULL,RCU_FALSE)
-    RCU_INC_FUNC_AUTONAME(user_f300,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f301,RCU_NULL,RCU_NULL,RCU_TRUE)
-    RCU_INC_FUNC_AUTONAME(user_f302,RCU_NULL,RCU_NULL,RCU_FALSE)
-
-RCU_DEF_FUNC_TBL_END
-
-RCU_DEF_MODULE_TBL(user_mtbl1)
-    RCU_INC_MODULE("m0",RCU_NULL,RCU_NULL,user_ftbl0,RCU_TRUE)
-    RCU_INC_MODULE("m1",user_m1_init,user_m1_destroy,user_ftbl1,RCU_TRUE)
-    RCU_INC_MODULE("m2",user_m2_init,user_m2_destroy,user_ftbl2,RCU_TRUE)
-    RCU_INC_MODULE("m3",user_m3_init,user_m3_destroy,user_ftbl3,RCU_TRUE)
-    RCU_INC_MODULE("m4",user_m4_init,user_m4_destroy,user_ftbl4,RCU_TRUE)
-    RCU_INC_MODULE("m5",user_m4_init,user_m4_destroy,user_ftbl5,RCU_FALSE)
-RCU_DEF_MODULE_TBL_END
-
-

@@ -18,9 +18,9 @@
 
 static int invoked = 0;
 
-RCU_DEF_GENERIC_FUNC(run_hook) {
+RCU_RUN_HOOK(run_hook) {
     int run_event;
-    run_event = RCU_GET_RUN_EVT_TYPE(param);
+    run_event = RCU_GET_RUN_EVENT_TYPE(param);
     if (run_event == RCU_TEST_RUN_STARTED) {
         invoked++;
     } else if (run_event == RCU_TEST_RUN_FINISHED) {

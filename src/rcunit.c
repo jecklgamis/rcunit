@@ -51,7 +51,7 @@ RCU_API int rcu_run_tests() {
     return rcu_run_test_engine();
 }
 
-void rcu_print_rcunit_info() {
+static void rcu_print_rcunit_info() {
     RCU_LOG_DEBUG("[ rcunit INFORMATION ]");
     RCU_LOG_DEBUG("rcunit version is %s (Built last %s %s)", RCU_VERSION_STRING, __DATE__, __TIME__);
 

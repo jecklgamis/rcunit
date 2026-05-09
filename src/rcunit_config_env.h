@@ -86,7 +86,7 @@
 #define PACKAGE_NAME "rcunit"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "rcunit 1.0-beta"
+#define PACKAGE_STRING "rcunit 2.0.0-rcX"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "rcunit"

@@ -18,7 +18,7 @@
 
 RCU_RUN_HOOK(run_hook) {
     int run_event;
-    run_event = RCU_GET_RUN_EVT_TYPE(param);
+    run_event = RCU_GET_RUN_EVENT_TYPE(param);
     if (run_event == RCU_TEST_RUN_STARTED) {
         puts("Test started");
     } else if (run_event == RCU_TEST_RUN_FINISHED) {

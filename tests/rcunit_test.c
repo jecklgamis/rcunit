@@ -31,6 +31,7 @@ RCU_FIXTURE(teardown) {
 #include "rcunit_registry_tests.c"
 #include "rcunit_module_tests.c"
 #include "rcunit_function_tests.c"
+#include "rcunit_run_tests.c"
 #include "rcunit_assertion_tests.c"
 #include "rcunit_mtrace_tests.c"
 #include "rcunit_exception_tests.c"
@@ -48,14 +49,25 @@ TMK_TEST_FUNCTION_TABLE_START(test_function_table)
     TMK_INCLUDE_TEST(rcu_test_create_multiple_mods)
     TMK_INCLUDE_TEST(rcu_test_create_and_destroy_module)
     TMK_INCLUDE_TEST(rcu_test_run_module)
-//TMK_INCLUDE_TEST(rcu_test_run_module_by_name)
-//TMK_INCLUDE_TEST(rcu_test_run_module_by_unknown_name)
+    TMK_INCLUDE_TEST(rcu_test_run_module_by_name)
+    TMK_INCLUDE_TEST(rcu_test_run_module_by_unknown_name)
 
 /* test function */
     TMK_INCLUDE_TEST(rcu_test_add_test)
     TMK_INCLUDE_TEST(rcu_test_add_test_to_module)
     TMK_INCLUDE_TEST(rcu_test_add_test_to_default_module)
     TMK_INCLUDE_TEST(rcu_test_add_test_fixture_to_module)
+    TMK_INCLUDE_TEST(rcu_test_add_test_fixture_to_default_module)
+    TMK_INCLUDE_TEST(rcu_test_add_null_test)
+    TMK_INCLUDE_TEST(rcu_test_add_duplicate_test)
+
+/* test run scenarios */
+    TMK_INCLUDE_TEST(rcu_test_passing_run)
+    TMK_INCLUDE_TEST(rcu_test_no_assertions_fails)
+    TMK_INCLUDE_TEST(rcu_test_non_fatal_failure)
+    TMK_INCLUDE_TEST(rcu_test_assert_false_fails)
+    TMK_INCLUDE_TEST(rcu_test_fixture_invocation_order)
+    TMK_INCLUDE_TEST(rcu_test_module_init_failure)
 
 /* run hooks */
     TMK_INCLUDE_TEST(rcu_test_run_hooks)
