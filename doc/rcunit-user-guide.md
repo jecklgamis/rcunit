@@ -139,11 +139,36 @@ int main(int argc, char *argv[]) {
 
 ### Test Reports
 
-rcunit generates plain-text, JSON, and HTML test run reports:
+Each test run writes plain-text, JSON, and HTML reports to the process current
+working directory:
 
 - `rcunit_test_run_report.txt`
 - `rcunit_test_run_report.json`
 - `rcunit_test_run_report.html`
+
+The plain-text report is the compact human-readable summary. The JSON report is
+intended for tools and CI jobs. It includes `generated_at`, `rcunit_version`,
+engine summary fields, registry summary fields, modules, tests, assertion
+counts, fixture failure flags, and failure records. The HTML report presents the
+same run data in a local browser view, with summary metrics, module results, test
+results, assertion counts, fixture status, and failures.
+
+Assertion failures printed to the terminal include a path relative to the
+current working directory:
+
+```text
+[ERROR] Assert failed in test_func_2 (examples/rcunit_example_app_demo.c:25) : RCU_FALSE
+```
+
+When tests run from a subdirectory, the path is relative to that subdirectory.
+
+Example report generation log:
+
+```text
+[INFO]  Test run report generated : rcunit_test_run_report.txt
+[INFO]  Test run report generated : rcunit_test_run_report.json
+[INFO]  Test run report generated : rcunit_test_run_report.html
+```
 
 ---
 
@@ -274,6 +299,8 @@ Example output:
 [INFO]  Test run started Sun Feb 10 20:22:32 2013
 [ERROR] Caught segmentation violation in my_test
 [INFO]  Test run report generated : rcunit_test_run_report.txt
+[INFO]  Test run report generated : rcunit_test_run_report.json
+[INFO]  Test run report generated : rcunit_test_run_report.html
 [INFO]  Test run finished Sun Feb 10 20:22:32 2013
 [INFO]  Test Run Results: Passed : 0  Failed : 1
 [INFO]  Test failed!

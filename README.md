@@ -34,3 +34,13 @@ headers in `/usr/local/include`. To change the install prefix:
 ```sh
 make check
 ```
+
+Test runs generate plain-text, JSON, and HTML reports in the process current
+working directory:
+
+- `rcunit_test_run_report.txt`
+- `rcunit_test_run_report.json`
+- `rcunit_test_run_report.html`
+
+The JSON report is suitable for tools and CI jobs. The HTML report provides a
+local browser view of module, test, assertion, fixture, and failure details.
