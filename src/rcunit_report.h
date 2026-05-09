@@ -19,6 +19,8 @@
 
 /* Run report file names */
 #define RCU_TEST_RUN_REPORT_FILENAME_PLAINTEXT "rcunit_test_run_report.txt"
+#define RCU_TEST_RUN_REPORT_FILENAME_JSON "rcunit_test_run_report.json"
+#define RCU_TEST_RUN_REPORT_FILENAME_HTML "rcunit_test_run_report.html"
 
 #if 0
 /* Temporary report buffer size */
@@ -61,4 +63,3 @@ const char *rcu_get_stat_str(int stat);
 #endif
 
 #endif /* RCUNIT_REPORT_H */
-

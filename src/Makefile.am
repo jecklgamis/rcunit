@@ -21,6 +21,8 @@ librcunit_a_SOURCES = \
     rcunit_assert.c \
     rcunit_mtrace.c \
     rcunit_report.c \
+    rcunit_report_html.c \
+    rcunit_report_json.c \
     rcunit_report_plaintext.c \
     rcunit_util.c \
     rcunit_thread.c

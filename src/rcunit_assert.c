@@ -16,9 +16,85 @@
  */
 
 #include "rcunit.h"
+#include <unistd.h>
 
 #define RCU_TEMP_BUFF_SIZE 1024
+#define RCU_FILE_PATH_BUFF_SIZE 2048
 static char g_temp_buff[RCU_TEMP_BUFF_SIZE];
+
+static int rcu_format_file_path(char *buff, size_t buff_len, const char *filename, int line_no) {
+    char cwd[RCU_FILE_PATH_BUFF_SIZE];
+    char filepath[RCU_FILE_PATH_BUFF_SIZE];
+    char relpath[RCU_FILE_PATH_BUFF_SIZE];
+    const char *path = filename;
+    int nr_written;
+
+    if (!buff || buff_len == 0 || !filename) {
+        return RCU_E_NG;
+    }
+
+    if (filename[0] != '/') {
+        if (!getcwd(cwd, sizeof(cwd))) {
+            return RCU_E_NG;
+        }
+        while (path[0] == '.' && path[1] == '/') {
+            path += 2;
+        }
+
+        nr_written = snprintf(filepath, sizeof(filepath), "%s/%s", cwd, path);
+        if (nr_written < 0 || (size_t) nr_written >= sizeof(filepath)) {
+            return RCU_E_NG;
+        }
+        if (access(filepath, F_OK) != 0) {
+            const char *source_dirs[] = {"examples", "tests", "src"};
+            unsigned int a;
+
+            for (a = 0; a < sizeof(source_dirs) / sizeof(source_dirs[0]); a++) {
+                nr_written = snprintf(filepath, sizeof(filepath), "%s/%s/%s", cwd, source_dirs[a], path);
+                if (nr_written < 0 || (size_t) nr_written >= sizeof(filepath)) {
+                    return RCU_E_NG;
+                }
+                if (access(filepath, F_OK) == 0) {
+                    nr_written = snprintf(relpath, sizeof(relpath), "%s/%s", source_dirs[a], path);
+                    if (nr_written < 0 || (size_t) nr_written >= sizeof(relpath)) {
+                        return RCU_E_NG;
+                    }
+                    path = relpath;
+                    break;
+                }
+            }
+        }
+        nr_written = snprintf(buff, buff_len, "%s:%d", path, line_no);
+    } else {
+        nr_written = snprintf(buff, buff_len, "%s:%d", path, line_no);
+    }
+
+    if (nr_written < 0 || (size_t) nr_written >= buff_len) {
+        return RCU_E_NG;
+    }
+    return RCU_E_OK;
+}
+
+static void rcu_log_assert_failure(const char *func_name, const char *filename, int line_no,
+                                   const char *assert_msg) {
+    char file_path[RCU_FILE_PATH_BUFF_SIZE];
+
+    if (rcu_format_file_path(file_path, sizeof(file_path), filename, line_no) == RCU_E_OK) {
+        RCU_LOG_ERROR("Assert failed in %s (%s) : %s", func_name, file_path, assert_msg);
+    } else {
+        RCU_LOG_ERROR("Assert failed in %s (%s:%d) : %s", func_name, filename, line_no, assert_msg);
+    }
+}
+
+static void rcu_log_non_test_assert_failure(const char *func_name, const char *filename, int line_no) {
+    char file_path[RCU_FILE_PATH_BUFF_SIZE];
+
+    if (rcu_format_file_path(file_path, sizeof(file_path), filename, line_no) == RCU_E_OK) {
+        RCU_LOG_ERROR("Assert failed in non-test function %s (%s)", func_name, file_path);
+    } else {
+        RCU_LOG_ERROR("Assert failed in non-test function %s (%s:%d)", func_name, filename, line_no);
+    }
+}
 
 void rcu_assert_impl(int cond, const char *filename, const char *func_name,
                      int line_no, const char *format, ...) {
@@ -45,8 +121,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
         case RCU_RUN_CTX_MODULE_INIT:
         case RCU_RUN_CTX_MODULE_DESTROY:
             if (!cond) {
-                RCU_LOG_ERROR("Assert failed in %s (%s:%d) : %s", func_name,
-                              filename, line_no, assert_msg_buff);
+                rcu_log_assert_failure(func_name, filename, line_no, assert_msg_buff);
                 if (run_ctx == RCU_RUN_CTX_MODULE_INIT) {
                     RCU_SET_INIT_FAILED(module);
                 } else {
@@ -60,8 +135,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
         case RCU_RUN_CTX_FUNC_INIT:
         case RCU_RUN_CTX_FUNC_DESTROY:
             if (!cond) {
-                RCU_LOG_ERROR("Assert failed in %s (%s:%d) : %s", func_name,
-                              filename, line_no, assert_msg_buff);
+                rcu_log_assert_failure(func_name, filename, line_no, assert_msg_buff);
                 if (run_ctx == RCU_RUN_CTX_MODULE_INIT) {
                     RCU_SET_INIT_FAILED(func);
                 } else {
@@ -78,8 +152,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
                 sprintf(func->name, "%s", func_name);
             }
             if (!cond) {
-                RCU_LOG_ERROR("Assert failed in %s (%s:%d) : %s", func_name,
-                              filename, line_no, assert_msg_buff);
+                rcu_log_assert_failure(func_name, filename, line_no, assert_msg_buff);
                 RCU_INCR(func->nr_fail_assert);
                 func->run_stat = RCU_RUN_STAT_TEST_FAILED;
                 rcu_add_fail_rec_to_func(func, assert_msg_buff, filename, line_no);
@@ -91,8 +164,7 @@ void rcu_assert_impl(int cond, const char *filename, const char *func_name,
             break;
         default:
             if (!cond) {
-                RCU_LOG_ERROR("Assert failed in non-test function %s (%s:%d)",
-                              func_name, filename, line_no);
+                rcu_log_non_test_assert_failure(func_name, filename, line_no);
                 rcu_add_fail_rec_impl(&engine->ae.assert_list, assert_msg_buff, filename, func_name, line_no);
             }
     }

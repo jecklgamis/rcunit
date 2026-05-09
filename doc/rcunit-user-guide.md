@@ -139,7 +139,11 @@ int main(int argc, char *argv[]) {
 
 ### Test Reports
 
-rcunit generates a plain-text test run report: `rcunit_test_run_report.txt`.
+rcunit generates plain-text, JSON, and HTML test run reports:
+
+- `rcunit_test_run_report.txt`
+- `rcunit_test_run_report.json`
+- `rcunit_test_run_report.html`
 
 ---
 

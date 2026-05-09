@@ -17,6 +17,8 @@
 #include "rcunit.h"
 
 extern int rcu_gen_plaintext_report(struct rcu_test_engine *engine);
+extern int rcu_gen_json_report(struct rcu_test_engine *engine);
+extern int rcu_gen_html_report(struct rcu_test_engine *engine);
 
 const char *rcu_get_stat_str(int stat) {
     switch (stat) {
@@ -69,6 +71,6 @@ void rcu_prepare_report(struct rcu_test_engine *engine) {
 
 void rcu_gen_test_run_report(struct rcu_test_engine *engine) {
     rcu_gen_plaintext_report(engine);
+    rcu_gen_json_report(engine);
+    rcu_gen_html_report(engine);
 }
-
-
