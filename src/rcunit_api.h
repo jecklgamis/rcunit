@@ -56,9 +56,6 @@ RCU_API int rcu_set_run_hook(rcu_generic_function hook);
 #define RCU_DEF_GENERIC_FUNC(name) void name(void *param)
 #define RCU_TEST(name) RCU_DEF_GENERIC_FUNC(name)
 #define RCU_FIXTURE(name) RCU_DEF_GENERIC_FUNC(name)
-#define RCU_SETUP(name) RCU_DEF_GENERIC_FUNC(name)
-#define RCU_TEARDOWN(name) RCU_DEF_GENERIC_FUNC(name)
-#define RCU_RUN_HOOK(name) RCU_DEF_GENERIC_FUNC(name)
 #define RCU_RUN_HOOK(name) RCU_DEF_GENERIC_FUNC(name)
 #define RCU_ASSERT_HOOK(name) RCU_DEF_GENERIC_FUNC(name)
 
@@ -67,10 +64,10 @@ RCU_API int rcu_set_run_hook(rcu_generic_function hook);
     struct rcu_module *name;
 
 #define RCU_DEF_INIT_FUNC(name) \
-    RCU_SETUP(name)
+    RCU_FIXTURE(name)
 
 #define RCU_DEF_DESTROY_FUNC(name) \
-    RCU_TEARDOWN(name)
+    RCU_FIXTURE(name)
 
 extern RCU_API int rcu_add_test_module(struct rcu_module *module);
 

@@ -21,10 +21,10 @@ RCU_TEST(test) {
         RCU_ASSERT(RCU_TRUE);
 }
 
-RCU_SETUP(setup) {
+RCU_FIXTURE(setup) {
 }
 
-RCU_TEARDOWN(teardown) {
+RCU_FIXTURE(teardown) {
 }
 
 #include "rcunit_framework_tests.c"

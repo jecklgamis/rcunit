@@ -88,10 +88,10 @@ RCU_TEST(test_func) {
     RCU_ASSERT(1);
 }
 
-RCU_SETUP(setup) {
+RCU_FIXTURE(setup) {
 }
 
-RCU_TEARDOWN(teardown) {
+RCU_FIXTURE(teardown) {
 }
 
 int main(int argc, char *argv[]) {
@@ -137,10 +137,10 @@ RCU_TEST(test_func) {
     RCU_ASSERT(1);
 }
 
-RCU_SETUP(mod_setup) {
+RCU_FIXTURE(mod_setup) {
 }
 
-RCU_TEARDOWN(mod_teardown) {
+RCU_FIXTURE(mod_teardown) {
 }
 
 int main(int argc, char *argv[]) {
@@ -223,8 +223,7 @@ int rcu_set_run_hook(rcu_generic_function hook);
 RCU_ADD_TEST("module", func)                        /* register a test in a named module */
 RCU_ADD_TEST_F("module", func, setup, teardown)     /* register a test with fixtures */
 RCU_TEST(name) { ... }                            /* define a test function */
-RCU_SETUP(name) { ... }         /* define a setup function */
-RCU_TEARDOWN(name) { ... }      /* define a teardown function */
+RCU_FIXTURE(name) { ... }       /* define a setup or teardown function */
 RCU_RUN_HOOK(name) { ... }      /* define a run hook function */
 ```
 

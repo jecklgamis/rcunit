@@ -42,11 +42,11 @@ TMK_TEST(rcu_test_create_default_module) {
 
 static int nr_module_fixture_calls = 0;
 
-RCU_SETUP(mod_setup) {
+RCU_FIXTURE(mod_setup) {
     nr_module_fixture_calls++;
 }
 
-RCU_TEARDOWN(mod_teardown) {
+RCU_FIXTURE(mod_teardown) {
     nr_module_fixture_calls++;
 }
 

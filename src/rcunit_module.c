@@ -39,12 +39,14 @@ RCU_API struct rcu_module *rcu_get_module(const char *name) {
 
 RCU_API void rcu_set_module_fixture(struct rcu_module *module, rcu_generic_function setup,
                              rcu_generic_function teardown) {
+    rcu_init();
     module->init = setup;
     module->destroy = teardown;
 }
 
 RCU_API void rcu_set_module_fixture_all(struct rcu_module *module, rcu_generic_function setup,
     rcu_generic_function teardown) {
+    rcu_init();
     module->init_all = setup;
     module->destroy_all = teardown;
 }
